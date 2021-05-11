@@ -1,0 +1,78 @@
+package filecache
+
+import (
+	"core/cache/icache"
+	"core/encry"
+	"core/file"
+	"core/lib"
+	"fmt"
+	"os"
+	"strings"
+)
+
+
+//FileCache 文件缓存
+type FileCache struct {
+	path string
+}
+//SetPath 设置缓存文件的路径
+func (f *FileCache)SetPath(path string) icache.ICacher{
+	f.path=path
+	file.Mkdir(path)
+	return f
+}
+//Set
+func (f *FileCache)Set(key string, value interface{}, overtime int64) bool {
+	fullPath:=f.getFullName(key)
+	file.PutContent(fullPath, fmt.Sprintf("%d#",lib.Time()+int(overtime))+string(lib.Serialize(value)))
+	return true
+}
+func (f *FileCache)getFullName(key string) string{
+	name:=encry.Md5(key)
+	fullPath:=fmt.Sprintf("%s%s",f.path,name)
+	return fullPath
+}
+//Get
+func (f *FileCache)Get(key string, value interface{}) bool {
+	fullPath:=f.getFullName(key)
+	if !file.FileExist(fullPath) {
+		return false
+	}
+	content:=file.GetContent(fullPath)
+	if (len(content)==0) {
+		return false
+	}
+	i:=strings.Index(content,"#")
+	overTime:=lib.SubString(content,0,i)
+	overTimeInt:=(&lib.Data{Value: overTime}).Int()
+	if lib.Time()>overTimeInt {
+		//过期了
+		os.Remove(fullPath)
+		return false
+	}
+	serializeContent:=lib.SubString(content,i+1,len(content))
+	lib.UnSerialize([]byte(serializeContent),value)
+	return true
+}
+//Del
+func (f *FileCache)Del(key string) bool {
+	fullPath:=f.getFullName(key)
+	err:=os.Remove(fullPath)
+	if err!=nil{
+		return false
+	}
+	return true
+}
+//FlushDB
+func (f *FileCache)FlushDB() bool {
+	err:=os.RemoveAll(f.path)
+	if err!=nil{
+		return false
+	}
+	return true
+}
+//NewFileCache 文件缓存
+func NewFileCache() icache.ICacher{
+	f:=&FileCache{}
+	return f.SetPath("runtime/cache/")
+}

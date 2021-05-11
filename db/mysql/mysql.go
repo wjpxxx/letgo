@@ -1,0 +1,417 @@
+package mysql
+import (
+	"core/file"
+	"database/sql/driver"
+	"strings"
+	"database/sql"
+	"core/lib"
+	"fmt"
+	"sync"
+	_ "github.com/go-sql-driver/mysql"
+)
+//全局实现者
+var pool MysqlPooler
+var poolLock sync.Mutex
+
+//NewPool 初始化数据库连接
+func NewPool(config MysqlConnect) MysqlPooler{
+	poolLock.Lock()
+	defer poolLock.Unlock()
+	if pool==nil{
+		var configs []MysqlConnect
+		configs=append(configs, config)
+		pool=&MysqlPool{}
+		pool.Init(configs)
+	}
+	return pool;
+}
+//NewPools 初始化多数据库连接
+func NewPools(configs []MysqlConnect) MysqlPooler{
+	poolLock.Lock()
+	defer poolLock.Unlock()
+	if pool==nil{
+		pool=&MysqlPool{}
+		pool.Init(configs)
+	}
+	return pool;
+}
+//DBer 数据库接口
+type DBer interface{
+	BeginTransaction()
+	Commit()
+	Rollback()
+	Exec(sql string)int64
+}
+//DBPool 连接池接口
+type DBPool interface{
+	SetDB(connectName,databaseName string)DBer
+}
+//DB 数据库和连接
+type DB struct{
+	databaseName string
+	connectName string
+	dbPool MysqlPooler
+}
+
+//SetPool 设置连接池
+func (db *DB)SetPool(pool MysqlPooler)DBPool{
+	db.dbPool=pool
+	return db
+}
+//SetDB 设置连接名和数据库名称
+func (db *DB)SetDB(connectName,databaseName string)DBer{
+	db.connectName=connectName
+	db.databaseName=databaseName
+	return db
+}
+//Exec 执行原生sql
+func (db *DB)Exec(sql string)int64 {
+	smt,err:=db.prepare(sql)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec()
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//BeginTransaction 开启事务
+func (db *DB)BeginTransaction(){
+	tx,err:=db.dbPool.GetDB(db.connectName).Begin()
+	if err!=nil{
+		return
+	}
+	db.dbPool.BeginTx(db.connectName)
+	db.dbPool.SetTx(db.connectName,tx)
+}
+//Commit 提交事务
+func (db *DB)Commit(){
+	db.dbPool.GetTx(db.connectName).Commit()
+	db.dbPool.EndTx(db.connectName)
+}
+//Rollback 事务回滚
+func (db *DB)Rollback(){
+	db.dbPool.GetTx(db.connectName).Rollback()
+	db.dbPool.EndTx(db.connectName)
+}
+//prepare 执行操作
+func (db *DB)prepare(sql string)(*sql.Stmt, error){
+	if db.dbPool.IsTransaction(db.connectName) {
+		//开启事务
+		return db.dbPool.GetTx(db.connectName).Prepare(sql)
+	}else{
+		//未使用事务
+		return db.dbPool.GetIncludeReadDB(db.connectName).Prepare(sql)
+	}
+}
+//Tabler 表操作接口
+type Tabler interface{
+	SetDB(db *DB)
+	GetDB()*DB
+	Insert(row lib.SqlIn) int64
+	Replace(row lib.SqlIn) int64
+	InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64
+	Drop() int64
+	Truncate() int64
+	Delete(onParams []interface{},where string,whereParams ...interface{}) int64
+	Update(row lib.SqlIn,onParams []interface{},where string,whereParams ...interface{})int64
+	Select(fields string, where string, whereParams ...interface{})lib.SqlRows
+	GetLastSql()string
+	GetSqlInfo()(string,[]interface{})
+}
+//Table 操作表
+type Table struct{
+	tableName string
+	db *DB
+	lastSql string
+	preSql string
+	preParams []interface{}
+}
+//获得最后执行的sql
+func (t *Table) GetLastSql()string{
+	return t.lastSql
+}
+//获得最后执行的sql
+func (t *Table) GetSqlInfo()(string,[]interface{}){
+	return t.preSql,t.preParams
+}
+//SetDB 设置数据库
+func (t *Table) SetDB(db *DB){
+	t.db=db
+}
+//GetDB 获得数据库
+func (t *Table) GetDB()*DB{
+	return t.db
+}
+//Insert 插入操作
+func (t *Table) Insert(row lib.SqlIn) int64{
+	return t.add(row, "insert into", "")
+}
+//Replace 插入操作
+func (t *Table) Replace(row lib.SqlIn) int64{
+	return t.add(row, "replace into", "")
+}
+//InsertOnDuplicate 如果你插入的记录导致一个UNIQUE索引或者primary key(主键)出现重复，那么就会认为该条记录存在，则执行update语句而不是insert语句，反之，则执行insert语句而不是更新语句。
+func (t *Table) InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
+	var feildsArray []string
+	var valuesArray []string
+	var setsArray []string
+	var vars []interface{}
+	for k,value:=range row{
+		feildsArray=append(feildsArray,fmt.Sprintf("`%s`",k))
+		valuesArray=append(valuesArray,"?")
+		vars=append(vars,value)
+	}
+	for k,value:=range updateRow{
+		setsArray=append(setsArray, fmt.Sprintf("`%s`=?",k))
+		vars=append(vars,value)
+	}
+	sql:=fmt.Sprintf("insert into %s(%s) values(%s) ON DUPLICATE KEY UPDATE %s", t.tableName, strings.Join(feildsArray,","),strings.Join(valuesArray,","),strings.Join(setsArray,","))
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql,vars...)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec(vars...)
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.LastInsertId()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//add 增加数据通过操作符
+func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
+	var feildsArray []string
+	var valuesArray []string
+	var vars []interface{}
+	for k,value:=range row{
+		feildsArray=append(feildsArray,fmt.Sprintf("`%s`",k))
+		valuesArray=append(valuesArray,"?")
+		vars=append(vars,value)
+	}
+	sql:=fmt.Sprintf("%s %s(%s) values(%s) %s",opBefore, t.tableName, strings.Join(feildsArray,","),strings.Join(valuesArray,","),opAfter)
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql,vars...)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec(vars...)
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.LastInsertId()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//Update 更新操作
+func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,whereParams ...interface{})int64{
+	var setsArray []string
+	var vars []interface{}
+	if len(onParams)>0{
+		vars=append(vars, onParams...)
+	}
+	for key,value:=range row {
+		setsArray=append(setsArray, fmt.Sprintf("%s=?",key))
+		vars=append(vars, value)
+	}
+	vars=append(vars,whereParams...)
+	sets:=strings.Join(setsArray,",")
+	sql:=fmt.Sprintf("update %s set %s where %s", t.tableName,sets,where)
+	t.sql(sql,vars...)
+	smt,err:=t.db.prepare(sql)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec(vars...)
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//Select 查询
+func (t *Table) Select(fields string, where string, whereParams ...interface{})lib.SqlRows{
+	var sql string
+	if where!=""{
+		sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
+	}else{
+		sql=fmt.Sprintf("select %s from %s", fields,t.tableName)
+	}
+	rows,err:=t.query(sql,whereParams...)
+	if err!=nil{
+		return nil
+	}
+	defer rows.Close()
+	return lib.RowsToSqlRows(rows)
+}
+//Drop 删除表
+func (t *Table)Drop() int64 {
+	sql:=fmt.Sprintf("drop table %s",t.tableName)
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec()
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//Truncate 清空表
+func (t *Table)Truncate() int64 {
+	sql:=fmt.Sprintf("truncate %s",t.tableName)
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec()
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//Delete 删除表
+func (t *Table)Delete(onParams []interface{},where string,whereParams ...interface{}) int64 {
+	var sql string
+	if where!="" {
+		sql=fmt.Sprintf("delete from %s where %s",t.tableName, where)
+	} else {
+		sql=fmt.Sprintf("delete from %s",t.tableName)
+	}
+	var vars []interface{}
+	if len(onParams)>0{
+		vars=append(vars, onParams...)
+	}
+	if len(whereParams)>0{
+		vars=append(vars, whereParams...)
+	}
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql,vars...)
+	if err!=nil{
+		return -1
+	}
+	
+	defer smt.Close()
+	var result driver.Result
+	var err2 error
+	if where!="" {
+		result, err2 =smt.Exec(vars...)
+	}else{
+		result, err2 =smt.Exec()
+	}
+	
+	if err2!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+//query 查询
+func (t *Table)query(sql string,whereParams ...interface{})(*sql.Rows, error){
+	t.sql(sql,whereParams...)
+	if t.db.dbPool.IsTransaction(t.db.connectName) {
+		//开启事务
+		if len(whereParams)>0{
+			return t.db.dbPool.GetTx(t.db.connectName).Query(sql,whereParams...)
+		}else{
+			return t.db.dbPool.GetTx(t.db.connectName).Query(sql)
+		}
+	}else{
+		//未使用事务
+		if len(whereParams)>0{
+			return t.db.dbPool.GetIncludeReadDB(t.db.connectName).Query(sql,whereParams...)
+		}else{
+			return t.db.dbPool.GetIncludeReadDB(t.db.connectName).Query(sql)
+		}
+	}
+}
+
+//sql
+func (t *Table)sql(sql string,whereParams ...interface{}){
+	t.preSql=sql
+	t.preParams=whereParams
+	t.lastSql=TransSql(sql,whereParams...)
+}
+//TransSql 转原生 sql
+func TransSql(sql string,whereParams ...interface{}) string{
+	if len(whereParams) > 0 {
+		var params []interface{}
+		for _,v:=range whereParams{
+			params=append(params, lib.InterfaceToString(v))
+		}
+		sql=strings.ReplaceAll(sql,"?","%s")
+		sql=fmt.Sprintf(sql,params...)
+		return sql
+	}else{
+		return sql
+	}
+}
+//NewTable 初始化表
+func NewTable(db *DB,tableName string) Tabler{
+	var table *Table=&Table{}
+	table.tableName=tableName
+	table.SetDB(db)
+	return table
+}
+//NewDB 新建数据库连接包括连接池
+func NewDB()*DB{
+	dbFile:="config/db.config"
+	cfgFile:=file.GetContent(dbFile)
+	var configs []MysqlConnect
+	if cfgFile==""{
+		var slaves []SlaveDB=make([]SlaveDB, 1)
+		master:=SlaveDB{
+				Name:"connectName",
+				DatabaseName:"databaseName",
+				UserName:"userName",
+				Password:"password",
+				Host:"127.0.0.1",
+				Port:"3306",
+				Charset:"utf8mb4",
+				MaxOpenConns:20,
+				MaxIdleConns:10,
+		}
+		configs=append(configs, MysqlConnect{
+			Master:master,
+			Slave:slaves,
+		})
+		file.PutContent(dbFile,fmt.Sprintf("%v",configs))
+		panic("please setting database config in config/db.config file")
+	}
+	lib.StringToObject(cfgFile, &configs)
+	var db DB
+	db.SetPool(NewPools(configs))
+	return &db
+}
