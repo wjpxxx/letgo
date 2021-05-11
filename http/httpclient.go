@@ -70,12 +70,12 @@ type Httper interface{
 	Post(url string,values lib.InRow)*HttpResponse
 	PostJson(url string,value interface{})*HttpResponse
 	PostMultipart(url string,values lib.InRow)*HttpResponse
-	Delete(url string,values ...interface{})*HttpResponse
-	Options(url string,values ...lib.InRow)*HttpResponse
+	Delete(url string,values lib.InRow)*HttpResponse
+	Options(url string,values lib.InRow)*HttpResponse
 	Head(url string)*HttpResponse
-	Connect(url string,values ...lib.InRow)*HttpResponse
-	Trace(url string, values ...lib.InRow)*HttpResponse
-	Patch(url string,values ...lib.InRow)*HttpResponse
+	Connect(url string,values lib.InRow)*HttpResponse
+	Trace(url string, values lib.InRow)*HttpResponse
+	Patch(url string,values lib.InRow)*HttpResponse
 }
 //Http 类
 type HttpClient struct {
@@ -218,30 +218,77 @@ func(h *HttpClient)addFile(writer *multipart.Writer, name,path string)error{
 	return err
 }
 //Delete 请求
-func(h *HttpClient)Delete(url string,values ...interface{}) *HttpResponse{
-	return nil
+func(h *HttpClient)Delete(url string,values lib.InRow) *HttpResponse{
+	if len(values)>0{
+		if !strings.Contains(url,"?") {
+			url=url+"?"+HttpBuildQuery(values)
+		}else{
+			url=url+HttpBuildQuery(values)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"DELETE",nil)
+	return h.getResponse(client.Do(req))
 }
 //Options 请求
-func(h *HttpClient)Options(url string,values ...lib.InRow) *HttpResponse{
-	return nil
+func(h *HttpClient)Options(url string,values lib.InRow) *HttpResponse{
+	if len(values)>0{
+		if !strings.Contains(url,"?") {
+			url=url+"?"+HttpBuildQuery(values)
+		}else{
+			url=url+HttpBuildQuery(values)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"OPTIONS",nil)
+	return h.getResponse(client.Do(req))
 }
 //Head 请求
 func(h *HttpClient)Head(url string) *HttpResponse{
-	return nil
+	client:=h.getClient()
+	req:=h.getRequest(url,"HEAD",nil)
+	return h.getResponse(client.Do(req))
 }
 
 //Connect 请求
-func(h *HttpClient)Connect(url string,values ...lib.InRow) *HttpResponse{
-	return nil
+func(h *HttpClient)Connect(url string,values lib.InRow) *HttpResponse{
+	if len(values)>0{
+		if !strings.Contains(url,"?") {
+			url=url+"?"+HttpBuildQuery(values)
+		}else{
+			url=url+HttpBuildQuery(values)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"CONNECT",nil)
+	return h.getResponse(client.Do(req))
 }
 
 //Trace 请求
-func(h *HttpClient)Trace(url string,values ...lib.InRow) *HttpResponse{
-	return nil
+func(h *HttpClient)Trace(url string,values lib.InRow) *HttpResponse{
+	if len(values)>0{
+		if !strings.Contains(url,"?") {
+			url=url+"?"+HttpBuildQuery(values)
+		}else{
+			url=url+HttpBuildQuery(values)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"TRACE",nil)
+	return h.getResponse(client.Do(req))
 }
 //Patch 请求
-func(h *HttpClient)Patch(url string,values ...lib.InRow) *HttpResponse{
-	return nil
+func(h *HttpClient)Patch(url string,values lib.InRow) *HttpResponse{
+	if len(values)>0{
+		if !strings.Contains(url,"?") {
+			url=url+"?"+HttpBuildQuery(values)
+		}else{
+			url=url+HttpBuildQuery(values)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"PATCH",nil)
+	return h.getResponse(client.Do(req))
 }
 
 //getClient 获得客户端
@@ -366,8 +413,16 @@ func (h *HttpClient)getResponse(response *http.Response,err error) *HttpResponse
 func HttpBuildQuery(values lib.InRow) string{
 	paramsValue:=make(url.Values)
 	for k, v := range values {
-		vs:=(&lib.Data{Value: v}).String()
-		paramsValue.Add(k,vs)
+		switch t:=v.(type) {
+		case []string:
+			for _,s:=range t{
+				paramsValue.Add(k,s)
+			}
+		default:
+			vs:=(&lib.Data{Value: v}).String()
+			paramsValue.Add(k,vs)
+		}
+		
 	}
 	return paramsValue.Encode()
 }
