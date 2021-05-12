@@ -17,6 +17,7 @@ import (
 	"strings"
 	"encoding/json"
 	"mime/multipart"
+	"encoding/xml"
 )
 
 const (
@@ -69,6 +70,7 @@ type Httper interface{
 	Get(url string,values lib.InRow)*HttpResponse
 	Post(url string,values lib.InRow)*HttpResponse
 	PostJson(url string,value interface{})*HttpResponse
+	PostXml(url string,value interface{})*HttpResponse
 	PostMultipart(url string,values lib.InRow)*HttpResponse
 	Delete(url string,values lib.InRow)*HttpResponse
 	Options(url string,values lib.InRow)*HttpResponse
@@ -188,7 +190,27 @@ func(h *HttpClient)PostJson(url string,value interface{}) *HttpResponse{
 	req:=h.getRequest(url,"POST",bytes.NewReader(body))
 	return h.getResponse(client.Do(req))
 }
-//PostFile 请求提交文件
+//PostXml 请求xml
+func(h *HttpClient)PostXml(url string,value interface{})*HttpResponse {
+	h.WithHeader("Content-Type", "text/xml")
+	var body []byte
+	switch t := value.(type) {
+	case []byte:
+		body = t
+	case string:
+		body = []byte(t)
+	default:
+		var err error
+		body, err = xml.Marshal(value)
+		if err != nil {
+			return h.responseErr(err)
+		}
+	}
+	client:=h.getClient()
+	req:=h.getRequest(url,"POST",bytes.NewReader(body))
+	return h.getResponse(client.Do(req))
+}
+//PostMultipart 请求提交文件
 func(h *HttpClient)PostMultipart(url string,values lib.InRow)*HttpResponse{
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
