@@ -1,5 +1,7 @@
 package lib
 
+import "encoding/xml"
+
 //SqlRows 查询多行
 type SqlRows []SqlRow
 
@@ -14,6 +16,10 @@ type Row map[string] *Data
 type InRow map[string]interface{}
 //IntRow 整型数据
 type IntRow map[int]interface{}
+//IntStringMap 
+type IntStringMap map[int]string
+//StringMap 
+type StringMap map[string]string
 
 //MergeInRow 合并InRow
 func MergeInRow(values ...InRow)InRow{
@@ -45,4 +51,32 @@ func MergeRow(values ...Row)Row{
 		}
 	}
 	return result
+}
+//MarshalXML
+func (i InRow)MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	t:=xml.ProcInst{
+		Target:"xml",
+		Inst:[]byte(`version="1.0" encoding="UTF-8"`),
+	}
+	e.EncodeToken(t)
+	start.Name=xml.Name{
+		Space: "",
+		Local: "map",
+	}
+	if err:=e.EncodeToken(start);err!=nil{
+		return err
+	}
+	for key,value:=range i{
+		elem:=xml.StartElement{
+			Name: xml.Name{
+				Space: "",
+				Local: key,
+			},
+			Attr: []xml.Attr{},
+		}
+		if err:=e.EncodeElement(value,elem);err!=nil{
+			return err
+		}
+	}
+	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

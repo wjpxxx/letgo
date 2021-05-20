@@ -133,3 +133,13 @@ func StringArrayToInterfaceArray(data []string)[]interface{}{
 	}
 	return it
 }
+
+//interface转ArrayString
+func InterfaceArrayToArrayString(list []interface{}) []string {
+	var rp []string
+	for _, v := range list {
+		data := &Data{Value: v}
+		rp = append(rp, data.String())
+	}
+	return rp
+}

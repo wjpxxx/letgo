@@ -231,6 +231,21 @@ func (d *Data) Int64() int64 {
 	return r
 }
 
+//WhetherArrayString 输出[]string字符串数组
+func (d *Data) WhetherArrayString() ([]string, bool) {
+	if v, ok := d.Value.([]string); ok {
+		return v, true
+	} else if v, ok := d.Value.([]interface{}); ok {
+		return InterfaceArrayToArrayString(v), true
+	}
+	return nil, false
+}
+
+//ArrayString 输出[]string字符串数组
+func (d *Data) ArrayString() ([]string) {
+	r, _ := d.WhetherArrayString()
+	return r
+}
 
 //序列化数据
 //参数data:待序列化数据

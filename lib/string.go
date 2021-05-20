@@ -1,6 +1,8 @@
 package lib
 
-//字符串截取
+import "fmt"
+
+//SubString 字符串截取
 //参数str：输入字符串
 //参数start：起始位置
 //参数end：结束位置
@@ -15,7 +17,7 @@ func SubString(str string, start int, end int) string {
 
 }
 
-//将首字母转化为大写
+//FirstToUpper 将首字母转化为大写
 //参数str：输入字符串
 //返回值：首字母大写字符串
 func FirstToUpper(str string) string {
@@ -29,7 +31,7 @@ func FirstToUpper(str string) string {
 	return string(strArry)
 }
 
-//是否包含字符
+//InStringArray 是否包含字符
 func InStringArray(need string, needArr []string) bool {
 	for _, v := range needArr {
 		if need == v {
@@ -37,4 +39,18 @@ func InStringArray(need string, needArr []string) bool {
 		}
 	}
 	return false
+}
+
+//ResolveAddress 解析地址
+func ResolveAddress(addr []string)string{
+	switch len(addr) {
+	case 0:
+		return ":1122"
+	case 1:
+		return fmt.Sprintf("%s:1122",addr[0])
+	case 2:
+		return fmt.Sprintf("%s:%s",addr[0],addr[1])
+	default:
+		panic("too many parameters")
+	}
 }

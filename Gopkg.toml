@@ -40,3 +40,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/bradfitz/gomemcache"
+
+[[constraint]]
+  name = "gopkg.in/yaml.v2"
+  version = "2.4.0"

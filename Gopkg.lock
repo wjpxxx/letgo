@@ -28,6 +28,14 @@
   revision = "bcc459a906419e2890a50fc2c99ea6dd927a88f2"
   version = "v1.6.0"
 
+[[projects]]
+  digest = "1:5054a1f394226de9e6ddc47b0ba77e35092a4112f4a1cd9cb94aba1f5bdc3ec6"
+  name = "gopkg.in/yaml.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7649d4548cb53a614db133b2a8ac1f31859dda8c"
+  version = "v2.4.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -35,6 +43,7 @@
     "github.com/bradfitz/gomemcache/memcache",
     "github.com/garyburd/redigo/redis",
     "github.com/go-sql-driver/mysql",
+    "gopkg.in/yaml.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
