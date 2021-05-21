@@ -14,10 +14,12 @@ func TestLetgo(t *testing.T) {
 	LoadHTMLGlob("config/*")
 	Get("/", func(ctx *context.Context){
 		x:=ctx.Input.Param("a")
-		ctx.Session.Set("a",x.Int())
-		var a int
-		ctx.Session.Get("a",&a)
-		fmt.Println("a:",a,"x:",x.Int())
+		if x!=nil{
+			ctx.Session.Set("a",x.Int())
+			var a int
+			ctx.Session.Get("a",&a)
+			fmt.Println("a:",a,"x:",x.Int())
+		}
 		ctx.Output.HTML(200,"index.tmpl",lib.InRow{
 			"title":"wjp",
 		})
@@ -44,5 +46,14 @@ func TestLetgo(t *testing.T) {
 			"b":2,
 		})
 	})
+	c:=&UserController{}
+	RegisterController(c ,"any:add")
 	Run()
+}
+type UserController struct{}
+func (c *UserController)Add(ctx *context.Context){
+	ctx.Output.JSON(200,lib.InRow{
+		"a":1,
+		"b":"wjp",
+	})
 }

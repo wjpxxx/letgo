@@ -55,6 +55,7 @@ func(s *Server)RunTLS(certFile, keyFile string, addr ...string)error{
 func(s *Server)RegisterRouter(method,relativePath string, handler context.HandlerFunc){
 	s.route.RegisterRouter(method,relativePath,handler)
 }
+
 //Router 获得路由
 func (s *Server)Router()*router.Router{
 	return s.route

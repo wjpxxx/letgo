@@ -38,10 +38,10 @@ func HttpRouter() *Router{
 //HandleHttpRequest 处理http请求
 func (r *Router)HandleHttpRequest(ctx *context.Context){
 	r.ctx=ctx
-	requestPath:=r.ctx.Request.URL.Path
+	requestPath:=strings.ToLower(r.ctx.Request.URL.Path)
 	found:=false
 	for _,router:=range r.routerInfo{
-		if r.ctx.Request.Method!=router.method {
+		if router.method!="ANY"&&r.ctx.Request.Method!=router.method {
 			continue
 		}
 		if !router.regex.MatchString(requestPath){

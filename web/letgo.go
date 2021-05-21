@@ -3,9 +3,13 @@ package web
 import (
 	"core/web/context"
 	"core/web/server"
+	"core/lib"
 	"html/template"
 	"net/http"
 	"sync"
+	"fmt"
+	"reflect"
+	"strings"
 )
 
 
@@ -35,7 +39,7 @@ func Post(rootPath string,fun context.HandlerFunc){
 
 //Any 任何请求
 func Any(rootPath string,fun context.HandlerFunc){
-	httpServer().RegisterRouter("Any", rootPath, fun)
+	httpServer().RegisterRouter("ANY", rootPath, fun)
 }
 
 //Put 请求
@@ -86,4 +90,72 @@ func Delims(left,right string){
 //SetFuncMap
 func SetFuncMap(funcMap template.FuncMap){
 	httpServer().Tmpl().SetFuncMap(funcMap)
+}
+
+//RegisterController 注册控制器
+func RegisterController(controller interface{},mapMethods ...string){
+	name:=getControllerName(controller)
+	methods:=getControllerMethod(controller,mapMethods...)
+	for _,v:=range methods{
+		path:=strings.ToLower(fmt.Sprintf("/%s/%s",name,v.name))
+		httpServer().RegisterRouter(v.method,path, v.fun.Interface().(func(*context.Context)))
+	}
+	
+}
+//getControllerName 获得控制器名称
+func getControllerName(controller interface{})string{
+	getType:=reflect.TypeOf(controller)
+	name:=getType.Name()
+	if name==""{
+		name=getType.Elem().Name()
+	}
+	i:=strings.Index(name,"Controller")
+	if i==-1{
+		panic("The controller name must end with controller")
+	}
+	name=name[0:i]
+	return name
+}
+type controllerMethod struct {
+	name string
+	fun reflect.Value
+	method string
+
+}
+//getControllerMethod 获得控制器方法
+func getControllerMethod(controller interface{},mapMethods ...string)[]controllerMethod{
+	getType:=reflect.TypeOf(controller)
+	getValue:=reflect.ValueOf(controller)
+	var methods []controllerMethod
+	mapMethod:=getMapMethods(mapMethods...)
+	for i:=0;i<getType.NumMethod();i++{
+		argName:=getType.Method(i).Type.In(1).Name()
+		if argName==""{
+			argName=getType.Method(i).Type.In(1).Elem().Name()
+		}
+		if argName!="Context"{
+			panic("The first parameter of the method must be *context.Context")
+		}
+		methodName:=getType.Method(i).Name
+		method:=controllerMethod{
+			name: methodName,
+			fun: getValue.Method(i),
+			method: mapMethod[strings.ToLower(methodName)],
+		}
+		methods=append(methods, method)
+	}
+	return methods
+}
+
+//getMapMethods 获得方法映射
+func getMapMethods(mapMethods ...string)lib.StringMap{
+	mp:=make(lib.StringMap)
+	for _,s:=range mapMethods{
+		mpArray:=strings.Split(s,":")
+		if len(mpArray)!=2{
+			panic("mapMethods error")
+		}
+		mp[strings.ToLower(mpArray[1])]=strings.ToUpper(mpArray[0])
+	}
+	return mp
 }
