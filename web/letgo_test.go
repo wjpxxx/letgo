@@ -13,6 +13,11 @@ func TestLetgo(t *testing.T) {
 	StaticFile("/1.png", "./assets/b3.jpg")
 	LoadHTMLGlob("config/*")
 	Get("/", func(ctx *context.Context){
+		x:=ctx.Input.Param("a")
+		ctx.Session.Set("a",x.Int())
+		var a int
+		ctx.Session.Get("a",&a)
+		fmt.Println("a:",a,"x:",x.Int())
 		ctx.Output.HTML(200,"index.tmpl",lib.InRow{
 			"title":"wjp",
 		})

@@ -246,7 +246,7 @@ func (d *Data) ArrayString() ([]string) {
 	r, _ := d.WhetherArrayString()
 	return r
 }
-
+var fix []byte=[]byte{0,1,1,1,1,1}
 //序列化数据
 //参数data:待序列化数据
 //返回值:序列化后的数据
@@ -254,7 +254,6 @@ func Serialize(data interface{}) []byte {
 	var result bytes.Buffer
 	enc := gob.NewEncoder(&result)
 	enc.Encode(data)
-	fix:=[]byte{0,1,1,1,1,1}
 	return append(fix,result.Bytes()...) 
 }
 
@@ -262,6 +261,6 @@ func Serialize(data interface{}) []byte {
 //参数data:序列化数据
 //参数rdata:反序列化后的数据
 func UnSerialize(data []byte, rdata interface{}) {
-	decoder := gob.NewDecoder(bytes.NewReader(data[6:]))
+	decoder := gob.NewDecoder(bytes.NewReader(data[len(fix):]))
 	decoder.Decode(rdata)
 }

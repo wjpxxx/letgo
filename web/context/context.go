@@ -5,6 +5,7 @@ import (
 	"core/web/input"
 	"core/web/output"
 	"core/web/tmpl"
+	"core/web/session"
 	"net/http"
 	"net/url"
 	"strings"
@@ -19,6 +20,7 @@ type Context struct {
 	Writer http.ResponseWriter
 	Input *input.Input
 	Output *output.Output
+	Session session.Sessioner
 	RouterPath string
 	sameSite http.SameSite
 	Tmpl *tmpl.Tmpl
@@ -33,6 +35,7 @@ func (c *Context)Reset(){
 }
 //Init 初始化
 func (c *Context)Init(){
+	c.Session.Start()	//启动session
 	c.Input.Init(c.Request)
 	c.Output.Init(c.Writer,c.Input,c.Tmpl.Template)
 }
@@ -58,8 +61,16 @@ func (c *Context)SetCookies(name,value string,maxAge int,path,domain string,secu
 }
 //SetCookie 设置cookie
 func (c *Context)SetCookie(name,value string) {
+	c.SetCookies(name,value,3600,"",c.Host(),false,false)
+}
+//SetCookieByExpire
+func (c *Context)SetCookieByExpire(name,value string,expire int){
+	c.SetCookies(name,value,expire,"",c.Host(),false,false)
+}
+//Host
+func (c *Context)Host()string{
 	hostArray:=strings.Split(c.Request.Host,":")
-	c.SetCookies(name,value,3600,"",hostArray[0],false,false)
+	return hostArray[0]
 }
 
 //Cookie 获得cookie
@@ -87,9 +98,11 @@ func (c *Context)GetHeader(key string)string{
 
 //NewContext 新建一个上下文
 func NewContext()*Context{
-	return &Context{
+	ctx:= &Context{
 		Input: input.NewInput(),
 		Output: output.NewOutput(),
 		Tmpl:tmpl.GetTmpl(),
 	}
+	ctx.Session=session.GetSession(ctx)
+	return ctx
 }

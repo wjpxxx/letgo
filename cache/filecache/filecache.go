@@ -50,7 +50,8 @@ func (f *FileCache)Get(key string, value interface{}) bool {
 		os.Remove(fullPath)
 		return false
 	}
-	serializeContent:=lib.SubString(content,i+1,len(content))
+	cbyte:=[]byte(content)
+	serializeContent:=cbyte[i+1:]
 	lib.UnSerialize([]byte(serializeContent),value)
 	return true
 }
@@ -73,6 +74,10 @@ func (f *FileCache)FlushDB() bool {
 }
 //NewFileCache 文件缓存
 func NewFileCache() icache.ICacher{
+	return NewFileCacheByPath("runtime/cache/")
+}
+//NewFileCacheByPath
+func NewFileCacheByPath(path string)icache.ICacher{
 	f:=&FileCache{}
-	return f.SetPath("runtime/cache/")
+	return f.SetPath(path)
 }

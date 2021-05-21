@@ -53,7 +53,7 @@ func DebugPrint(format string,values ...interface{}){
 		fmt.Fprintf(w,"[Letgo-debug]"+format,values...)
 	}
 }
-
+//init
 func init() {
 	logFile:="config/log.config"
 	cfgFile:=file.GetContent(logFile)
