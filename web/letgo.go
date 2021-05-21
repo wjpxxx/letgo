@@ -126,7 +126,7 @@ type controllerMethod struct {
 func getControllerMethod(controller interface{},mapMethods ...string)[]controllerMethod{
 	getType:=reflect.TypeOf(controller)
 	getValue:=reflect.ValueOf(controller)
-	var methods []controllerMethod
+	var funs []controllerMethod
 	mapMethod:=getMapMethods(mapMethods...)
 	for i:=0;i<getType.NumMethod();i++{
 		argName:=getType.Method(i).Type.In(1).Name()
@@ -137,14 +137,18 @@ func getControllerMethod(controller interface{},mapMethods ...string)[]controlle
 			panic("The first parameter of the method must be *context.Context")
 		}
 		methodName:=getType.Method(i).Name
-		method:=controllerMethod{
+		httpMethod:="ANY"
+		if _,ok:=mapMethod[strings.ToLower(methodName)];ok{
+			httpMethod=mapMethod[strings.ToLower(methodName)]
+		}
+		fun:=controllerMethod{
 			name: methodName,
 			fun: getValue.Method(i),
-			method: mapMethod[strings.ToLower(methodName)],
+			method: httpMethod,
 		}
-		methods=append(methods, method)
+		funs=append(funs, fun)
 	}
-	return methods
+	return funs
 }
 
 //getMapMethods 获得方法映射

@@ -47,7 +47,7 @@ func TestLetgo(t *testing.T) {
 		})
 	})
 	c:=&UserController{}
-	RegisterController(c ,"any:add")
+	RegisterController(c)
 	Run()
 }
 type UserController struct{}
