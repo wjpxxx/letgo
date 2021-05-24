@@ -20,6 +20,10 @@ func (o *Output)Init(writer http.ResponseWriter,in *input.Input,templ *template.
 	o.in=in
 	o.templ=templ
 }
+//Header 设置头
+func (o *Output)Header(key,value string){
+	o.writer.Header().Set(key,value)
+}
 //JSON
 func (o *Output)JSON(code int, value interface{})error{
 	return o.Render(code,value, binding.JSON)
@@ -50,7 +54,10 @@ func (o *Output)XML(code int, value interface{})error{
 func (o *Output)YAML(code int, value interface{})error{
 	return o.Render(code,value, binding.YAML)
 }
-
+//Redirect 跳转
+func(o *Output)Redirect(code int,location string){
+	http.Redirect(o.writer,o.in.R(),location,code)
+}
 
 //NewInput 新建一个input
 func NewOutput()*Output{

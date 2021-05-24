@@ -13,6 +13,7 @@ func TestLetgo(t *testing.T) {
 	StaticFile("/1.png", "./assets/b3.jpg")
 	LoadHTMLGlob("config/*")
 	Get("/", func(ctx *context.Context){
+		//ctx.Output.Redirect(301,"http://www.baidu.com")
 		x:=ctx.Input.Param("a")
 		if x!=nil{
 			ctx.Session.Set("a",x.Int())

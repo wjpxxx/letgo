@@ -28,6 +28,10 @@ type Input struct {
 	request *http.Request
 
 }
+//R 获取请求
+func (i *Input)R()*http.Request{
+	return i.request
+}
 //Param 获得参数
 func (i *Input)Param(key string) *lib.Data{
 	return i.params[key]
