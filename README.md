@@ -36,6 +36,7 @@ import (
 )
 
 func main() {
+    web.LoadHTMLGlob("templates/*")
 	web.Get("/", func(ctx *context.Context){
 		//ctx.Output.Redirect(301,"http://www.baidu.com")
 		x:=ctx.Input.Param("a")
