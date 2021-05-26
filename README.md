@@ -36,7 +36,7 @@ import (
 )
 
 func main() {
-    web.LoadHTMLGlob("templates/*")
+	web.LoadHTMLGlob("templates/*")
 	web.Get("/", func(ctx *context.Context){
 		//ctx.Output.Redirect(301,"http://www.baidu.com")
 		x:=ctx.Input.Param("a")
@@ -100,7 +100,7 @@ func (c *UserController)Add(ctx *context.Context){
 func main() {
 	c:=&UserController{}
 	web.RegisterController(c)
-    c2:=&UserController{}
+	c2:=&UserController{}
 	web.RegisterController(c2,"get:add")
 	web.Run()
 }
@@ -130,5 +130,34 @@ func main() {
                 AndHaving("m.id",1).
                 OrderBy("m.id desc").Find()
         fmt.Println(model.GetLastSql())
+}
+```
+
+## RPC
+
+```go
+import "github.com/wjpxxx/letgo/net/rpc"
+
+func main(){
+	s:=rpc.NewServer()
+	//s.RegisterName("Hello",new(Hello))
+	s.Register(new(Hello))
+	go func(){
+		for{
+			time.Sleep(10*time.Second)
+			var reply string
+			rpc.NewClient().Start().Call("Hello.Say","nihao",&reply).Close()
+			fmt.Println(reply)
+			rm:=RpcMessage{
+				Method: "Hello.Say",
+				Args: "rpc message",
+				Callback: func(a interface{}){
+					fmt.Println(a.(string))
+				},
+			}
+			rpc.NewClient().Start().CallByMessage(rm).Close()
+		}
+	}()
+	s.Run()
 }
 ```
