@@ -148,7 +148,7 @@ func main(){
 			var reply string
 			rpc.NewClient().Start().Call("Hello.Say","nihao",&reply).Close()
 			fmt.Println(reply)
-			rm:=RpcMessage{
+			rm:=rpc.RpcMessage{
 				Method: "Hello.Say",
 				Args: "rpc message",
 				Callback: func(a interface{}){
