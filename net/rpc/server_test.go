@@ -24,6 +24,7 @@ func TestServer(t *testing.T){
 		for{
 			time.Sleep(10*time.Second)
 			var reply string
+			//NewClient().WithAddress("127.0.0.1","8080").Call("Hello.Say","nihao",&reply).Close()
 			NewClient().Start().Call("Hello.Say","nihao",&reply).Close()
 			fmt.Println(reply)
 			rm:=RpcMessage{

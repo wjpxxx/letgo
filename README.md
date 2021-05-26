@@ -146,6 +146,7 @@ func main(){
 		for{
 			time.Sleep(10*time.Second)
 			var reply string
+			//rpc.NewClient().WithAddress("127.0.0.1","8080").Call("Hello.Say","nihao",&reply).Close()
 			rpc.NewClient().Start().Call("Hello.Say","nihao",&reply).Close()
 			fmt.Println(reply)
 			rm:=rpc.RpcMessage{
