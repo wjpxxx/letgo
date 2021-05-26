@@ -161,3 +161,15 @@ func main(){
 	s.Run()
 }
 ```
+
+## Command
+
+```go
+import "github.com/wjpxxx/letgo/command/command"
+
+func main(){
+	cmd:=command.New().Cd("D:\\Development\\go\\web\\src").SetCMD("dir")
+	//cmd.AddPipe(New().SetCMD("find","'\\c'","'80'"))
+	cmd.Run()
+}
+```
