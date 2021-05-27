@@ -24,7 +24,11 @@ func (f *FileCache)SetPath(path string) icache.ICacher{
 //Set
 func (f *FileCache)Set(key string, value interface{}, overtime int64) bool {
 	fullPath:=f.getFullName(key)
-	file.PutContent(fullPath, fmt.Sprintf("%d#",lib.Time()+int(overtime))+string(lib.Serialize(value)))
+	if overtime>-1{
+		file.PutContent(fullPath, fmt.Sprintf("%d#",lib.Time()+int(overtime))+string(lib.Serialize(value)))
+	} else {
+		file.PutContent(fullPath, fmt.Sprintf("%d#",int(overtime))+string(lib.Serialize(value)))
+	}
 	return true
 }
 func (f *FileCache)getFullName(key string) string{
@@ -45,7 +49,7 @@ func (f *FileCache)Get(key string, value interface{}) bool {
 	i:=strings.Index(content,"#")
 	overTime:=lib.SubString(content,0,i)
 	overTimeInt:=(&lib.Data{Value: overTime}).Int()
-	if lib.Time()>overTimeInt {
+	if overTimeInt>-1&&lib.Time()>overTimeInt {
 		//过期了
 		os.Remove(fullPath)
 		return false

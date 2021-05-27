@@ -6,7 +6,7 @@ import (
 	"os"
 	"io/ioutil"
 	"strings"
-	"path"
+	"path/filepath"
 )
 
 //BaseName 函数返回路径中的文件名部分。
@@ -15,9 +15,9 @@ import (
 func BaseName(fullPath ...string) string {
 	l := len(fullPath)
 	if l == 1 {
-		return path.Base(fullPath[0])
+		return filepath.Base(fullPath[0])
 	} else if l == 2 {
-		fn := path.Base(fullPath[0])
+		fn := filepath.Base(fullPath[0])
 		return strings.TrimSuffix(fn, fullPath[1])
 	}
 	return ""
@@ -27,20 +27,20 @@ func BaseName(fullPath ...string) string {
 //DirName 函数返回路径部分
 //fullPath	必需。规定要检查的路径。
 func DirName(fullPath string) string {
-	return path.Dir(fullPath)
+	return filepath.Dir(fullPath)
 }
 
 //BaseNameNoSuffix 函数返回路径中的文件名部分,不带扩展名。
 //fullPath	必需。规定要检查的路径。
 func BaseNameNoSuffix(fullPath string) string {
-	fn := path.Base(fullPath)
-	suffix := path.Ext(fullPath)
+	fn := filepath.Base(fullPath)
+	suffix := filepath.Ext(fullPath)
 	return strings.TrimSuffix(fn, suffix)
 }
 
 //GetExt 获得文件后缀，扩展名
 func GetExt(fullPath string) string {
-	suffix := path.Ext(fullPath)
+	suffix := filepath.Ext(fullPath)
 	return suffix
 }
 
@@ -163,8 +163,9 @@ func (f *File) ReadBlock(size int64) ([]byte, int64) {
 		buf = make([]byte, size)
 	} else if f.Size()-seek > 0 {
 		buf = make([]byte, f.Size()-seek)
-	}else if f.Size()-seek <= 0 {
+	}else if f.Size()-seek <= 0 &&f.Size()-f.seek>=0 {
 		buf = make([]byte, f.Size()-f.seek)
+		seek=f.Size()
 	}else {
 		return nil, -1
 	}

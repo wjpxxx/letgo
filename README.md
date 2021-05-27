@@ -174,3 +174,71 @@ func main(){
 	cmd.Run()
 }
 ```
+
+## Synchronize files
+
+1.server config in config/sync_server.config
+
+```go
+{"ip":"127.0.0.1","port":"5566"}
+```
+start server
+
+```sh
+./main server
+```
+
+2.client config in config/sync_client.config
+
+```go
+{
+    "locationPath":"D:/Development/go/web/src/sync-v2", //Local directory to be synchronized
+    "remotePath":"/root/new/buyer2",	//Directory stored on the server
+    "filter":[			//Filter out files that are not synchronized to the server
+        "main.go",
+        "runtime/cache/sync/*"
+    ],
+    "server":{
+        "ip":"127.0.0.1",	//Server IP
+        "port":"5566",
+        "slave":[
+            {
+                "ip":"127.0.0.2",	//For other servers, it is recommended to be in the same LAN as the server
+                "port":"5566"
+            }
+        ]
+    }
+}
+```
+start client
+
+```sh
+./main client
+```
+
+The client sends the file to be synchronized to the server, and then the server synchronizes the file to the slave
+
+3.go code
+
+```go
+package main
+
+import (
+	"github.com/wjpxxx/letgo/plugin/sync/syncclient"
+	"github.com/wjpxxx/letgo/plugin/sync/syncserver"
+	"os"
+)
+
+
+func main() {
+	args:=os.Args
+	if len(args)>1{
+		if args[1]=="server"{
+			syncserver.Run()
+		} else if args[1]=="client"{
+			syncclient.Run()
+		}
+	}
+}
+```
+
