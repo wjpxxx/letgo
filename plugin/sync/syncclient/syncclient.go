@@ -11,12 +11,15 @@ import (
 	"path/filepath"
 	"core/log"
 )
-
+//SyncClient
 type SyncClient struct{}
 
 //Run
 func (s *SyncClient)Run(values ...interface{}){
-	client:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	client,err:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	if err!=nil{
+		return
+	}
 	defer client.Close()
 	walkdir.Walk(config.LocationPath,&walkdir.Options{
 		Callback: func(pathName, fileName, fullName string) {
@@ -69,12 +72,14 @@ func saveFileModifyTime(fullName string, f file.Filer) {
 //rpcCall 发送
 func rpcCall(client *rpc.Client,message syncconfig.FileSyncMessage,seek int64,f file.Filer){
 	for {
-		var success bool
+		var result syncconfig.MessageResult=syncconfig.MessageResult{}
 		//fmt.Println(fmt.Sprintf("message:%s",message))
-		client.Call("FileSync.Sync",message, &success)
-		if success {
+		client.Call("FileSync.Sync",message, &result)
+		if result.Success {
 			showProccess(seek,f)
 			break
+		}else{
+			//发送失败
 		}
 		//不成功则重发
 	}

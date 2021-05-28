@@ -55,3 +55,16 @@ type FileData struct{
 	Size int64 `json:"size"`
 	Data []byte `json:"data"`
 }
+
+//MessageResult
+type MessageResult struct{
+	Success bool `json:"success"`
+	Err string `json:"err"`
+	Code int `json:"code"`
+	Msg string `json:"msg"`
+}
+
+//String
+func (f MessageResult)String()string{
+	return lib.ObjectToString(f)
+}
