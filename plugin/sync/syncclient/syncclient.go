@@ -12,8 +12,10 @@ import (
 	"core/log"
 )
 
+type SyncClient struct{}
+
 //Run
-func Run(){
+func (s *SyncClient)Run(values ...interface{}){
 	client:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
 	defer client.Close()
 	walkdir.Walk(config.LocationPath,&walkdir.Options{
@@ -138,4 +140,9 @@ func init() {
 	if !lib.StringToObject(cfgFile, &config) {
 		panic("config/sync_client.config file format error, Please check carefully")
 	}
+}
+
+//New
+func New()*SyncClient{
+	return &SyncClient{}
 }

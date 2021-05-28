@@ -8,9 +8,11 @@ import (
 	"core/plugin/sync/syncconfig"
 	"fmt"
 )
+//SyncServer
+type SyncServer struct{}
 
 //Run
-func Run(){
+func (s *SyncServer)Run(values ...interface{}){
 	rpc.NewServer().Register(new(api.FileSync)).Register(new(api.Command)).Run(config.IP,config.Port)
 }
 
@@ -29,4 +31,8 @@ func init(){
 		panic("please setting sync server config in config/sync_server.config file")
 	}
 	lib.StringToObject(cfgFile, &config)
+}
+//New
+func New()*SyncServer{
+	return &SyncServer{}
 }

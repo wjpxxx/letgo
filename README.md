@@ -224,8 +224,7 @@ The client sends the file to be synchronized to the server, and then the server 
 package main
 
 import (
-	"github.com/wjpxxx/letgo/plugin/sync/syncclient"
-	"github.com/wjpxxx/letgo/plugin/sync/syncserver"
+	"github.com/wjpxxx/letgo/plugin"
 	"os"
 )
 
@@ -234,9 +233,9 @@ func main() {
 	args:=os.Args
 	if len(args)>1{
 		if args[1]=="server"{
-			syncserver.Run()
+			plugin.Plugin("sync-server").Run()
 		} else if args[1]=="client"{
-			syncclient.Run()
+			plugin.Plugin("sync-client").Run()
 		}
 	}
 }

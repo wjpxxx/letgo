@@ -5,10 +5,8 @@ import (
 	"core/cache/icache"
 	"core/cache/memcache"
 	"core/cache/redis"
-	"sync"
 )
 
-var cacheLock sync.Mutex
 var cacheList map[string]icache.ICacher
 //Register 注册缓存对象
 func Register(name string, cacher icache.ICacher) {
