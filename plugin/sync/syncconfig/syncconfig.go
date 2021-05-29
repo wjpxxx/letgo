@@ -55,6 +55,29 @@ type FileData struct{
 	Size int64 `json:"size"`
 	Data []byte `json:"data"`
 }
+//CmdMessage
+type CmdMessage struct {
+	Server
+	Dir string `json:"dir"`
+	Cmd string `json:"cmd"`
+	Slave []CmdSlave `json:"slave"`
+}
+
+//CmdSlave
+type CmdSlave struct{
+	Server
+	Dir string `json:"dir"`
+	Cmd string `json:"cmd"`
+}
+//CmdResult
+type CmdResult struct{
+	Server
+	Result string `json:"result"`
+}
+//String
+func (f CmdResult)String()string{
+	return lib.ObjectToString(f)
+}
 
 //MessageResult
 type MessageResult struct{
@@ -62,6 +85,7 @@ type MessageResult struct{
 	Err string `json:"err"`
 	Code int `json:"code"`
 	Msg string `json:"msg"`
+	Data []byte `json:"data"`
 }
 
 //String

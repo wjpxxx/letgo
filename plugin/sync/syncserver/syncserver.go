@@ -12,8 +12,9 @@ import (
 type SyncServer struct{}
 
 //Run
-func (s *SyncServer)Run(values ...interface{}){
+func (s *SyncServer)Run(values ...interface{})interface{}{
 	rpc.NewServer().Register(new(api.FileSync)).Register(new(api.Command)).Run(config.IP,config.Port)
+	return true
 }
 
 //sync server config

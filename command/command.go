@@ -5,14 +5,13 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"syscall"
 )
 
 //Command
 type Command struct{
-	in io.ReadCloser
-	out io.WriteCloser
-	errOut io.WriteCloser
+	in io.Reader
+	out io.Writer
+	errOut io.Writer
 	cmd *exec.Cmd
 	Name string
 	Args []string
@@ -27,12 +26,14 @@ func (c *Command)newCmd()*exec.Cmd{
 		cmds=append([]string{"/C",c.Name}, c.Args...)
 		cmd=exec.Command("cmd",cmds...)
 	}else{
-		cmd=exec.Command(c.Name,c.Args...)
+		var cmds []string
+		cmds=append([]string{"-c",c.Name}, c.Args...)
+		cmd=exec.Command("/bin/sh",cmds...)
 	}
 	if c.dir!=""{
 		cmd.Dir=c.dir
 	}
-	cmd.SysProcAttr=&syscall.SysProcAttr{HideWindow: true,CreationFlags: 0x08000000}
+	//cmd.SysProcAttr=&syscall.SysProcAttr{HideWindow: true,CreationFlags: 0x08000000}
 	return cmd
 }
 //Cd
@@ -134,15 +135,15 @@ func (c *Command)Wait()error{
 	return c.cmd.Wait()
 }
 //SetStdin
-func (c *Command)SetStdin(in io.ReadCloser){
+func (c *Command)SetStdin(in io.Reader){
 	c.in=in
 }
 //SetStdout
-func (c *Command)SetStdout(out io.WriteCloser){
+func (c *Command)SetStdout(out io.Writer){
 	c.out=out
 }
 //SetStderr
-func (c *Command)SetStderr(err io.WriteCloser){
+func (c *Command)SetStderr(err io.Writer){
 	c.errOut=err
 }
 func (c *Command)SetCMD(name string,args ...string)*Command{

@@ -4,7 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"strconv"
+	"bytes"
+
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 //字符串转float32
@@ -142,4 +147,17 @@ func InterfaceArrayToArrayString(list []interface{}) []string {
 		rp = append(rp, data.String())
 	}
 	return rp
+}
+
+//Utf8ToGb2312 UTF8转GBK2312
+func Utf8ToGb2312(src string) string {
+	data, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader([]byte(src)), simplifiedchinese.GB18030.NewEncoder()))
+	return string(data)
+}
+
+//Gb2312ToUtf8 utf8转gbk
+func Gb2312ToUtf8(src string) string {
+	data, _ := ioutil.ReadAll(simplifiedchinese.GB18030.NewDecoder().Reader(bytes.NewReader([]byte(src))))
+	rts := string(data)
+	return rts
 }

@@ -23,5 +23,6 @@ func Plugin(name string)iplugin.Pluginer{
 //init 注册插件
 func init(){
 	Register("sync-server", syncserver.New())
-	Register("sync-client", syncclient.New())
+	Register("sync-file", syncclient.NewFileSync())
+	Register("sync-cmd",syncclient.NewCommandSync())
 }
