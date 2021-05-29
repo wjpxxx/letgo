@@ -220,9 +220,6 @@ The client sends the file to be synchronized to the server, and then the server 
 
 3.start cmd
 
-```
-start cmd
-
 ```sh
 ./main cmd
 ```
