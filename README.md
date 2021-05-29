@@ -210,15 +210,26 @@ start server
     }
 }
 ```
-start client
+start file
 
 ```sh
-./main client
+./main file
 ```
 
 The client sends the file to be synchronized to the server, and then the server synchronizes the file to the slave
 
-3.go code
+3.start cmd
+
+```
+start cmd
+
+```sh
+./main cmd
+```
+
+The client sends the console command to the server, and at the same time, it also sends it to the slave, and the concurrent execution interface returns
+
+4.go code
 
 ```go
 package main
