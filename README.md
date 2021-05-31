@@ -2,6 +2,12 @@
 
 letgo is an open-source, high-performance web framework for the Go programming language.
 
+my email :474790700@qq.com
+
+oschina: https://gitee.com/WJPone
+
+开源中国的小伙伴，该项目确实是本人的项目，并非是他人项目
+
 ## Contents
 
 - [letgo Web Framework](#letgo-web-framework)
