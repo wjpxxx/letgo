@@ -315,3 +315,13 @@ func (t *Table)Aggregate(pipeline interface{},result interface{}){
 		panic(err)
 	}
 }
+
+//NewModel
+func NewModel(dbName,tableName string)Tabler{
+	return NewTable(NewDB().SetDB(dbName, dbName), tableName)
+}
+
+//NewModelByConnectName 新建一个模型
+func NewModelByConnectName(connectName,dbName,tableName string) Tabler{
+	return NewTable(NewDB().SetDB(connectName, dbName), tableName)
+}
