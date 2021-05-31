@@ -1,10 +1,10 @@
 package input
 
 import (
-	"core/lib"
-	"core/file"
-	"core/log"
-	"core/web/binding"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/log"
+	"github.com/wjpxxx/letgo/web/binding"
 	"errors"
 	"mime/multipart"
 	"net"

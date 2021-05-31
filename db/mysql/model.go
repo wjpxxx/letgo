@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"math"
 	"strings"
@@ -221,6 +221,13 @@ func (m *Model) Init(dbName,tableName string) Modeler{
 	m.tableName=tableName
 	m.dbName=dbName
 	m.db=db.SetDB(m.dbName,m.dbName)
+	return m
+}
+//Init 初始化
+func (m *Model) InitByConnectName(connectName,dbName,tableName string) Modeler{
+	m.tableName=tableName
+	m.dbName=dbName
+	m.db=db.SetDB(connectName,m.dbName)
 	return m
 }
 //DBer 获得数据库接口
@@ -908,4 +915,10 @@ func GetDB()*DB{
 func NewModel(dbName,tableName string) Modeler{
 	model:=Model{}
 	return model.Init(dbName,tableName)
+}
+
+//NewModelByConnectName 新建一个模型
+func NewModelByConnectName(connectName,dbName,tableName string) Modeler{
+	model:=Model{}
+	return model.InitByConnectName(connectName,dbName,tableName)
 }

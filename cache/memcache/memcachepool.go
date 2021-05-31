@@ -1,7 +1,7 @@
 package memcache
 
 import (
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"time"
 

@@ -1,7 +1,7 @@
 package log
 
 import (
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"os"
 )
 

@@ -1,7 +1,7 @@
 package walkdir
 
 import (
-	"core/log"
+	"github.com/wjpxxx/letgo/log"
 	"io/ioutil"
 	"path/filepath"
 )

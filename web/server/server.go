@@ -1,10 +1,10 @@
 package server
 
 import (
-	"core/lib"
-	"core/web/context"
-	"core/web/router"
-	"core/web/tmpl"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/context"
+	"github.com/wjpxxx/letgo/web/router"
+	"github.com/wjpxxx/letgo/web/tmpl"
 	"net/http"
 	"sync"
 )

@@ -1,8 +1,8 @@
 package log
 
 import (
-	"core/file"
-	"core/lib"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"io"
 	"os"

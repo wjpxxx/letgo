@@ -1,9 +1,9 @@
 package syncclient
 
 import (
-	"core/lib"
-	"core/net/rpc"
-	"core/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/net/rpc"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 )
 
 //CommandSync

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"core/file"
-	"core/net/rpc"
-	"core/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/net/rpc"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"path/filepath"
 )
 

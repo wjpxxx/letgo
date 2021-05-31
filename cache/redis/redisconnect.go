@@ -1,6 +1,6 @@
 package redis
 
-import "core/lib"
+import "github.com/wjpxxx/letgo/lib"
 
 //RedisConnect 连接配置
 type RedisConnect struct {

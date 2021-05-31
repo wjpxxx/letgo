@@ -232,8 +232,8 @@ The client sends the console command to the server, and at the same time, it als
 package main
 
 import (
-	"core/plugin"
-	"core/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/plugin"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"fmt"
 	"os"
 )

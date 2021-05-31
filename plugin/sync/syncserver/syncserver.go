@@ -1,11 +1,11 @@
 package syncserver
 
 import (
-	"core/file"
-	"core/lib"
-	"core/net/rpc"
-	"core/plugin/sync/api"
-	"core/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/net/rpc"
+	"github.com/wjpxxx/letgo/plugin/sync/api"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"fmt"
 )
 //SyncServer

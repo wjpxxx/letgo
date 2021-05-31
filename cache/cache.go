@@ -1,10 +1,10 @@
 package cache
 
 import (
-	"core/cache/filecache"
-	"core/cache/icache"
-	"core/cache/memcache"
-	"core/cache/redis"
+	"github.com/wjpxxx/letgo/cache/filecache"
+	"github.com/wjpxxx/letgo/cache/icache"
+	"github.com/wjpxxx/letgo/cache/memcache"
+	"github.com/wjpxxx/letgo/cache/redis"
 )
 
 var cacheList map[string]icache.ICacher

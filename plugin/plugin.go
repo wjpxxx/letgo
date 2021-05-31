@@ -1,9 +1,9 @@
 package plugin
 
 import (
-	"core/plugin/iplugin"
-	"core/plugin/sync/syncclient"
-	"core/plugin/sync/syncserver"
+	"github.com/wjpxxx/letgo/plugin/iplugin"
+	"github.com/wjpxxx/letgo/plugin/sync/syncclient"
+	"github.com/wjpxxx/letgo/plugin/sync/syncserver"
 )
 
 //pluginList

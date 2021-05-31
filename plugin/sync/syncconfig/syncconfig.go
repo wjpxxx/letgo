@@ -1,6 +1,6 @@
 package syncconfig
 
-import "core/lib"
+import "github.com/wjpxxx/letgo/lib"
 
 //ClientConfig 客户端配置文件
 type ClientConfig struct {

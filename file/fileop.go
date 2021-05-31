@@ -2,7 +2,7 @@ package file
 
 import (
 	"bufio"
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"os"
 	"io/ioutil"
 	"strings"

@@ -1,11 +1,11 @@
 package context
 
 import (
-	"core/lib"
-	"core/web/input"
-	"core/web/output"
-	"core/web/tmpl"
-	"core/web/session"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/input"
+	"github.com/wjpxxx/letgo/web/output"
+	"github.com/wjpxxx/letgo/web/tmpl"
+	"github.com/wjpxxx/letgo/web/session"
 	"net/http"
 	"net/url"
 	"strings"

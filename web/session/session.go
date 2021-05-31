@@ -1,12 +1,12 @@
 package session
 
 import (
-	"core/cache/filecache"
-	"core/cache/icache"
-	"core/cache"
-	"core/file"
-	"core/lib"
-	"core/encry"
+	"github.com/wjpxxx/letgo/cache/filecache"
+	"github.com/wjpxxx/letgo/cache/icache"
+	"github.com/wjpxxx/letgo/cache"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/encry"
 	"fmt"
 	"sync"
 	"time"

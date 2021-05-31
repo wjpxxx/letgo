@@ -1,9 +1,9 @@
 package web
 
 import (
-	"core/web/context"
-	"core/web/server"
-	"core/lib"
+	"github.com/wjpxxx/letgo/web/context"
+	"github.com/wjpxxx/letgo/web/server"
+	"github.com/wjpxxx/letgo/lib"
 	"html/template"
 	"net/http"
 	"sync"

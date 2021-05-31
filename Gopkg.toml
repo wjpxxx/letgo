@@ -24,6 +24,11 @@
 #   go-tests = true
 #   unused-packages = true
 
+ignored = [
+  "golang.org/x/text/*" ,
+  "golang.org/x/crypto/*" ,
+  "golang.org/x/sync/*"
+]
 
 [prune]
   go-tests = true
@@ -44,8 +49,6 @@
 [[constraint]]
   name = "gopkg.in/yaml.v2"
   version = "2.4.0"
-
 [[constraint]]
-  branch = "master"
-  name = "golang.org/x/text"
-  source = "github.com/golang/text"
+  name = "go.mongodb.org/mongo-driver"
+  version = "1.5.2"

@@ -1,10 +1,10 @@
 package filecache
 
 import (
-	"core/cache/icache"
-	"core/encry"
-	"core/file"
-	"core/lib"
+	"github.com/wjpxxx/letgo/cache/icache"
+	"github.com/wjpxxx/letgo/encry"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"os"
 	"strings"

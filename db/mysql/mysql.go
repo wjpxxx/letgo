@@ -1,10 +1,10 @@
 package mysql
 import (
-	"core/file"
+	"github.com/wjpxxx/letgo/file"
 	"database/sql/driver"
 	"strings"
 	"database/sql"
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"sync"
 	_ "github.com/go-sql-driver/mysql"

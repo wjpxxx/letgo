@@ -1,6 +1,6 @@
 package session
 
-import "core/lib"
+import "github.com/wjpxxx/letgo/lib"
 
 //SessionConfig
 type SessionConfig struct{

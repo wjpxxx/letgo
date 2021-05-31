@@ -1,8 +1,8 @@
 package syncclient
 import (
-	"core/file"
-	"core/lib"
-	"core/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"fmt"
 )
 

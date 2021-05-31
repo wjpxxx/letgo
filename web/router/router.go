@@ -1,8 +1,8 @@
 package router
 
 import (
-	"core/lib"
-	"core/web/context"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/context"
 	"net/http"
 	"path"
 	"regexp"

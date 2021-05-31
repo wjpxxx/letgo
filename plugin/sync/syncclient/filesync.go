@@ -1,14 +1,14 @@
 package syncclient
 
 import (
-	"core/file"
-	"core/net/rpc"
-	"core/encry"
-	"core/cache/filecache"
-	"core/plugin/sync/syncconfig"
-	"core/plugin/sync/walkdir"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/net/rpc"
+	"github.com/wjpxxx/letgo/encry"
+	"github.com/wjpxxx/letgo/cache/filecache"
+	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
+	"github.com/wjpxxx/letgo/plugin/sync/walkdir"
 	"path/filepath"
-	"core/log"
+	"github.com/wjpxxx/letgo/log"
 )
 //FileSync
 type FileSync struct {}

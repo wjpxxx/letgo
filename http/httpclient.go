@@ -1,8 +1,8 @@
 package httpclient
 
 import (
-	"core/file"
-	"core/lib"
+	"github.com/wjpxxx/letgo/file"
+	"github.com/wjpxxx/letgo/lib"
 	"crypto/tls"
 	"crypto/x509"
 	"bytes"

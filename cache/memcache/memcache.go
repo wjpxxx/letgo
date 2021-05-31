@@ -1,11 +1,11 @@
 package memcache
 
 import (
-	"core/cache/icache"
-	"core/file"
+	"github.com/wjpxxx/letgo/cache/icache"
+	"github.com/wjpxxx/letgo/file"
 	"sync"
 	"github.com/bradfitz/gomemcache/memcache"
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 )
 

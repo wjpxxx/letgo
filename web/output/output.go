@@ -1,8 +1,8 @@
 package output
 
 import (
-	"core/web/binding"
-	"core/web/input"
+	"github.com/wjpxxx/letgo/web/binding"
+	"github.com/wjpxxx/letgo/web/input"
 	"html/template"
 	"net/http"
 )

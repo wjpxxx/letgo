@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"testing"
 )

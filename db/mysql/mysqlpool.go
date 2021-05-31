@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"core/lib"
+	"github.com/wjpxxx/letgo/lib"
 	"database/sql"
 	"fmt"
 	"time"
