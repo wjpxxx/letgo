@@ -246,6 +246,18 @@ func (r *Redis)RPop(key string, value interface{}) bool{
 	lib.UnSerialize(v,value)
 	return true
 }
+//Push Push操作
+func (r *Redis)Push(key string, value interface{}) bool{
+	i:=r.LPush(key,value)
+	if i>-1{
+		return true
+	}
+	return false
+}
+//Push Push操作
+func (r *Redis)Pop(key string, value interface{}) bool{
+	return r.RPop(key,value)
+}
 //Type Type操作
 func (r *Redis)Type(key string) (string, bool){
 	v, err := redis.String(r.getRedis().Get().Do("TYPE", key))

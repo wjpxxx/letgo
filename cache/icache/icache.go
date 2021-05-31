@@ -7,3 +7,9 @@ type ICacher interface{
 	Del(key string) bool
 	FlushDB() bool
 }
+
+//Quequer 队列接口
+type Quequer interface{
+	Push(key string, value interface{}) bool
+	Pop(key string, value interface{}) bool
+}
