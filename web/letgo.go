@@ -4,6 +4,7 @@ import (
 	"github.com/wjpxxx/letgo/web/context"
 	"github.com/wjpxxx/letgo/web/server"
 	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/filter"
 	"html/template"
 	"net/http"
 	"sync"
@@ -162,4 +163,9 @@ func getMapMethods(mapMethods ...string)lib.StringMap{
 		mp[strings.ToLower(mpArray[1])]=strings.ToUpper(mpArray[0])
 	}
 	return mp
+}
+
+//AddFilter 添加过滤
+func AddFilter(pattern string, pos int, filterFunc context.HandlerFunc){
+	filter.AddFilter(pattern,pos,filterFunc)
 }

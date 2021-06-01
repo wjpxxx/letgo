@@ -39,9 +39,16 @@ package main
 import (
     "github.com/wjpxxx/letgo/web"
     "github.com/wjpxxx/letgo/web/context"
+	"github.com/wjpxxx/letgo/web/filter"
+	"fmt"
 )
 
 func main() {
+	web.AddFilter("/user/*",filter.BEFORE_ROUTER,func(ctx *context.Context){
+		ctx.Output.JSON(200,lib.InRow{
+			"www":"fff",
+		})
+	})
 	web.LoadHTMLGlob("templates/*")
 	web.Get("/", func(ctx *context.Context){
 		//ctx.Output.Redirect(301,"http://www.baidu.com")

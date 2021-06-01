@@ -5,10 +5,16 @@ import (
 	"github.com/wjpxxx/letgo/web/context"
 	"fmt"
 	"testing"
+	"github.com/wjpxxx/letgo/web/filter"
 )
 
 
 func TestLetgo(t *testing.T) {
+	AddFilter("/user/*",filter.BEFORE_ROUTER,func(ctx *context.Context){
+		ctx.Output.JSON(200,lib.InRow{
+			"www":"fff",
+		})
+	})
 	Static("/assets/", "./assets")
 	StaticFile("/1.png", "./assets/b3.jpg")
 	LoadHTMLGlob("config/*")
@@ -40,7 +46,11 @@ func TestLetgo(t *testing.T) {
 			"b":2,
 		})
 	})
-
+	Get("/www/*",func(ctx *context.Context){
+		ctx.Output.JSON(200,lib.InRow{
+			"success":true,
+		})
+	})
 	Get("/user/:id([0-9]+)/:id3([0-9]+)", func(ctx *context.Context){
 		ctx.Output.XML(200,lib.InRow{
 			"message":"123123",

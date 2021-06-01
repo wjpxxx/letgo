@@ -3,11 +3,13 @@ package router
 import (
 	"github.com/wjpxxx/letgo/lib"
 	"github.com/wjpxxx/letgo/web/context"
+	"github.com/wjpxxx/letgo/web/filter"
 	"net/http"
 	"path"
 	"regexp"
 	"strings"
 	"sync"
+	"fmt"
 )
 
 
@@ -24,6 +26,7 @@ type RouterInfo struct{
 	regex *regexp.Regexp
 	params lib.IntStringMap
 	handler context.HandlerFunc
+	isStatic bool  //是否是静态资源
 	method string
 	path string
 }
@@ -38,6 +41,9 @@ func HttpRouter() *Router{
 //HandleHttpRequest 处理http请求
 func (r *Router)HandleHttpRequest(ctx *context.Context){
 	r.ctx=ctx
+	r.ctx.Init()
+	//过滤
+	filter.ExecFilter(filter.BEFORE_ROUTER,r.ctx)
 	requestPath:=strings.ToLower(r.ctx.Request.URL.Path)
 	found:=false
 	for _,router:=range r.routerInfo{
@@ -57,16 +63,18 @@ func (r *Router)HandleHttpRequest(ctx *context.Context){
 				r.ctx.Input.SetParam(router.params[i], match)
 			}
 		}
+		filter.ExecFilter(filter.BEFORE_EXEC,r.ctx)
 		//初始化参数
 		r.ctx.RouterPath=router.path
-		r.ctx.Init()
 		router.handler(r.ctx)
+		filter.ExecFilter(filter.AFTER_EXEC,r.ctx)
 		found=true
 	}
 	//no found
 	if !found {
-		http.NotFound(ctx.Writer, ctx.Request)
+		http.NotFound(r.ctx.Writer, r.ctx.Request)
 	}
+	filter.ExecFilter(filter.AFTER_ROUTER,r.ctx)
 }
 
 //File 输出文件
@@ -79,6 +87,7 @@ func (r *Router)StaticFile(relativePath, filePath string) {
 		panic("parameters can not be used when serving a static folder")
 	}
 	handler := func(c *context.Context) {
+		filter.ExecFilter(filter.BEFORE_STATIC,c)
 		r.File(filePath)
 	}
 	r.RegisterRouter(http.MethodGet,relativePath,handler)
@@ -102,12 +111,14 @@ func (r *Router)StaticFS(relativePath string, fs http.FileSystem){
 func (r *Router) createStaticHandle(relativePath string, fs http.FileSystem)context.HandlerFunc{
 	fileServer:=http.StripPrefix(relativePath, http.FileServer(fs))
 	return func(ctx *context.Context){
+		filter.ExecFilter(filter.BEFORE_STATIC,ctx)
 		fileServer.ServeHTTP(ctx.Writer,ctx.Request)
 	}
 	
 }
 //RegisterRouter 注册路由
 func (r *Router)RegisterRouter(method,relativePath string, handler context.HandlerFunc){
+	var isStatic bool=false
 	oldRelativePath:=relativePath
 	parts:=strings.Split(relativePath, "/")
 	paramsIndex:=0
@@ -128,6 +139,11 @@ func (r *Router)RegisterRouter(method,relativePath string, handler context.Handl
 	//静态资源
 	if strings.Index(relativePath, "*filepath")!=-1 {
 		relativePath=strings.Replace(relativePath, "*filepath", ".*",1)
+		isStatic=true
+	}
+	lasti:=strings.LastIndex(relativePath,"*")
+	if lasti!=-1{
+		relativePath=fmt.Sprintf("%s%s",relativePath[:lasti],".*")
 	}
 	regex,regexErr:=regexp.Compile(relativePath)
 	if regexErr!=nil{
@@ -139,5 +155,6 @@ func (r *Router)RegisterRouter(method,relativePath string, handler context.Handl
 	router.regex=regex
 	router.path=oldRelativePath
 	router.handler=handler
+	router.isStatic=isStatic
 	r.routerInfo=append(r.routerInfo, router)
 }
