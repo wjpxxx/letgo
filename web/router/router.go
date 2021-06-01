@@ -72,9 +72,11 @@ func (r *Router)HandleHttpRequest(ctx *context.Context){
 	}
 	//no found
 	if !found {
-		http.NotFound(r.ctx.Writer, r.ctx.Request)
+		ctx.Output.NotFound()
+	}else{
+		filter.ExecFilter(filter.AFTER_ROUTER,r.ctx)
 	}
-	filter.ExecFilter(filter.AFTER_ROUTER,r.ctx)
+	
 }
 
 //File 输出文件

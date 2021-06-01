@@ -12,6 +12,7 @@ type Output struct{
 	writer http.ResponseWriter
 	in *input.Input
 	templ *template.Template
+	status int
 }
 
 //Init 初始化
@@ -19,6 +20,7 @@ func (o *Output)Init(writer http.ResponseWriter,in *input.Input,templ *template.
 	o.writer=writer
 	o.in=in
 	o.templ=templ
+	o.status=0
 }
 //Header 设置头
 func (o *Output)Header(key,value string){
@@ -35,8 +37,12 @@ func (o *Output)JSONP(code int, value interface{})error{
 }
 //Render
 func (o *Output)Render(code int,value interface{},bind binding.Rendering)error{
-	err:= bind.Render(code,o.writer,value)
-	return err
+	if o.status==0&&code>0{
+		o.status=code
+		err:= bind.Render(code,o.writer,value)
+		return err
+	}
+	return nil
 }
 
 //HTML
@@ -56,7 +62,18 @@ func (o *Output)YAML(code int, value interface{})error{
 }
 //Redirect 跳转
 func(o *Output)Redirect(code int,location string){
-	http.Redirect(o.writer,o.in.R(),location,code)
+	if o.status==0&&code>0{
+		o.status=code
+		http.Redirect(o.writer,o.in.R(),location,code)
+	}
+}
+
+//NotFound 404
+func(o *Output)NotFound(){
+	if o.status==0{
+		o.status=404
+		http.NotFound(o.writer, o.in.R())
+	}
 }
 
 //NewInput 新建一个input

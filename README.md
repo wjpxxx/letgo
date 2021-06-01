@@ -105,10 +105,7 @@ func main() {
 ```go
 type UserController struct{}
 func (c *UserController)Add(ctx *context.Context){
-	ctx.Output.JSON(200,lib.InRow{
-		"a":1,
-		"b":"wjp",
-	})
+	ctx.Output.Redirect(302,"/")
 }
 func main() {
 	c:=&UserController{}
