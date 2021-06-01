@@ -260,3 +260,32 @@ func main() {
 	}
 ```
 
+## Task
+
+Creating memory resident applications When the stop method is called, all tasks will wait for execution and exit
+
+```go
+
+package main
+
+import (
+	"github.com/wjpxxx/letgo/cron/task"
+	"time"
+	"fmt"
+)
+
+func main() {
+	task.RegisterTask("add",1,func(ctx *Context){
+		fmt.Println(ctx.Name,ctx.TaskNo)
+		//fmt.Println()
+		//time.Sleep(1*time.Second)
+	})
+	go func(){
+		time.Sleep(15*time.Second)
+		task.Stop()
+	}()
+	//task.Start()
+	task.StartAndWait()
+}
+
+```
