@@ -17,5 +17,6 @@ require (
 	github.com/xdg-go/stringprep v1.0.2
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d
 	go.mongodb.org/mongo-driver v1.5.2
+	golang.org/x/text v0.3.5
 	gopkg.in/yaml.v2 v2.4.0
 )

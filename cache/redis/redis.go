@@ -71,6 +71,8 @@ type Master interface{
 	SPop(key string,value interface{}) bool
 	SRandMember(key string, count int) [][]byte
 	SRem(key string, members ...interface{}) int
+	Push(key string, value interface{}) bool
+	Pop(key string, value interface{}) bool
 }
 //Redis redis对象
 type Redis struct {
