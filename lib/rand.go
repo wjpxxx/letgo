@@ -62,6 +62,33 @@ func RandCharNoNumberEx(length int, r int) string {
 	return s
 }
 
+
+//获取指定长度的字符
+//参数length：要获取字符的长度
+//返回随机指定长度的字符串
+func RandLChar(length int) string {
+	chr := []byte{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'}
+	var s string = ""
+	for i := 0; i < length; i++ {
+		n := Rand(0, len(chr)-1, i)
+		s += string(chr[n])
+	}
+	return s
+}
+
+//获取指定长度的字符
+//参数length：要获取字符的长度
+//返回随机指定长度的字符串
+func RandUChar(length int) string {
+	chr := []byte{'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+	var s string = ""
+	for i := 0; i < length; i++ {
+		n := Rand(0, len(chr)-1, i)
+		s += string(chr[n])
+	}
+	return s
+}
+
 //获取指定长度的数字
 //参数length：要获取字符的长度
 //返回随机指定长度的字符串
