@@ -11,7 +11,7 @@ import (
 
 func TestLetgo(t *testing.T) {
 	AddFilter("/user/*",filter.BEFORE_ROUTER,func(ctx *context.Context){
-		//ctx.Output.Redirect(302,"/")
+		ctx.Output.Redirect(302,"/")
 	})
 	Static("/assets/", "./assets")
 	StaticFile("/1.png", "./assets/b3.jpg")

@@ -75,7 +75,13 @@ func(o *Output)NotFound(){
 		http.NotFound(o.writer, o.in.R())
 	}
 }
-
+//HasOutput 是否输出了 true已经输出 false 未输出
+func(o *Output)HasOutput()bool{
+	if o.status==0{
+		return false
+	}
+	return true
+}
 //NewInput 新建一个input
 func NewOutput()*Output{
 	return &Output{

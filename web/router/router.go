@@ -66,7 +66,9 @@ func (r *Router)HandleHttpRequest(ctx *context.Context){
 		filter.ExecFilter(filter.BEFORE_EXEC,r.ctx)
 		//初始化参数
 		r.ctx.RouterPath=router.path
-		router.handler(r.ctx)
+		if !r.ctx.Output.HasOutput() {
+			router.handler(r.ctx)
+		}
 		filter.ExecFilter(filter.AFTER_EXEC,r.ctx)
 		found=true
 	}
