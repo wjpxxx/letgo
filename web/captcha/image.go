@@ -10,6 +10,9 @@ import (
 	"image/draw"
 	"math"
 	"os"
+	"bytes"
+	"encoding/base64"
+	"fmt"
 
 	"github.com/golang/freetype"
 	"github.com/golang/freetype/truetype"
@@ -56,6 +59,14 @@ func (i *Image)SaveImage(fullPath string){
 	}
 }
 
+//Base64Encode
+func (i *Image)Base64Encode()string{
+	buf:=bytes.NewBuffer(nil)
+	png.Encode(buf,i)
+	return fmt.Sprintf("%s%s","data:image/png;base64,",base64.StdEncoding.EncodeToString(buf.Bytes()))
+}
+
+
 //Fill
 func(i *Image)Fill(img image.Image){
 	draw.Draw(i,i.Bounds(),img,image.ZP,draw.Over)
@@ -90,6 +101,7 @@ func (i *Image)DrawLine(x1,y1,x2,y2 int,colr color.Color){
 		x1 += ix
 	}
 }
+//sign
 func sign(x int) int {
 	if x > 0 {
 		return 1

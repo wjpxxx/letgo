@@ -116,6 +116,38 @@ func main() {
 }
 ```
 
+## Captcha
+
+```go
+package main
+
+import (
+	"github.com/wjpxxx/letgo/web/captcha"
+	"image/color"
+	"github.com/wjpxxx/letgo/file"
+	"fmt"
+)
+
+func main(){
+	c:=captcha.NewCaptcha()
+	c.AddFonts("STHUPO.TTF")
+	c.AddColors(color.RGBA{255,0,255,255},color.RGBA{0,255,255,255},color.Black)
+	c.SetSize(200,60)
+	//c.AddBackColors(color.Black,color.Opaque)
+	//c.Create(4,NUM)
+	//c.Create(4,LCHAR)
+	//c.SetDisturbLevel(HIGH)
+	c.SetDisturbLevel(captcha.MEDIUM)
+	img1,code1:=c.Create(4,captcha.ALL)
+	//img1.DrawLine(10,0,100,20,color.RGBA{255,0,255,255})
+	img1.SaveImage("1.png")
+	img2,code2:=c.Create(4,captcha.ALL)
+	file.PutContent("2",img2.Base64Encode())
+	img2.SaveImage("2.png")
+	fmt.Println(code1,code2)
+}
+```
+
 ## Model operation
 
 ```go
