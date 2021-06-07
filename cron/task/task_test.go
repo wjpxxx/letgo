@@ -11,7 +11,7 @@ func TestTask(t *testing.T) {
 		//time.Sleep(1*time.Second)
 	})
 	go func(){
-		time.Sleep(15*time.Second)
+		time.Sleep(105*time.Second)
 		Stop()
 	}()
 	StartAndWait()

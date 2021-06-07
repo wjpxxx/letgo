@@ -35,8 +35,8 @@ type taskMapSort struct{
 }
 
 //newMapSort
-func newMapKV(taskList map[string]task)*taskMapSort{
-	ms:=&taskMapSort{
+func newMapKV(taskList map[string]task)taskMapSort{
+	ms:=taskMapSort{
 		Keys:make([]string, 0,len(taskList)),
 		Values: make([]task, 0,len(taskList)),
 	}
@@ -91,10 +91,10 @@ func (t *taskManager)Start(){
 }
 //run
 func (t *taskManager)run(){
+	sortList:=newMapKV(t.taskList)
 	for{
 		select{
 		default:
-			sortList:=newMapKV(t.taskList)
 			t.startTask(sortList)
 			time.Sleep(10*time.Millisecond)
 		case <-t.stop:
@@ -103,7 +103,7 @@ func (t *taskManager)run(){
 	}
 }
 //startTask
-func (t *taskManager)startTask(sortList *taskMapSort){
+func (t *taskManager)startTask(sortList taskMapSort){
 	for _,tsk:=range sortList.Values{
 		if !tsk.context.IsDone(){
 			tsk.context.SetDone(true)

@@ -152,7 +152,12 @@ func(h *HttpClient)Get(url string,values lib.InRow) *HttpResponse{
 		if !strings.Contains(url,"?") {
 			url=url+"?"+HttpBuildQuery(values)
 		}else{
-			url=url+HttpBuildQuery(values)
+			if !strings.Contains(url,"&") {
+				url=url+HttpBuildQuery(values)
+			} else{
+				url=url+"&"+HttpBuildQuery(values)
+			}
+			
 		}
 	}
 	client:=h.getClient()
@@ -186,6 +191,7 @@ func(h *HttpClient)PostJson(url string,value interface{}) *HttpResponse{
 			return h.responseErr(err)
 		}
 	}
+	//fmt.Println("body",string(body))
 	client:=h.getClient()
 	req:=h.getRequest(url,"POST",bytes.NewReader(body))
 	return h.getResponse(client.Do(req))
@@ -447,4 +453,9 @@ func HttpBuildQuery(values lib.InRow) string{
 		
 	}
 	return paramsValue.Encode()
+}
+
+//New
+func New()*HttpClient{
+	return &HttpClient{}
 }

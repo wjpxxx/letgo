@@ -172,7 +172,7 @@ func main() {
             AndHaving("m.id",1).
             OrderBy("m.id desc").Find()
     fmt.Println(model.GetLastSql())
-	fmt.Println(m["master_id"].Int64(),m["name"],m["age"].Int(),m["password"].String())
+    fmt.Println(m["master_id"].Int64(),m["name"],m["age"].Int(),m["password"].String())
 }
 ```
 
