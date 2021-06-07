@@ -86,7 +86,7 @@ func main() {
 		})
 	})
 
-	web.Run()
+	web.Run()//listen and serve on 0.0.0.0:1122 (for windows "localhost:1122")
 }
 ```
 
@@ -156,22 +156,23 @@ package main
 import "github.com/wjpxxx/letgo/db/mysql"
 func main() {
     model:=NewModel("dbname","tablename")
-        model.Fields("*").
-                Alias("m").
-                Join("sys_shopee_shop as s").
-                On("m.id","s.master_id").
-                OrOn("s.master_id",1).
-                AndOnRaw("m.id=1 or m.id=2").
-                LeftJoin("sys_lazada_shop as l").
-                On("m.id", "l.master_id").
-                WhereRaw("m.id=1").
-                AndWhere("m.id",2).
-                OrWhereIn("m.id",lib.Int64ArrayToInterfaceArray(ids)).
-                GroupBy("m.id").
-                Having("m.id",1).
-                AndHaving("m.id",1).
-                OrderBy("m.id desc").Find()
-        fmt.Println(model.GetLastSql())
+    m:=model.Fields("*").
+            Alias("m").
+            Join("sys_shopee_shop as s").
+            On("m.id","s.master_id").
+            OrOn("s.master_id",1).
+            AndOnRaw("m.id=1 or m.id=2").
+            LeftJoin("sys_lazada_shop as l").
+            On("m.id", "l.master_id").
+            WhereRaw("m.id=1").
+            AndWhere("m.id",2).
+            OrWhereIn("m.id",lib.Int64ArrayToInterfaceArray(ids)).
+            GroupBy("m.id").
+            Having("m.id",1).
+            AndHaving("m.id",1).
+            OrderBy("m.id desc").Find()
+    fmt.Println(model.GetLastSql())
+	fmt.Println(m["master_id"].Int64(),m["name"],m["age"].Int(),m["password"].String())
 }
 ```
 
