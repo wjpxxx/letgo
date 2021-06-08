@@ -60,6 +60,11 @@ func (o *Output)XML(code int, value interface{})error{
 func (o *Output)YAML(code int, value interface{})error{
 	return o.Render(code,value, binding.YAML)
 }
+
+//Text
+func (o *Output)Text(code int, value interface{})error{
+	return o.Render(code,value, binding.TEXT)
+}
 //Redirect 跳转
 func(o *Output)Redirect(code int,location string){
 	if o.status==0&&code>0{
