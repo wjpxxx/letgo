@@ -5,6 +5,8 @@ import (
 	"github.com/wjpxxx/letgo/net/rpc"
 	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"path/filepath"
+	//"github.com/wjpxxx/letgo/log"
+	//"fmt"
 )
 
 //FileSync 文件同步
@@ -36,10 +38,13 @@ func (f *FileSync)saveFile(message syncconfig.FileSyncMessage){
 		//当前目录
 		fullName=filepath.Join(message.RemotePath,message.File.Name)
 	}else{
-		path:=filepath.Join(message.RemotePath,message.RelPath)
+		path:=filepath.Join(message.RemotePath,file.Slash(message.RelPath))
+		//fmt.Println("path:",path,",RemotePath:",message.RemotePath,",RelPath:",filepath.ToSlash(message.RelPath))
 		file.Mkdir(path)
 		fullName=filepath.Join(path,message.File.Name)
 	}
+	//fmt.Println("fullName:",fullName)
+	//log.DebugPrint("fullName:%s",fullName)
 	fn:=file.NewFile(fullName)
 	fn.WriteAt(message.File.Data,message.File.Size-message.File.Seek)
 }

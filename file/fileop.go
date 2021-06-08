@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"path/filepath"
+	"runtime"
 )
 
 //BaseName 函数返回路径中的文件名部分。
@@ -78,6 +79,19 @@ func FileExist(fileName string) bool {
 		return false
 	}
 }
+//Slash 根据系统返回正常的路径
+func Slash(path string) string{
+	if runtime.GOOS=="windows" {
+		return strings.ReplaceAll(path, "/", string(os.PathSeparator))
+	}else{
+		return strings.ReplaceAll(path, "\\", string(os.PathSeparator))
+	}
+}
+//SlashR  将'\'转为'/'
+func SlashR(path string)string{
+	return strings.ReplaceAll(path, "\\", "/")
+}
+
 //Filer 文件接口
 type Filer interface{
 	Size() int64
@@ -191,6 +205,8 @@ func (f *File) WriteAt(b []byte, offset int64) int{
 	f.open()
 	defer f.close()
 	seek,_:=f.handle.WriteAt(b,offset)
+	l:=int64(len(b))
+	f.handle.Truncate(l+offset)
 	return seek
 }
 //WriteAppend 追加文件

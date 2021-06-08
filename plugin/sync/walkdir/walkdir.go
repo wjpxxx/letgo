@@ -2,8 +2,12 @@ package walkdir
 
 import (
 	"github.com/wjpxxx/letgo/log"
+	"github.com/wjpxxx/letgo/file"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
+	"fmt"
+	"regexp"
 )
 
 //Walk 遍历目录
@@ -23,7 +27,7 @@ func Walk(dirname string,options *Options){
 			Walk(tmpDirName, options)
 		}else{
 			fullPath:=filepath.Join(dirname,p.Name())
-			if options.Callback!=nil&&filter(fullPath,options.Filter){
+			if options.Callback!=nil&&filter(fullPath,options){
 				options.Callback(dirname,p.Name(),fullPath)
 			}
 		}
@@ -34,19 +38,31 @@ type WalkFunc func(pathName,fileName,fullName string)
 type Options struct{
 	Callback WalkFunc
 	Filter []string //Filter files
+	LocationPath string
 }
 //filter
-func filter(fullPath string,filterArray []string)bool{
+func filter(fullPath string,options *Options)bool{
+	filterArray:=options.Filter
+	localPath:=options.LocationPath
+	fullPath=file.SlashR(fullPath)
 	for _,f:=range filterArray{
 		if !filepath.IsAbs(f) {
-			f,_=filepath.Abs(f)
+			f=filepath.Join(localPath,f)
 		}
-		r,err:=filepath.Match(f,fullPath)
+		f=file.SlashR(f)
+		lasti:=strings.LastIndex(f,"*")
+		if lasti!=-1{
+			f=fmt.Sprintf("%s%s",f[:lasti],".*")
+		}
+		//log.DebugPrint("f %s",f)
+		//log.DebugPrint("f abs: %s %s",f,fullPath)
+		regex,err:=regexp.Compile(f)
 		if err!=nil{
 			log.DebugPrint("filter error %v",err)
 			continue
 		}
-		if r {
+		//log.DebugPrint("regex:%v",regex.MatchString(fullPath))
+		if regex.MatchString(fullPath){
 			return false
 		}
 	}

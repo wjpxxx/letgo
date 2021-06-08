@@ -40,6 +40,7 @@ func (f *FileSync) SyncFile(client *rpc.Client){
 					if seek>=0{
 						//文件有内容并存在
 						message:=f.packedFileSync(buf,seek,filer)
+						//log.DebugPrint("%v",message)
 						f.rpcCall(client,message,seek,filer)
 						if fsize==seek{
 							success=true
@@ -56,6 +57,7 @@ func (f *FileSync) SyncFile(client *rpc.Client){
 			}
 		},
 		Filter: config.Filter,
+		LocationPath:config.LocationPath,
 	})
 }
 
