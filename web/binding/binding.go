@@ -18,12 +18,14 @@ const (
 	MIMEXML               = "application/xml"
 	MIMEXML2              = "text/xml"
 	MIMEYAML              = "application/x-yaml"
+	MIMETEXT              = "application/text"
 )
 var (
 	JSON =jsonBinding{}
 	XML=xmlBinding{}
 	YAML=yamlBinding{}
 	JSONP=jsonpBinding{}
+	TEXT=textBinding{}
 )
 func NewBind(contentType string)Binding{
 	switch contentType {
@@ -46,6 +48,8 @@ func NewRender(contentType string)Rendering{
 		return XML
 	case MIMEYAML:
 		return YAML
+	case MIMETEXT:
+		return TEXT
 	default:
 		panic("unknown type")
 	}
