@@ -18,7 +18,7 @@ const (
 	MIMEXML               = "application/xml"
 	MIMEXML2              = "text/xml"
 	MIMEYAML              = "application/x-yaml"
-	MIMETEXT              = "application/text"
+	MIMETEXT              = "text/html"
 )
 var (
 	JSON =jsonBinding{}
