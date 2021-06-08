@@ -29,6 +29,9 @@ func TestLetgo(t *testing.T) {
 			"title":"wjp",
 		})
 	})
+	Get("/text", func(ctx *context.Context){
+		ctx.Output.Text(200,"Hello letgo")
+	})
 	
 	Post("/user/:id([0-9]+)", func(ctx *context.Context){
 		type A struct{
