@@ -72,6 +72,10 @@ func (c *Context)Host()string{
 	hostArray:=strings.Split(c.Request.Host,":")
 	return hostArray[0]
 }
+//HttpOrigin
+func (c *Context)HttpOrigin()string{
+	return c.Request.Header.Get("Origin");
+}
 
 //Cookie 获得cookie
 func (c *Context)Cookie(name string)*lib.Data{

@@ -111,6 +111,18 @@ func (i *Input)Init(request *http.Request) {
 	}
 	i.initQuery()
 	i.initForm()
+	i.initJson()
+}
+//initJson
+func (i *Input)initJson(){
+	if strings.Index(i.ContentType(),"application/json")!=-1{
+		var result map[string]interface{}
+		lib.StringToObject(i.Body(), &result)
+		for k,v:=range result{
+			i.SetParam(k,v)
+			i.SetPost(k,v)
+		}
+	}
 }
 
 //initQuery
