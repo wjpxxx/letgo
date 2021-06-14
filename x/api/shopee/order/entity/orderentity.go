@@ -47,9 +47,6 @@ type OrderEntity struct{
 	CheckoutShippingCarrier string `json:"checkout_shipping_carrier"`
 }
 
-//OrderResponseOptionalFields
-type OrderResponseOptionalFieldsType string
-
 //String
 func(o OrderEntity)String()string{
 	return lib.ObjectToString(o)

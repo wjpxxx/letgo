@@ -11,5 +11,6 @@ require (
 	github.com/klauspost/compress v1.12.3 // indirect
 	go.mongodb.org/mongo-driver v1.5.2 // indirect
 	golang.org/x/image v0.0.0-20210504121937-7319ad40d33e // indirect
+	golang.org/x/text v0.3.5
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

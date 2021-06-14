@@ -149,6 +149,15 @@ func InterfaceArrayToArrayString(list []interface{}) []string {
 	return rp
 }
 
+//interface转ArrayString
+func Int64ArrayToArrayString(list []int64) []string {
+	var rp []string
+	for _, v := range list {
+		rp = append(rp, fmt.Sprintf("%d",v))
+	}
+	return rp
+}
+
 //Utf8ToGb2312 UTF8转GBK2312
 func Utf8ToGb2312(src string) string {
 	data, _ := ioutil.ReadAll(transform.NewReader(bytes.NewReader([]byte(src)), simplifiedchinese.GB18030.NewEncoder()))

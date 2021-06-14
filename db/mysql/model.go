@@ -12,6 +12,7 @@ var db *DB
 //Model 模型
 type Model struct{
 	tableName string
+	aliasName string
 	otherTableName []joinCond
 	dbName string
 	fields []string
@@ -26,6 +27,7 @@ type Model struct{
 	preParams []interface{}
 	unionModel Modeler
 	db DBer
+	SoftDelete bool
 }
 //cond 操作
 type cond struct{
@@ -249,6 +251,7 @@ func (m *Model)GetSqlInfo()(string,[]interface{}){
 }
 //Alias 命名
 func (m *Model)Alias(name string) Aliaser{
+	m.aliasName=name
 	m.tableName=fmt.Sprintf("%s as %s", m.tableName, name)
 	return m
 }
@@ -636,6 +639,20 @@ func (m *Model)getWhere()(string,[]interface{}){
 		}else{
 			where+=fmt.Sprintf(" %s %s %s "+q,w.logic,w.field,w.symbol)
 		}
+	}
+	if m.SoftDelete {
+		logic:="and"
+		if len(m.where)==0{
+			logic=""
+		}
+		if m.aliasName!="" {
+			where+=fmt.Sprintf(" %s %s %s ",logic,m.aliasName+".delete_time","=?")
+			values=append(values,-1)
+		}else{
+			where+=fmt.Sprintf(" %s %s %s ",logic,"delete_time","=?")
+			values=append(values,-1)
+		}
+		//fmt.Println(where,values);
 	}
 	return where,values
 }

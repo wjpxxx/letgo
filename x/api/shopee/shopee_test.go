@@ -13,11 +13,11 @@ import(
 func TestShopee(t *testing.T){
 	Register("shopee-api",shopeeConfig.New("https://partner.test-stable.shopeemobile.com","/api/v2/",1001219,"cea778f3b36d99bda5d16a4e511fa55f9032464940163fe4acfee13c48658f42","/shopee_callback"))
 	fmt.Println(GetApi("shopee-api").AuthorizationURL())
-	file.PutContent("json",fmt.Sprintf("%v",GetApi("shopee-api").GetAccesstoken("69958af305efe832865ff5eb67a9c2e3",9714)))
-	fmt.Println(GetApi("shopee-api").RefreshAccessToken(*commonentity.NewShop(9714,14377,"8d15a63559e5efcf75f64e096d60071e","67decdc2a76c641ea8ba0fd2cf4cc014")))
+	file.PutContent("json",fmt.Sprintf("%v",GetApi("shopee-api").GetAccesstoken("0d3454ebfff77f77f829ff68a3e0b581",9714)))
+	fmt.Println(GetApi("shopee-api").RefreshAccessToken(*commonentity.NewShop(9714,14377,"02835bd3021284b69329f122552fe615","4cbd2e961ed3460ef3baa1be36806e16")))
 	Register("shopee-api-v2",shopeeConfig.New("https://partner.test-stable.shopeemobile.com","/api/v2/",1001219,"cea778f3b36d99bda5d16a4e511fa55f9032464940163fe4acfee13c48658f42","/shopee_callback").SetShopInfo(&commonentity.ShopInfo{
-		RefreshToken:"7b9e401bedce79d51d34ffeeee47c713",
-		AccessToken:"4fe3d5896fa522574e8dc50eb265c0f0",
+		RefreshToken:"9a9468cf1d0f8e972765cbe779fe6b45",
+		AccessToken:"e69f7c8a64622c5b02e6166d1ee19877",
 		ExpireIn:14376,
 		ShopID:9714,
 	}))
@@ -39,4 +39,7 @@ func TestShopee(t *testing.T){
 		},
 	}))
 	fmt.Println(GetApi("shopee-api-v2").GetShippingParameter("210606JQ3AFK4A"))
+	//fmt.Println(GetApi("shopee-api-v2").GetItemBaseInfo([]int64{100015844}))
+	//fmt.Println(GetApi("shopee-api-v2").GetItemExtraInfo([]int64{100015844}))
+	fmt.Println(GetApi("shopee-api-v2").GetItemList(0,10,0,0,"NORMAL"))
 }

@@ -5,6 +5,7 @@ import(
 	"github.com/wjpxxx/letgo/encry"
 	"github.com/wjpxxx/letgo/httpclient"
 	"github.com/wjpxxx/letgo/x/api/shopee/commonentity"
+	logisticsEntity "github.com/wjpxxx/letgo/x/api/shopee/logistics/entity"
 	"errors"
 	"fmt"
 )
@@ -60,7 +61,6 @@ func (c *Config)HttpPost(method string,data interface{},out interface{})error{
 	return c.Http("POST", method,data,out)
 }
 
-
 //Http 请求
 func (c *Config)Http(requestMethod,method string,data interface{},out interface{})error{
 	query:=c.GetCommonParam(method)
@@ -75,7 +75,17 @@ func (c *Config)Http(requestMethod,method string,data interface{},out interface{
 	if result.Err!=""{
 		return errors.New(result.Err)
 	}
-	lib.StringToObject(result.Body(),out)
+	if method=="logistics/download_shipping_document"{
+		//下载快递单
+		s:=lib.StringToObject(result.Body(),out)
+		if !s{
+			rs:=out.(*logisticsEntity.DownloadShippingDocumentResult)
+			rs.File=result.BodyByte
+		}
+	}else{
+		lib.StringToObject(result.Body(),out)
+	}
+	
 	//fmt.Println(method,result.Body())
 	return nil
 }

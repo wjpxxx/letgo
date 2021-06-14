@@ -16,6 +16,7 @@ type AddressEntity struct{
 	Town string `json:"town"`
 	AddressFlag []string `json:"address_flag"`
 	TimeSlotList []TimeSlotEntity `json:"time_slot_list"`
+	AddressType []string `json:"address_type"`
 }
 
 //String

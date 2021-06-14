@@ -6,7 +6,7 @@ import (
 
 //BranchListEntity
 type BranchListEntity struct{
-	BranchID int `json:"branch_id"`
+	BranchID int64 `json:"branch_id"`
 	Region string `json:"region"`
 	State string `json:"state"`
 	City string `json:"city"`
