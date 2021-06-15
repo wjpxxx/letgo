@@ -64,3 +64,30 @@ type ItemListEntity struct{
 func(i ItemListEntity)String()string{
 	return lib.ObjectToString(i)
 }
+
+//AddItemRequestItemEntity
+type AddItemRequestItemEntity struct{
+	OriginalPrice float32 `json:"original_price "`
+	Description string `json:"description"`
+	Weight float32 `json:"weight"`
+	ItemName string `json:"item_name"`
+	ItemStatus string `json:"item_status"`
+	Dimension DimensionEntity `json:"dimension"`
+	NormalStock int `json:"normal_stock"`
+	LogisticInfo []LogisticInfoEntity `json:"logistic_info"`
+	AttributeList []AttributeEntity `json:"attribute_list"`
+	CategoryID int64 `json:"category_id"`
+	Image ImageEntity `json:"image"`
+	PreOrder PreOrderEntity `json:"pre_order"`
+	ItemSku string `json:"item_sku"`
+	Condition string `json:"condition"`
+	Wholesales []WholesalesEntity `json:"wholesales"`
+	VideoUploadID []string `json:"video_upload_id"`
+	Brand BrandEntity `json:"brand"`
+	ItemDangerous int `json:"item_dangerous"`
+}
+
+//String
+func(i AddItemRequestItemEntity)String()string{
+	return lib.ObjectToString(i)
+}

@@ -114,3 +114,33 @@ func (p *Product)GetItemList(offset,pageSize,updateTimeFrom,updateTimeTo int,ite
 	}
 	return result
 }
+
+
+//DeleteItem
+//@Title Use this call to delete a product item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=615&version=2
+func (p *Product)DeleteItem(itemID int64)entity.DeleteItemResult{
+	method:="product/delete_item"
+	params:=lib.InRow{
+		"item_id":itemID,
+	}
+	result:=entity.DeleteItemResult{}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+//AddItem
+//@Title Add a new item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=616&version=2
+func (p *Product)AddItem(item entity.AddItemRequestItemEntity)entity.AddItemResult{
+	method:="product/add_item"
+	result:=entity.AddItemResult{}
+	err:=p.Config.HttpPost(method,item,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}

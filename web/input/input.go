@@ -26,6 +26,7 @@ type Input struct {
 	get lib.Row
 	post lib.Row
 	request *http.Request
+	body []byte
 
 }
 //R 获取请求
@@ -59,11 +60,7 @@ func (i *Input)SetGet(key string, value interface{}){
 }
 //BodyBytes 内容
 func (i *Input)BodyBytes()[]byte{
-	buf,err:=ioutil.ReadAll(i.request.Body)
-	if err!=nil{
-		return nil
-	}
-	return buf
+	return i.body
 }
 //Body
 func (i *Input)Body()string{
@@ -103,6 +100,7 @@ func (i *Input)set(method,key string, value interface{}){
 func (i *Input)Init(request *http.Request) {
 	i.Method=request.Method
 	i.request=request
+	i.body,_=ioutil.ReadAll(i.request.Body)
 	err:=i.request.ParseMultipartForm(defaultMultipartMem)
 	if err!=nil{
 		if err!=http.ErrNotMultipart{

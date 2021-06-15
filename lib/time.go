@@ -70,6 +70,12 @@ func TimeFormat(format string) string {
 	return tm.Format(format)
 }
 
+//UTCTime 获得utc时间字符串
+func UTCTime() string{
+	t,_:=time.ParseInLocation("2006-01-02 15:04:05", Now(), time.Local)
+	return t.UTC().Format("2006-01-02T15:04:05Z")
+}
+
 //将时间戳转字符串并格式化
 func TimeLongToFormat(t int64, format string) string {
 	tm := time.Unix(t, 0)

@@ -75,6 +75,14 @@ func Hmac(str string, key string) string {
 
 }
 
+//HmacSHA1 签名采用HmacSHA1算法 + Base64，编码采用UTF-8
+func HmacSHA1(str string, key string) string{
+	h := hmac.New(sha1.New, []byte(key))
+	io.WriteString(h, str)
+	r := fmt.Sprintf("%x", h.Sum(nil))
+	return r
+}
+
 //hmac+hex加密
 func HmacHex(str string, key string) string {
 	h := hmac.New(sha256.New, []byte(key))

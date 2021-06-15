@@ -455,6 +455,12 @@ func HttpBuildQuery(values lib.InRow) string{
 	return paramsValue.Encode()
 }
 
+//UrlEncode url编码
+func UrlEncode(queryString string)string{
+	qs:=url.QueryEscape(queryString)
+	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(qs, "+", "%20"),"*", "%2A"),"%7E","~")
+}
+
 //New
 func New()*HttpClient{
 	return &HttpClient{}
