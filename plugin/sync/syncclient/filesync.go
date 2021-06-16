@@ -102,7 +102,7 @@ func (f *FileSync) showProccess(seek int64,filer file.Filer){
 	}else{
 		sended=100
 	}
-	log.DebugPrint("正在发送文件%s,已发送%.2f%s",filer.Name(),sended,"%")
+	log.DebugPrint("正在发送文件%s,已发送%.2f%s",filer.FullPath(),sended,"%")
 }
 
 //packed 打包

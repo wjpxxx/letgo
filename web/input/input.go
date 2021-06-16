@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 	"io"
+	"bytes"
 )
 
 const defaultMultipartMem=64<<20 //64MB
@@ -101,6 +102,7 @@ func (i *Input)Init(request *http.Request) {
 	i.Method=request.Method
 	i.request=request
 	i.body,_=ioutil.ReadAll(i.request.Body)
+	i.request.Body=ioutil.NopCloser(bytes.NewBuffer(i.body))
 	err:=i.request.ParseMultipartForm(defaultMultipartMem)
 	if err!=nil{
 		if err!=http.ErrNotMultipart{
