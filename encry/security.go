@@ -79,7 +79,7 @@ func Hmac(str string, key string) string {
 func HmacSHA1(str string, key string) string{
 	h := hmac.New(sha1.New, []byte(key))
 	io.WriteString(h, str)
-	r := fmt.Sprintf("%x", h.Sum(nil))
+	r := base64.StdEncoding.EncodeToString(h.Sum(nil))
 	return r
 }
 
