@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"net/http"
+	"bytes"
 )
 
 //xmlBinding
@@ -13,11 +14,11 @@ func (xmlBinding) Name() string {
 	return "xml"
 }
 //Bind
-func (xmlBinding) Bind(req *http.Request, value interface{}) error {
-	if req==nil||req.Body==nil{
+func (xmlBinding) Bind(req *http.Request,body []byte, value interface{}) error {
+	if req==nil||body==nil{
 		return errors.New("error request")
 	}
-	decoder:=xml.NewDecoder(req.Body)
+	decoder:=xml.NewDecoder(bytes.NewReader(body))
 	if err:=decoder.Decode(value);err!=nil{
 		return err
 	}

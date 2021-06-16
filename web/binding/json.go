@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"bytes"
 )
 
 //jsonBinding
@@ -13,11 +14,11 @@ func(jsonBinding)Name()string{
 	return "json"
 }
 //Bind
-func(jsonBinding)Bind(req *http.Request,value interface{}) error{
-	if req==nil||req.Body==nil{
+func(jsonBinding)Bind(req *http.Request,body []byte,value interface{}) error{
+	if req==nil||body==nil{
 		return errors.New("error request")
 	}
-	decoder:=json.NewDecoder(req.Body)
+	decoder:=json.NewDecoder(bytes.NewReader(body))
 	if err:=decoder.Decode(value);err!=nil{
 		return err
 	}

@@ -4,6 +4,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"errors"
 	"net/http"
+	"bytes"
 )
 type yamlBinding struct{}
 
@@ -12,11 +13,11 @@ func (yamlBinding) Name() string {
 	return "yaml"
 }
 //Bind
-func (yamlBinding) Bind(req *http.Request, value interface{}) error {
-	if req==nil||req.Body==nil{
+func (yamlBinding) Bind(req *http.Request,body []byte, value interface{}) error {
+	if req==nil||body==nil{
 		return errors.New("error request")
 	}
-	decoder:=yaml.NewDecoder(req.Body)
+	decoder:=yaml.NewDecoder(bytes.NewReader(body))
 	if err:=decoder.Decode(value);err!=nil{
 		return err
 	}

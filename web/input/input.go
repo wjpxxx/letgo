@@ -237,7 +237,7 @@ func(i *Input)BindYAML(value interface{})error{
 
 //BindWith
 func(i *Input)BindWith(value interface{},bind binding.Binding)error{
-	return bind.Bind(i.request,value)
+	return bind.Bind(i.request,i.body,value)
 }
 
 //NewInput 新建一个input

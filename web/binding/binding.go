@@ -7,7 +7,7 @@ import (
 //Binding
 type Binding interface {
 	Name() string
-	Bind(*http.Request,interface{})error
+	Bind(*http.Request,[]byte,interface{})error
 }
 //Render
 type Rendering interface{
