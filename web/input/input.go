@@ -102,6 +102,7 @@ func (i *Input)Init(request *http.Request) {
 	i.Method=request.Method
 	i.request=request
 	i.body,_=ioutil.ReadAll(i.request.Body)
+	i.request.Body.Close()
 	i.request.Body=ioutil.NopCloser(bytes.NewBuffer(i.body))
 	err:=i.request.ParseMultipartForm(defaultMultipartMem)
 	if err!=nil{
