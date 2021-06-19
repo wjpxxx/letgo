@@ -5,15 +5,13 @@ import (
 	"github.com/wjpxxx/letgo/x/api/shopee/commonentity"
 )
 
-//AddItemResult
-type AddItemResult struct{
+//DeleteModelResult
+type DeleteModelResult struct{
 	commonentity.Result
 	Warning string `json:"warning"`
-	ItemDangerous int `json:"item_dangerous"`
-	Response ItemEntity `json:"response"`
 }
 
 //String
-func(g AddItemResult)String()string{
+func(g DeleteModelResult)String()string{
 	return lib.ObjectToString(g)
 }

@@ -19,3 +19,15 @@ type PriceInfoEntity struct{
 func(p PriceInfoEntity)String()string{
 	return lib.ObjectToString(p)
 }
+
+
+//PriceInfoEntity
+type UpdatePricePriceInfoEntity struct{
+	ModelID int64 `json:"model_id"`
+	OriginalPrice float32 `json:"original_price"`
+}
+
+//String
+func(p UpdatePricePriceInfoEntity)String()string{
+	return lib.ObjectToString(p)
+}

@@ -138,6 +138,9 @@ func getControllerMethod(controller interface{},mapMethods ...string)[]controlle
 			continue
 			//panic("The first parameter of the method must be *context.Context")
 		}
+		if (getType.Method(i).Type.NumOut()>0){
+			continue
+		}
 		methodName:=getType.Method(i).Name
 		httpMethod:="ANY"
 		if _,ok:=mapMethod[strings.ToLower(methodName)];ok{

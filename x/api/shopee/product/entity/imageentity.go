@@ -14,3 +14,14 @@ type ImageEntity struct{
 func(i ImageEntity)String()string{
 	return lib.ObjectToString(i)
 }
+
+//TierImageEntity
+type TierImageEntity struct{
+	ImageID string `json:"image_id"`
+	ImageURL string `json:"image_url"`
+}
+
+//String
+func(i TierImageEntity)String()string{
+	return lib.ObjectToString(i)
+}

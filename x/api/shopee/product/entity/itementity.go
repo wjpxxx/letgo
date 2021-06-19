@@ -91,3 +91,37 @@ type AddItemRequestItemEntity struct{
 func(i AddItemRequestItemEntity)String()string{
 	return lib.ObjectToString(i)
 }
+
+//UpdateItemRequestItemEntity
+type UpdateItemRequestItemEntity struct{
+	AddItemRequestItemEntity
+}
+
+//String
+func(i UpdateItemRequestItemEntity)String()string{
+	return lib.ObjectToString(i)
+}
+
+
+//UnlistItemItemListEntity
+type UnlistItemItemListEntity struct{
+	ItemID int64 `json:"item_id"`
+	Unlist bool `json:"unlist"`
+}
+
+//String
+func(i UnlistItemItemListEntity)String()string{
+	return lib.ObjectToString(i)
+}
+
+
+//GetBoostedListItemListEntity
+type GetBoostedListItemListEntity struct{
+	ItemID int64 `json:"item_id"`
+	CoolDownSecond int `json:"cool_down_second"`
+}
+
+//String
+func(i GetBoostedListItemListEntity)String()string{
+	return lib.ObjectToString(i)
+}

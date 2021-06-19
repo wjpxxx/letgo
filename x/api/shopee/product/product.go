@@ -144,3 +144,254 @@ func (p *Product)AddItem(item entity.AddItemRequestItemEntity)entity.AddItemResu
 	}
 	return result
 }
+
+
+//UpdateItem
+//@Title Update item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=617&version=2
+func (p *Product)UpdateItem(item entity.UpdateItemRequestItemEntity)entity.UpdateItemResult{
+	method:="product/update_item"
+	result:=entity.UpdateItemResult{}
+	err:=p.Config.HttpPost(method,item,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//GetModelList
+//@Title Get model list of an item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=618&version=2
+func (p *Product)GetModelList(itemID int64)entity.GetModelListResult{
+	method:="product/get_model_list"
+	result:=entity.GetModelListResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+
+//UpdateSizeChart
+//@Title Update size chart image of item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=619&version=2
+func (p *Product)UpdateSizeChart(itemID int64,sizeChart string)entity.UpdateSizeChartResult{
+	method:="product/update_size_chart"
+	result:=entity.UpdateSizeChartResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"size_chart":sizeChart,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+//UnlistItem
+//@Title Unlist item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=622&version=2
+func (p *Product)UnlistItem(itemList []entity.UnlistItemItemListEntity)entity.UnlistItemResult{
+	method:="product/unlist_item"
+	result:=entity.UnlistItemResult{}
+	err:=p.Config.HttpPost(method,itemList,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+
+//BoostItem
+//@Title Boost item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=624&version=2
+func (p *Product)BoostItem(itemIdList []int64)entity.BoostItemResult{
+	method:="product/boost_item"
+	result:=entity.BoostItemResult{}
+	params:=lib.InRow{
+		"item_id_list":itemIdList,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//GetBoostedList
+//@Title Get boosted item list.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=626&version=2
+func (p *Product)GetBoostedList(itemIdList []int64)entity.GetBoostedListResult{
+	method:="product/get_boosted_list"
+	result:=entity.GetBoostedListResult{}
+	err:=p.Config.HttpGet(method,nil,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//GetDtsLimit
+//@Title Get day to shipping limit.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=628&version=2
+func (p *Product)GetDtsLimit(categoryID int64)entity.GetDtsLimitResult{
+	method:="product/get_dts_limit"
+	result:=entity.GetDtsLimitResult{}
+	params:=lib.InRow{
+		"category_id":categoryID,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//GetItemLimit
+//@Title Get item upload control.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=629&version=2
+func (p *Product)GetItemLimit(categoryID int64)entity.GetItemLimitResult{
+	method:="product/get_item_limit"
+	result:=entity.GetItemLimitResult{}
+	err:=p.Config.HttpGet(method,nil,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+//SupportSizeChart
+//@Title Get category support size chart.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=631&version=2
+func (p *Product)SupportSizeChart(category int64)entity.SupportSizeChartResult{
+	method:="product/support_size_chart"
+	result:=entity.SupportSizeChartResult{}
+	params:=lib.InRow{
+		"category":category,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//InitTierVariation
+//@Title Init item tier-variation struct.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=646&version=2
+func (p *Product)InitTierVariation(itemID int64,tierVariation entity.TierVariationEntity,model entity.InitTierVariationModelEntity)entity.InitTierVariationResult{
+	method:="product/init_tier_variation"
+	result:=entity.InitTierVariationResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"tier_variation":tierVariation,
+		"model":model,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//UpdateTierVariation
+//@Title Update item tier-variation struct.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=647&version=2
+func (p *Product)UpdateTierVariation(itemID int64,tierVariation entity.TierVariationEntity)entity.UpdateTierVariationResult{
+	method:="product/update_tier_variation"
+	result:=entity.UpdateTierVariationResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"tier_variation":tierVariation,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//UpdateModel
+//@Title Update seller sku for model.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=648&version=2
+func (p *Product)UpdateModel(itemID int64,model entity.UpdateModelEntity)entity.UpdateModelResult{
+	method:="product/update_model"
+	result:=entity.UpdateModelResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"model":model,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//AddModel
+//@Title Add model.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=649&version=2
+func (p *Product)AddModel(itemID int64,modelList []entity.InitTierVariationModelEntity)entity.AddModelResult{
+	method:="product/add_model"
+	result:=entity.AddModelResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"model_list":modelList,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//DeleteModel
+//@Title Delete item model.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=650&version=2
+func (p *Product)DeleteModel(itemID,modelID int64)entity.DeleteModelResult{
+	method:="product/delete_model"
+	result:=entity.DeleteModelResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"model_id":modelID,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//UpdatePrice
+//@Title Update price.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=651&version=2
+func (p *Product)UpdatePrice(itemID int64,priceList []entity.UpdatePricePriceInfoEntity)entity.UpdatePriceResult{
+	method:="product/update_price"
+	result:=entity.UpdatePriceResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"price_list":priceList,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}

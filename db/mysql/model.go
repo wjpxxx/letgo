@@ -862,6 +862,7 @@ func (m *Model)Update(data lib.SqlIn){
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
 	table:=NewTable(db,tableName)
+	data=m.addDeleteTime(data)
 	table.Update(data,values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -869,6 +870,7 @@ func (m *Model)Update(data lib.SqlIn){
 //Insert 插入操作
 func (m *Model)Insert(row lib.SqlIn)int64{
 	table:=NewTable(db,m.tableName)
+	row=m.addDeleteTime(row)
 	id:=table.Insert(row)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -878,9 +880,24 @@ func (m *Model)Insert(row lib.SqlIn)int64{
 func (m *Model)Create(row lib.SqlIn)int64{
 	return m.Insert(row)
 }
+//判断是否添加软删除
+func (m *Model)addDeleteTime(row lib.SqlIn)lib.SqlIn{
+	if m.SoftDelete {
+		if _,ok:=row["delete_time"];!ok{
+			row["delete_time"]=-1
+		}else{
+			d:=lib.Data{Value:row["delete_time"]}
+			if d.Int()==0{
+				row["delete_time"]=-1
+			}
+		}
+	}
+	return row
+}
 //Replace 插入操作
 func (m *Model)Replace(row lib.SqlIn) int64{
 	table:=NewTable(db,m.tableName)
+	row=m.addDeleteTime(row)
 	effects:=table.Replace(row)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -889,6 +906,7 @@ func (m *Model)Replace(row lib.SqlIn) int64{
 //InsertOnDuplicate 如果你插入的记录导致一个UNIQUE索引或者primary key(主键)出现重复，那么就会认为该条记录存在，则执行update语句而不是insert语句，反之，则执行insert语句而不是更新语句。
 func (m *Model)InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
 	table:=NewTable(db,m.tableName)
+	row=m.addDeleteTime(row)
 	effects:=table.InsertOnDuplicate(row,updateRow)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
