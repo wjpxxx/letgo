@@ -756,6 +756,7 @@ func (m *Model)Count()int64{
 	rows:= table.Select("count(1) as c",where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	if len(rows)==1{
 		return rows[0]["c"].Int64()
 	}
@@ -793,6 +794,7 @@ func (m *Model)Get()lib.SqlRows{
 	rows:= table.Select(fields,where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return rows
 }
 //Find 获得单条数据
@@ -827,11 +829,25 @@ func (m *Model)Find()lib.SqlRow{
 	rows:= table.Select(fields,where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	if len(rows)==1{
 		return rows[0]
 	}
 	return nil
 }
+//clear 清理变量
+func (m *Model)clear(){
+	m.otherTableName=m.otherTableName[:0]
+	m.fields=m.fields[:0]
+	m.where=m.where[:0]
+	m.groupBy=m.groupBy[:0]
+	m.having=m.having[:0]
+	m.orderBy=""
+	m.offset=0
+	m.limit=0
+	m.preParams=m.preParams[:0]
+}
+
 //Pager 分页查询
 func (m *Model)Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow){
 	offset := pageSize * (page - 1)
@@ -844,6 +860,7 @@ func (m *Model)Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow){
 	pageInfo["pageCount"] = (&lib.Data{}).Set(int(math.Ceil(float64(total) / float64(pageSize))))
 	pageInfo["page"]=(&lib.Data{}).Set(page)
 	pageInfo["pageSize"]=(&lib.Data{}).Set(pageSize)
+	m.clear()
 	return list,pageInfo
 }
 //OrderBy 排序
@@ -866,6 +883,7 @@ func (m *Model)Update(data lib.SqlIn){
 	table.Update(data,values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 }
 //Insert 插入操作
 func (m *Model)Insert(row lib.SqlIn)int64{
@@ -874,6 +892,7 @@ func (m *Model)Insert(row lib.SqlIn)int64{
 	id:=table.Insert(row)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return id
 }
 //Create 插入数据
@@ -901,6 +920,7 @@ func (m *Model)Replace(row lib.SqlIn) int64{
 	effects:=table.Replace(row)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return effects
 }
 //InsertOnDuplicate 如果你插入的记录导致一个UNIQUE索引或者primary key(主键)出现重复，那么就会认为该条记录存在，则执行update语句而不是insert语句，反之，则执行insert语句而不是更新语句。
@@ -910,6 +930,7 @@ func (m *Model)InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
 	effects:=table.InsertOnDuplicate(row,updateRow)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return effects
 }
 //Drop 删除表
@@ -918,6 +939,7 @@ func (m *Model)Drop() int64 {
 	effects:=table.Drop()
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return effects
 }
 //Truncate 清空表
@@ -926,6 +948,7 @@ func (m *Model)Truncate() int64{
 	effects:=table.Truncate()
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return effects
 }
 //Delete 删除
@@ -936,6 +959,7 @@ func (m *Model)Delete() int64{
 	effects:=table.Delete(values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
 	return effects
 }
 //init 初始化连接池
