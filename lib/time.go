@@ -247,7 +247,17 @@ func GetWeekStr() string {
 	w := int(time.Now().Weekday())
 	return GetWeekStrByWeekInt(w)
 }
-
+//获得当前时间戳下的周一的时间戳
+func GetMondayTime(ti int) int{
+	tm := time.Unix(int64(ti), 0)
+	offset := int(time.Monday - tm.Weekday())
+	if offset > 0 {
+		offset = -6
+	}
+	weekStartDate := time.Date(tm.Year(), tm.Month(), tm.Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, offset)
+	weekStartDateInt := int(weekStartDate.Unix())
+	return weekStartDateInt
+}
 //获得指定时间戳的周一到周日的时间戳
 func StartAndEndWeekTime(ti int) []int {
 	tm := time.Unix(int64(ti), 0)

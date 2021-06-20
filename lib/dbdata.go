@@ -1,12 +1,66 @@
 package lib
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"reflect"
+)
 
 //SqlRows 查询多行
 type SqlRows []SqlRow
 
+//ToOutput
+func (s SqlRows)ToOutput()[]InRow{
+	var list []InRow
+	for _,data:=range s{
+		d:=make(InRow)
+		for k,v:=range data{
+			typeOf :=reflect.TypeOf(v.Value)
+			switch typeOf.String() {
+				case "int64":
+					d[k]=v.Int64()
+				case "int":
+					d[k]=v.Int()
+				case "float64":
+					d[k]=v.Float64()
+				case "float32":
+					d[k]=v.Float32()
+				case "bool":
+					d[k]=v.Value
+				default:
+					d[k]=v.String()
+			}
+			
+		}
+		list=append(list, d)
+	}
+	return list
+}
+
 //SqlRow 查询单行
 type SqlRow Row
+
+//ToOutput
+func (s SqlRow)ToOutput()InRow{
+	d:=make(InRow)
+	for k,v:=range s{
+		typeOf :=reflect.TypeOf(v.Value)
+		switch typeOf.String() {
+			case "int64":
+				d[k]=v.Int64()
+			case "int":
+				d[k]=v.Int()
+			case "float64":
+				d[k]=v.Float64()
+			case "float32":
+				d[k]=v.Float32()
+			case "bool":
+				d[k]=v.Value
+			default:
+				d[k]=v.String()
+		}
+	}
+	return d
+}
 
 //SqlIn sql插入更新数据格式
 type SqlIn InRow
