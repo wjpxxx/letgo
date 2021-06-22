@@ -36,6 +36,12 @@ func (s SqlRows)ToOutput()[]InRow{
 	return list
 }
 
+//Bind 绑定对象
+func (s SqlRows)Bind(value interface{})bool{
+	
+	return StringToObject(ObjectToString(s.ToOutput()), value) 
+}
+
 //SqlRow 查询单行
 type SqlRow Row
 
@@ -60,6 +66,11 @@ func (s SqlRow)ToOutput()InRow{
 		}
 	}
 	return d
+}
+
+//Bind 绑定对象
+func (s SqlRow)Bind(value interface{})bool{
+	return StringToObject(ObjectToString(s.ToOutput()), value) 
 }
 
 //SqlIn sql插入更新数据格式
