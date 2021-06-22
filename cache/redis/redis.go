@@ -118,9 +118,16 @@ func (r *Redis)SetPool(pooler RedisPooler)Rediser {
 }
 //Set set操作
 func (r *Redis)Set(key string, value interface{}, overtime int64) bool{
-	_, err :=r.getRedis().Get().Do("SET",key,lib.Serialize(value),"EX",overtime)
-	if err != nil {
-		return false
+	if overtime>-1{
+		_, err :=r.getRedis().Get().Do("SET",key,lib.Serialize(value),"EX",overtime)
+		if err != nil {
+			return false
+		}
+	}else{
+		_, err :=r.getRedis().Get().Do("SET",key,lib.Serialize(value))
+		if err != nil {
+			return false
+		}
 	}
 	return true
 }

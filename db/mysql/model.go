@@ -728,6 +728,10 @@ func (m *Model)GetModelSql()(string,[]interface{}){
 }
 //Count 统计数量
 func (m *Model)Count()int64{
+	return m.CountByClear(true)
+}
+//CountByClear 统计数量
+func (m *Model)CountByClear(isClear bool)int64{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
 	if len(whereValues)>0{
@@ -756,7 +760,9 @@ func (m *Model)Count()int64{
 	rows:= table.Select("count(1) as c",where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
-	m.clear()
+	if isClear{
+		m.clear()
+	}
 	if len(rows)==1{
 		return rows[0]["c"].Int64()
 	}
@@ -764,6 +770,11 @@ func (m *Model)Count()int64{
 }
 //Get 获得列表
 func (m *Model)Get()lib.SqlRows{
+	return m.GetByClear(true)
+}
+
+//GetByClear 获得列表
+func (m *Model)GetByClear(isClear bool)lib.SqlRows{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
 	if len(whereValues)>0{
@@ -794,7 +805,9 @@ func (m *Model)Get()lib.SqlRows{
 	rows:= table.Select(fields,where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
-	m.clear()
+	if isClear {
+		m.clear()
+	}
 	return rows
 }
 //Find 获得单条数据
@@ -854,8 +867,8 @@ func (m *Model)Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow){
 	m.offset=offset
 	m.limit=pageSize
 	var pageInfo lib.SqlRow=lib.SqlRow{}
-	list:=m.Get()
-	total:=m.Count()
+	list:=m.GetByClear(false)
+	total:=m.CountByClear(false)
 	pageInfo["total"]=(&lib.Data{}).Set(total)
 	pageInfo["pageCount"] = (&lib.Data{}).Set(int(math.Ceil(float64(total) / float64(pageSize))))
 	pageInfo["page"]=(&lib.Data{}).Set(page)
