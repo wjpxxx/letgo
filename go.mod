@@ -9,7 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/klauspost/compress v1.12.3 // indirect
-	go.mongodb.org/mongo-driver v1.5.2 // indirect
+	go.mongodb.org/mongo-driver v1.5.2
 	golang.org/x/image v0.0.0-20210504121937-7319ad40d33e // indirect
 	golang.org/x/text v0.3.5
 	gopkg.in/yaml.v2 v2.4.0 // indirect

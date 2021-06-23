@@ -90,7 +90,17 @@ func NewTable(db *MongoDB,tableName string) Tabler{
 	var table *Table=&Table{}
 	table.tableName=tableName
 	table.SetDB(db)
+	table.CreateCollection()
 	return table
+}
+//CreateCollection 创建集合
+func (t *Table)CreateCollection(){
+	db:=t.getDB()
+	ctx,cancel:=context.WithTimeout(context.Background(), time.Duration(db.Config.ExecuteTimeout)*time.Second)
+	defer func(){
+		cancel()
+	}()
+	db.Database.CreateCollection(ctx, t.tableName)
 }
 
 //SetDB 设置数据库
