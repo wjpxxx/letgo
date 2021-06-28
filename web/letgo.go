@@ -27,11 +27,11 @@ func httpServer() *server.Server{
 }
 //Run 启动
 func Run(addr ...string) {
-	httpServer().Run(...addr)
+	httpServer().Run(addr...)
 }
 //Run 启动
 func RunTLS(certFile, keyFile string, addr ...string) {
-	httpServer().RunTLS(certFile, keyFile,...addr)
+	httpServer().RunTLS(certFile, keyFile,addr...)
 }
 //Get 请求
 func Get(rootPath string,fun context.HandlerFunc){
