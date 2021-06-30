@@ -36,7 +36,8 @@ func httpServer() *server.Server{
 //Run 启动
 func Run(addr ...string) {
 	go func(){
-		log.DebugPrint("Letgo Start web server")
+		pid:=os.Getpid()
+		log.DebugPrint("Start web server Pid:%d",pid)
 		if err:=httpServer().Run(addr...);err!=nil{
 			//log.DebugPrint("letgo stop :%v", err)
 		}
@@ -58,10 +59,10 @@ func waitSignal(){
 			ctx,cancel:=syscontext.WithTimeout(syscontext.Background(), 10*time.Second)
 			defer cancel()
 			if err:=httpServer().Shutdown(ctx); err!=nil{
-				log.DebugPrint("Letgo Shutdown Fail %v", err)
+				log.DebugPrint("Shutdown Fail %v", err)
 				return
 			}
-			log.DebugPrint("Letgo Shutdown Pid:%d", pid)
+			log.DebugPrint("Shutdown Pid:%d", pid)
 			return
 		default:
 			return
@@ -92,7 +93,8 @@ func startNewProcess(){
 //Run 启动
 func RunTLS(certFile, keyFile string, addr ...string) {
 	go func ()  {
-		log.DebugPrint("Letgo Start web server")
+		pid:=os.Getpid()
+		log.DebugPrint("Start web server Pid:%d",pid)
 		if err:=httpServer().RunTLS(certFile, keyFile,addr...);err!=nil{
 			//log.DebugPrint("Letgo Start fail :%v", err)
 		}
