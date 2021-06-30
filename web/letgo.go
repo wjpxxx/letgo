@@ -62,6 +62,7 @@ func waitSignal(){
 				return
 			}
 			log.DebugPrint("Letgo Shutdown Pid:%d", pid)
+			return
 		default:
 			return
 		}
