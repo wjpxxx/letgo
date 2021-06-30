@@ -5,6 +5,7 @@ import (
 	"github.com/wjpxxx/letgo/web/context"
 	"github.com/wjpxxx/letgo/web/router"
 	"github.com/wjpxxx/letgo/web/tmpl"
+	syscontext "context"
 	"net/http"
 	"sync"
 )
@@ -13,6 +14,7 @@ import (
 type Server struct {
 	pool sync.Pool
 	route *router.Router
+	httpServer *http.Server
 }
 //NewServer
 func NewServer()*Server{
@@ -41,15 +43,15 @@ func (s *Server)handleHttpRequest(c *context.Context){
 func (s *Server)Run(addr ...string)error {
 	address:=lib.ResolveAddress(addr)
 	//fmt.Println(address)
-	http.ListenAndServe(address, s)
-	return nil
+	s.httpServer = &http.Server{Addr: address, Handler: s}
+	return s.httpServer.ListenAndServe()
 }
 
 //RunTLS 启动服务
 func(s *Server)RunTLS(certFile, keyFile string, addr ...string)error{
 	address:=lib.ResolveAddress(addr)
-	http.ListenAndServeTLS(address,certFile,keyFile,s)
-	return nil
+	s.httpServer = &http.Server{Addr: address, Handler: s}
+	return s.httpServer.ListenAndServeTLS(certFile, keyFile)
 }
 //RegisterRouter 注册路由
 func(s *Server)RegisterRouter(method,relativePath string, handler context.HandlerFunc){
@@ -63,4 +65,8 @@ func (s *Server)Router()*router.Router{
 //Tmpl 获得模板对象
 func (s *Server)Tmpl()*tmpl.Tmpl{
 	return tmpl.GetTmpl()
+}
+//Shutdown 关闭服务
+func (s *Server)Shutdown(ctx syscontext.Context)error{
+	return s.httpServer.Shutdown(ctx)
 }
