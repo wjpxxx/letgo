@@ -36,6 +36,7 @@ func httpServer() *server.Server{
 //Run 启动
 func Run(addr ...string) {
 	go func(){
+		log.DebugPrint("Letgo Start web server")
 		if err:=httpServer().Run(addr...);err!=nil{
 			//log.DebugPrint("letgo stop :%v", err)
 		}
@@ -90,6 +91,7 @@ func startNewProcess(){
 //Run 启动
 func RunTLS(certFile, keyFile string, addr ...string) {
 	go func ()  {
+		log.DebugPrint("Letgo Start web server")
 		if err:=httpServer().RunTLS(certFile, keyFile,addr...);err!=nil{
 			//log.DebugPrint("Letgo Start fail :%v", err)
 		}
