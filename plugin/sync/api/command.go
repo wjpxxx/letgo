@@ -53,6 +53,9 @@ func  (c *Command)doCmd(message syncconfig.CmdMessage) *syncconfig.CmdResult{
 //doSlaveCmd
 func  (c *Command)doSlaveCmd(message syncconfig.CmdMessage,results map[string]syncconfig.CmdResult)map[string]syncconfig.CmdResult{
 	for _,slave:=range message.Slave{
+		if slave.Cmd==""{
+			continue
+		}
 		msg:=syncconfig.CmdMessage{
 			Server: syncconfig.Server{
 				IP: slave.IP,

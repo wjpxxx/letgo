@@ -1,6 +1,9 @@
 package syncconfig
 
-import "github.com/wjpxxx/letgo/lib"
+import (
+	"github.com/wjpxxx/letgo/lib"
+)
+
 
 //ClientConfig 客户端配置文件
 type ClientConfig struct {
@@ -86,6 +89,7 @@ type MessageResult struct{
 	Code int `json:"code"`
 	Msg string `json:"msg"`
 	Data []byte `json:"data"`
+	
 }
 
 //String

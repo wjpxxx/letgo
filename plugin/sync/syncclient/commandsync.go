@@ -27,13 +27,18 @@ func NewCommandSync()*CommandSync{
 func (c *CommandSync) do(client *rpc.Client,values ...interface{})map[string]syncconfig.CmdResult{
 	var dir string
 	var cmd string
+	var ip string
 	if len(values)==1{
 		cmd=values[0].(string)
 	}else if len(values)==2{
 		dir=values[0].(string)
 		cmd=values[1].(string)
+	}else if len(values)==3{
+		dir=values[0].(string)
+		cmd=values[1].(string)
+		ip=values[2].(string)
 	}
-	message:=c.packedCmd(dir,cmd)
+	message:=c.packedCmd(dir,cmd,ip)
 	return c.rpcCall(client,message)
 }
 
@@ -48,34 +53,86 @@ func (c *CommandSync)rpcCall(client *rpc.Client,message syncconfig.CmdMessage)ma
 			return rs
 		}
 	}
-	return nil
 }
 
 //packed 打包
-func (c *CommandSync) packedCmd(dir,cmd string)syncconfig.CmdMessage{
-	return syncconfig.CmdMessage{
-		Server: syncconfig.Server{
-			IP: config.Server.IP,
-			Port: config.Server.Port,
-		},
-		Dir: dir,
-		Cmd: cmd,
-		Slave:c.cmdSlave(dir,cmd),
-	}
-}
-//cmdSlave
-func (c *CommandSync) cmdSlave(dir,cmd string)[]syncconfig.CmdSlave{
-	var slaves []syncconfig.CmdSlave
-	for _,slave:=range config.Server.Slave{
-		s:=syncconfig.CmdSlave{
+func (c *CommandSync) packedCmd(dir,cmd,ip string)syncconfig.CmdMessage{
+	if ip!=""{
+		if ip==config.Server.IP{
+			//如果有传IP,则只有IP的服务器执行
+			return syncconfig.CmdMessage{
+				Server: syncconfig.Server{
+					IP: config.Server.IP,
+					Port: config.Server.Port,
+				},
+				Dir: dir,
+				Cmd: cmd,
+				Slave:c.cmdSlave(dir,cmd,ip),
+			}
+		}else{
+			//其他台不执行
+			return syncconfig.CmdMessage{
+				Server: syncconfig.Server{
+					IP: config.Server.IP,
+					Port: config.Server.Port,
+				},
+				Dir: "",
+				Cmd: "",
+				Slave:c.cmdSlave(dir,cmd,ip),
+			}
+		}
+		
+	}else{
+		return syncconfig.CmdMessage{
 			Server: syncconfig.Server{
-				IP: slave.IP,
-				Port: slave.Port,
+				IP: config.Server.IP,
+				Port: config.Server.Port,
 			},
 			Dir: dir,
 			Cmd: cmd,
+			Slave:c.cmdSlave(dir,cmd,ip),
 		}
-		slaves=append(slaves, s)
+	}
+	
+}
+//cmdSlave
+func (c *CommandSync) cmdSlave(dir,cmd,ip string)[]syncconfig.CmdSlave{
+	var slaves []syncconfig.CmdSlave
+	for _,slave:=range config.Server.Slave{
+		if ip!=""{
+			if ip==slave.IP{
+				//改台IP执行
+				s:=syncconfig.CmdSlave{
+					Server: syncconfig.Server{
+						IP: slave.IP,
+						Port: slave.Port,
+					},
+					Dir: dir,
+					Cmd: cmd,
+				}
+				slaves=append(slaves, s)
+			}else{
+				s:=syncconfig.CmdSlave{
+					Server: syncconfig.Server{
+						IP: slave.IP,
+						Port: slave.Port,
+					},
+					Dir: "",
+					Cmd: "",
+				}
+				slaves=append(slaves, s)
+			}
+		}else{
+			s:=syncconfig.CmdSlave{
+				Server: syncconfig.Server{
+					IP: slave.IP,
+					Port: slave.Port,
+				},
+				Dir: dir,
+				Cmd: cmd,
+			}
+			slaves=append(slaves, s)
+		}
 	}
 	return slaves
 }
