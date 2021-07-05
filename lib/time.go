@@ -12,6 +12,7 @@ func Time() int {
 	timestamp := cur.UnixNano() / 1000000
 	return int(timestamp / 1000)
 }
+
 //TimeByTime 获得时间戳
 func TimeByTime(t time.Time) int {
 	timestamp := t.UnixNano() / 1000000
@@ -58,6 +59,7 @@ func Now() string {
 	return tm.Format("2006-01-02 15:04:05")
 }
 
+
 //将时间戳转字符串并格式化
 func TimeToFormat(t int, format string) string {
 	tm := time.Unix(int64(t), 0)
@@ -85,6 +87,20 @@ func TimeLongToFormat(t int64, format string) string {
 //获得凌晨零点时间戳
 func ZeroTime() int {
 	return ZeroTimeByTime(Time())
+}
+
+//ZeroTimeByLocal 获得凌晨零点时间戳
+func ZeroTimeByLocal(localName string) int {
+	return ZeroTimeByTimeByLocal(Time(),localName)
+}
+
+//获得时间戳对应的凌晨0点时间戳
+func ZeroTimeByTimeByLocal(ti int,localName string) int {
+	loc, _ := time.LoadLocation(localName)
+	timeStr := TimeToFormat(ti, "2006-01-02")
+	t, _ := time.ParseInLocation("2006-01-02", timeStr, loc)
+	timeNumber := t.Unix()
+	return int(timeNumber)
 }
 
 //获得时间戳对应的凌晨0点时间戳
