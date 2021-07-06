@@ -164,6 +164,7 @@ type Wherer interface{
 	Union(model Modeler) Unioner
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
 	Update(data lib.SqlIn)
+	Delete() int64
 }
 //GroupByer 分组接口
 type GroupByer interface{
