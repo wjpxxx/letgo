@@ -51,7 +51,7 @@ func DebugPrint(format string,values ...interface{}){
 			format+="\n"
 		}
 		timeStr=lib.Now()
-		fmt.Fprintf(w,"[Letgo-debug-"+timeStr+"]"+format,values...)
+		fmt.Fprintf(w,"[Letgo-debug:"+timeStr+"]"+format,values...)
 	}
 }
 //init
