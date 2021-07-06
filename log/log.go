@@ -50,7 +50,7 @@ func DebugPrint(format string,values ...interface{}){
 		if !strings.HasSuffix(format,"\n") {
 			format+="\n"
 		}
-		timeStr=lib.Now()
+		timeStr:=lib.Now()
 		fmt.Fprintf(w,"[Letgo-debug:"+timeStr+"]"+format,values...)
 	}
 }
