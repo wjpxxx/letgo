@@ -331,7 +331,7 @@ Creating Crontab
 
 ```go
 
-package crontab
+package main
 import (
 	"github.com/wjpxxx/letgo/cron/context"
 	"github.com/wjpxxx/letgo/lib"
