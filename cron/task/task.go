@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"sort"
 	"time"
+	"github.com/wjpxxx/letgo/cron/context"
+	"github.com/wjpxxx/letgo/lib"
 )
 
 //DoFunc
-type DoFunc func(*Context)
+type DoFunc func(*context.Context)
 
 //Task
 type task struct{
-	context *Context
+	context *context.Context
 	do DoFunc
 }
 
@@ -67,7 +69,7 @@ func init(){
 func (t *taskManager)RegisterTask(name string,taskNums int,call DoFunc){
 	t.taskLock.Lock()
 	for i:=0;i<taskNums;i++{
-		ctx:=NewContext()
+		ctx:=context.NewContext()
 		ctx.Name=name
 		ctx.TaskNo=i
 		ctx.Done=false
@@ -110,6 +112,7 @@ func (t *taskManager)startTask(sortList taskMapSort){
 			t.wait.Add(1)
 			go func(tk task){
 				defer t.wait.Done()
+				tsk.context.Now=lib.Time()
 				tk.do(tk.context)
 				tk.context.SetDone(false)
 			}(tsk)

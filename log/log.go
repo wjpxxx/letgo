@@ -54,6 +54,18 @@ func DebugPrint(format string,values ...interface{}){
 		fmt.Fprintf(w,"[Letgo-debug:"+timeStr+"]"+format,values...)
 	}
 }
+
+//DebugPrint
+func PanicPrint(format string,values ...interface{}){
+	if IsDebug() {
+		if !strings.HasSuffix(format,"\n") {
+			format+="\n"
+		}
+		timeStr:=lib.Now()
+		panic(fmt.Sprintf("[Letgo-debug:"+timeStr+"]"+format,values...))
+	}
+}
+
 //init
 func init() {
 	logFile:="config/log.config"

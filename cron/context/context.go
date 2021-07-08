@@ -1,4 +1,4 @@
-package task
+package context
 
 import(
 	"sync"
@@ -11,6 +11,7 @@ type Context struct{
 	TaskNo int `json:"taskNo"`
 	Done bool `json:"done"`
 	lock sync.RWMutex
+	Now int `json:"now"`
 }
 //IsDone
 func (c *Context)IsDone()bool{

@@ -38,7 +38,14 @@ func StrToInt(str string) int {
 	}
 	return 0
 }
-
+//字符串转uint
+func StrToUInt(str string) uint {
+	vv, err := strconv.Atoi(str)
+	if err == nil {
+		return uint(vv)
+	}
+	return 0
+}
 //字符串转int64
 func StrToInt64(str string) int64 {
 	vv, err := strconv.ParseInt(str, 10, 64)
