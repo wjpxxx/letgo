@@ -324,3 +324,32 @@ func main() {
 }
 
 ```
+
+## Crontab
+
+Creating Crontab
+
+```go
+
+package crontab
+import (
+	"github.com/wjpxxx/letgo/cron/context"
+	"github.com/wjpxxx/letgo/lib"
+	"fmt"
+	"time"
+)
+func main() {
+	AddCron("cron1","*/6 * * * * *",func(ctx *context.Context){
+		fmt.Println("cron1", lib.Now())
+	})
+	AddCron("cron2","*/3 * * * * *",func(ctx *context.Context){
+		fmt.Println("cron2", lib.Now())
+	})
+	go func(){
+		time.Sleep(10*time.Second)
+		Stop()
+	}()
+	StartAndWait()
+}
+
+```
