@@ -4,7 +4,7 @@ import (
 	"github.com/wjpxxx/letgo/lib"
 	"fmt"
 	"time"
-
+	"github.com/wjpxxx/letgo/log"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -32,16 +32,23 @@ func (r *RedisPool) open(connect SlaveDB) *redis.Pool {
 			address:=fmt.Sprintf("%s:%s",connect.Host,connect.Port)
 			con,err:=redis.Dial("tcp", address)
 			if err!=nil{
+				log.PanicPrint("open connect fail %s",err.Error())
 				return nil,err
 			}
 			if connect.Password!=""{
 				if _, err := con.Do("AUTH", connect.Password); err != nil {
 					con.Close()
+					if err!=nil{
+						log.PanicPrint("AUTH fail %s",err.Error())
+					}
 					return nil, err
 				}
 			}
 			if _, err := con.Do("SELECT", connect.Db); err != nil {
 				con.Close()
+				if err!=nil{
+					log.PanicPrint("AUTH fail %s",err.Error())
+				}
 				return nil, err
 			}
 			return con, nil

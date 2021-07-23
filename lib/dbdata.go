@@ -38,7 +38,6 @@ func (s SqlRows)ToOutput()[]InRow{
 
 //Bind 绑定对象
 func (s SqlRows)Bind(value interface{})bool{
-	
 	return StringToObject(ObjectToString(s.ToOutput()), value) 
 }
 

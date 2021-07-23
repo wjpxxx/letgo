@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+	"github.com/wjpxxx/letgo/log"
 )
 
 //MysqlPooler 全局连接池接口
@@ -101,7 +102,7 @@ func(m *MysqlPool)open(connect SlaveDB) *sql.DB{
 	connectStr:=fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s",connect.UserName,connect.Password,connect.Host,connect.Port,connect.DatabaseName,connect.Charset)
 	db, err:=sql.Open("mysql",connectStr)
 	if err!=nil{
-		panic("open connect fail "+err.Error())
+		log.PanicPrint("open connect fail %s",err.Error())
 	}
 	if connect.MaxIdleConns>0{
 		db.SetMaxIdleConns(connect.MaxIdleConns)
