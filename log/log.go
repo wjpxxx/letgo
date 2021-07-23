@@ -55,7 +55,7 @@ func DebugPrint(format string,values ...interface{}){
 	}
 }
 
-//DebugPrint
+//PanicPrint
 func PanicPrint(format string,values ...interface{}){
 	if IsDebug() {
 		if !strings.HasSuffix(format,"\n") {

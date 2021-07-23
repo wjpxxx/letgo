@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"bytes"
+	"math"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -19,6 +20,10 @@ func StrToFloat32(str string) float32 {
 		return float32(vv)
 	}
 	return 0
+}
+//Round
+func Round(x float32)int{
+	return int(math.Floor(float64(x)+0.5))
 }
 
 //字符串转float64

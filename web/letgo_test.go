@@ -2,6 +2,7 @@ package web
 
 import (
 	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/limiting"
 	"github.com/wjpxxx/letgo/web/context"
 	"fmt"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 
 func TestLetgo(t *testing.T) {
+	EnableLimiting(limiting.LIMIT_FLOW_TOKEN_BUCKET, 0.02)
 	AddFilter("/user/*",filter.BEFORE_ROUTER,func(ctx *context.Context){
 		ctx.Output.Redirect(302,"/")
 	})

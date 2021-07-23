@@ -43,6 +43,14 @@ func (c *Context)Init(){
 func (c *Context)FullPath()string{
 	return c.Request.URL.String()
 }
+//Router
+func (c *Context)Router()string{
+	requestPath:=strings.ToLower(c.Request.URL.Path)
+	if requestPath==""{
+		return "/"
+	}
+	return requestPath
+}
 //SetCookie 设置cookie
 func (c *Context)SetCookies(name,value string,maxAge int,path,domain string,secure,httpOnly bool) {
 	if path=="" {

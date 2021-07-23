@@ -114,6 +114,67 @@ func main() {
 }
 ```
 
+## Enable current limiting algorithm
+
+```go
+package main
+
+import (
+    "github.com/wjpxxx/letgo/web"
+    "github.com/wjpxxx/letgo/web/context"
+	"github.com/wjpxxx/letgo/web/filter"
+	"github.com/wjpxxx/letgo/web/limiting"
+	"fmt"
+)
+
+func main() {
+	EnableLimiting(limiting.LIMIT_FLOW_TOKEN_BUCKET, 0.02)
+	web.AddFilter("/user/*",filter.BEFORE_ROUTER,func(ctx *context.Context){
+		ctx.Output.JSON(200,lib.InRow{
+			"www":"fff",
+		})
+	})
+	web.LoadHTMLGlob("templates/*")
+	web.Get("/", func(ctx *context.Context){
+		//ctx.Output.Redirect(301,"http://www.baidu.com")
+		x:=ctx.Input.Param("a")
+		if x!=nil{
+			ctx.Session.Set("a",x.Int())
+			var a int
+			ctx.Session.Get("a",&a)
+			fmt.Println("a:",a,"x:",x.Int())
+		}
+		ctx.Output.HTML(200,"index.tmpl",lib.InRow{
+			"title":"wjp",
+		})
+	})
+	
+	web.Post("/user/:id([0-9]+)", func(ctx *context.Context){
+		type A struct{
+			Data string `json:"data"`
+			ShopID int64 `json:"shop_id"`
+		}
+		a:=A{}
+		ctx.SetCookie("a", "234234")
+		ctx.Input.BindJSON(&a)
+		fmt.Println(a)
+		ctx.Output.YAML(500,lib.InRow{
+			"message":"123123",
+			"b":2,
+		})
+	})
+
+	web.Get("/user/:id([0-9]+)/:id3([0-9]+)", func(ctx *context.Context){
+		ctx.Output.XML(200,lib.InRow{
+			"message":"123123",
+			"b":2,
+		})
+	})
+
+	web.Run()//listen and serve on 0.0.0.0:1122 (for windows "localhost:1122")
+}
+```
+
 ## Captcha
 
 ```go

@@ -6,6 +6,7 @@ import (
 	"github.com/wjpxxx/letgo/lib"
 	"github.com/wjpxxx/letgo/log"
 	"github.com/wjpxxx/letgo/web/filter"
+	"github.com/wjpxxx/letgo/web/limiting"
 	"html/template"
 	"net/http"
 	"sync"
@@ -18,9 +19,8 @@ import (
 	syscontext "context"
 	"time"
 	"os/exec"
+	"runtime"
 )
-
-
 
 var initserver *server.Server
 
@@ -54,7 +54,9 @@ func waitSignal(){
 		switch sig {
 		case syscall.SIGINT,syscall.SIGTERM:
 			//启动新进程
-			startNewProcess()
+			if runtime.GOOS!="windows" {
+				startNewProcess()
+			}
 			//准备关闭旧进程
 			ctx,cancel:=syscontext.WithTimeout(syscontext.Background(), 10*time.Second)
 			defer cancel()
@@ -184,7 +186,7 @@ func getControllerName(controller interface{})string{
 	}
 	i:=strings.Index(name,"Controller")
 	if i==-1{
-		panic("The controller name must end with controller")
+		log.PanicPrint("The controller name must end with controller")
 	}
 	name=name[0:i]
 	return name
@@ -244,4 +246,34 @@ func getMapMethods(mapMethods ...string)lib.StringMap{
 //AddFilter 添加过滤
 func AddFilter(pattern string, pos int, filterFunc context.HandlerFunc){
 	filter.AddFilter(pattern,pos,filterFunc)
+}
+//EnableLimiting 启用限流算法
+//当是LIMIT_FLOW_COUNTER 第一个参数是流量的总限制,第二个参数是窗口大小
+//当是LIMIT_FLOW_ROLLING_COUNTER 第一个参数是流量总限制,第二个子窗口个数,第三个是总窗口大小
+//当LIMIT_FLOW_LEAKY_BUCKET 第一个是流量总大小,第二个参数是流出速度 个/毫秒
+//当LIMIT_FLOW_TOKEN_BUCKET 第一个参数是流入速度 个/毫秒
+func EnableLimiting(limitType limiting.LimitFlowType,args ...interface{}) {
+	limitModule:=make(map[string]limiting.Ilimiter)
+	AddFilter("/*",filter.BEFORE_ROUTER, func(ctx *context.Context){
+		if limitType!=limiting.LIMIT_FLOW_NONE {
+			//启用限流算法
+			rt:=ctx.Router()
+			if _,ok:=limitModule[rt];!ok{
+				switch limitType {
+				case limiting.LIMIT_FLOW_COUNTER:
+					limitModule[rt]=limiting.NewFlowCounterByParams(args...)
+				case limiting.LIMIT_FLOW_LEAKY_BUCKET:
+					limitModule[rt]=limiting.NewLeakyBucketByParams(args...)
+				case limiting.LIMIT_FLOW_ROLLING_COUNTER:
+					limitModule[rt]=limiting.NewFlowRollingCounterByParams(args...)
+				case limiting.LIMIT_FLOW_TOKEN_BUCKET:
+					limitModule[rt]=limiting.NewTokenBucketByParams(args...)
+				}
+			}
+			if limitModule[rt].Pass() {
+				//达到限流
+				ctx.Output.Text(500, "Maximum number of requests reached")
+			}
+		}
+	})
 }
