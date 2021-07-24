@@ -214,7 +214,7 @@ package main
 
 import "github.com/wjpxxx/letgo/db/mysql"
 func main() {
-    model:=NewModel("dbname","tablename")
+    model:=mysql.NewModel("dbname","tablename")
     m:=model.Fields("*").
             Alias("m").
             Join("sys_shopee_shop as s").
@@ -232,6 +232,15 @@ func main() {
             OrderBy("m.id desc").Find()
     fmt.Println(model.GetLastSql())
     fmt.Println(m["master_id"].Int64(),m["name"],m["age"].Int(),m["password"].String())
+    //show all tables in database
+    db:=mysql.Connect("connectName", "databaseName")
+    fmt.Println("tables:",db.ShowTables())
+    //Judge whether the table exists
+    fmt.Println("tables:",db.IsExist("tableName"))
+    //Displays field names and properties
+    //db2:=mysql.Connect("connectName", "databaseName")
+    fmt.Println("fieldInformation:",db.Desc("tableName"))
+
 }
 ```
 

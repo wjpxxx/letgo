@@ -70,12 +70,12 @@ func TestNewDB(t *testing.T) {
 }
 
 func TestShowTables(t *testing.T){
-	db=Connect("xingtool_base", "xingtool_base")
+	db:=Connect("xingtool_base", "xingtool_base")
 	fmt.Println("tables:",db.ShowTables())
 }
 
 func TestDDL(t *testing.T){
-	db=Connect("xingtool_base", "xingtool_base")
+	db:=Connect("xingtool_base", "xingtool_base")
 	fmt.Println("tables:",db.Desc("sys_admin"))
 	fmt.Println("tables:",db.IsExist("sys_adminxx"))
 }
