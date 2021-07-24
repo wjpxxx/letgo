@@ -5,6 +5,7 @@ import (
 	"strings"
 	"database/sql"
 	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/log"
 	"fmt"
 	"sync"
 	_ "github.com/go-sql-driver/mysql"
@@ -41,6 +42,10 @@ type DBer interface{
 	Commit()
 	Rollback()
 	Exec(sql string)int64
+	Query(sql string,whereParams ...interface{})lib.SqlRows
+	Desc(tableName string)lib.Columns
+	IsExist(tableName string) bool
+	ShowTables()[]string
 }
 //DBPool 连接池接口
 type DBPool interface{
@@ -108,6 +113,85 @@ func (db *DB)prepare(sql string)(*sql.Stmt, error){
 	}else{
 		//未使用事务
 		return db.dbPool.GetIncludeReadDB(db.connectName).Prepare(sql)
+	}
+}
+//Desc 查询表结构
+func (db *DB)Desc(tableName string)lib.Columns{
+	sql:=fmt.Sprintf("select * from information_schema.columns where table_schema = '%s' and table_name = '%s'", db.databaseName,tableName)
+	lst:= db.Query(sql)
+	var cls lib.Columns
+	for _,c:=range lst{
+		cc:= lib.Column{
+			Name: c["COLUMN_NAME"].String(),
+			Type: c["COLUMN_TYPE"].String(),
+			DataType: c["DATA_TYPE"].String(),
+			Scale: c["NUMERIC_SCALE"].Int(),
+			Extra: c["EXTRA"].String(),
+			Key: c["COLUMN_KEY"].String(),
+			IsNull: c["IS_NULLABLE"].String(),
+			Default: c["COLUMN_DEFAULT"].String(),
+			Comment:c["COLUMN_COMMENT"].String(),
+			CharacterSetName:c["CHARACTER_SET_NAME"].String(),
+			CollationName:c["COLLATION_NAME"].String(),
+		}
+		nums:=[]string{"int","bigint","bit","tinyint","decimal","double","float","integer","mediumint","numeric","smallint"}
+		dates:=[]string{"datetime","timestamp","time"}
+		if lib.InStringArray(c["DATA_TYPE"].String(),nums){
+			cc.Length=c["NUMERIC_PRECISION"].Int()
+		}else if lib.InStringArray(c["DATA_TYPE"].String(),dates){
+			cc.Length=c["DATETIME_PRECISION"].Int()
+		}else{
+			cc.Length=c["CHARACTER_MAXIMUM_LENGTH"].Int()
+		}
+		cls=append(cls, cc)
+	}
+	return cls
+}
+//ShowTables 显示数据库的所有表名称
+func (db *DB)ShowTables()[]string{
+	var tables []string
+	tbs:=db.Query("show tables")
+	k:=fmt.Sprintf("Tables_in_%s",db.databaseName)
+	for _,t:=range tbs{
+		tables=append(tables, t[k].String())
+	}
+	return tables
+}
+//IsExist 检测表是否存在
+func (db *DB)IsExist(tableName string) bool{
+	sql:=fmt.Sprintf("select * from information_schema.tables where table_schema = '%s' and table_name ='%s';",db.databaseName,tableName)
+	tb:= db.Query(sql)
+	if tb!=nil{
+		return true
+	}
+	return false
+}
+
+//Query
+func (db *DB)Query(sql string,whereParams ...interface{})lib.SqlRows{
+	rows,err:=db.query(sql,whereParams...)
+	if err!=nil{
+		return nil
+	}
+	defer rows.Close()
+	return lib.RowsToSqlRows(rows)
+}
+//query
+func (db *DB)query(sql string,whereParams ...interface{})(*sql.Rows, error){
+	if db.dbPool.IsTransaction(db.connectName) {
+		//开启事务
+		if len(whereParams)>0{
+			return db.dbPool.GetTx(db.connectName).Query(sql,whereParams...)
+		}else{
+			return db.dbPool.GetTx(db.connectName).Query(sql)
+		}
+	}else{
+		//未使用事务
+		if len(whereParams)>0{
+			return db.dbPool.GetIncludeReadDB(db.connectName).Query(sql,whereParams...)
+		}else{
+			return db.dbPool.GetIncludeReadDB(db.connectName).Query(sql)
+		}
 	}
 }
 //Tabler 表操作接口
@@ -341,21 +425,7 @@ func (t *Table)Delete(onParams []interface{},where string,whereParams ...interfa
 //query 查询
 func (t *Table)query(sql string,whereParams ...interface{})(*sql.Rows, error){
 	t.sql(sql,whereParams...)
-	if t.db.dbPool.IsTransaction(t.db.connectName) {
-		//开启事务
-		if len(whereParams)>0{
-			return t.db.dbPool.GetTx(t.db.connectName).Query(sql,whereParams...)
-		}else{
-			return t.db.dbPool.GetTx(t.db.connectName).Query(sql)
-		}
-	}else{
-		//未使用事务
-		if len(whereParams)>0{
-			return t.db.dbPool.GetIncludeReadDB(t.db.connectName).Query(sql,whereParams...)
-		}else{
-			return t.db.dbPool.GetIncludeReadDB(t.db.connectName).Query(sql)
-		}
-	}
+	return t.db.query(sql, whereParams...)
 }
 
 //sql
@@ -385,6 +455,14 @@ func NewTable(db *DB,tableName string) Tabler{
 	table.SetDB(db)
 	return table
 }
+
+//Connect 连接到数据库
+func Connect(connectName,databaseName string)*DB{
+	db:=NewDB()
+	db.SetDB(connectName, databaseName)
+	return db
+}
+
 //NewDB 新建数据库连接包括连接池
 func NewDB()*DB{
 	dbFile:="config/db.config"
@@ -408,7 +486,7 @@ func NewDB()*DB{
 			Slave:slaves,
 		})
 		file.PutContent(dbFile,fmt.Sprintf("%v",configs))
-		panic("please setting database config in config/db.config file")
+		log.PanicPrint("please setting database config in config/db.config file")
 	}
 	lib.StringToObject(cfgFile, &configs)
 	var db DB

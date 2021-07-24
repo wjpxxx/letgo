@@ -8,6 +8,13 @@ import (
 //SqlRows 查询多行
 type SqlRows []SqlRow
 
+//表的字段信息
+type Columns []Column
+
+//String
+func (c Columns)String()string{
+	return ObjectToString(c)
+}
 //ToOutput
 func (s SqlRows)ToOutput()[]InRow{
 	var list []InRow
@@ -143,4 +150,23 @@ func (i InRow)MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
+}
+//Column 表字段信息
+type Column struct{
+	Name string `json:"name"`  //字段名
+	Type string `json:"type"`  //字段类型
+	DataType string `json:"dataType"` //字段类型
+	Length int `json:"length"` //字段长度
+	Scale int `json:"scale"`  //小数点
+	Extra string `json:"extra"` //扩展
+	Key string `json:"key"`  //主键为PRI
+	IsNull string `json:"isNull"` //是否为空 NO不为空 YES为空
+	Default string `json:"default"` //默认值
+	Comment string `json:"comment"`  //备注
+	CharacterSetName string `json:"characterSetName"` //字段字符编码
+	CollationName string `json:"collationName"` //字段字符编码
+}
+//String
+func (c Column)String()string{
+	return ObjectToString(c)
 }
