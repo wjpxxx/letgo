@@ -244,6 +244,26 @@ func main() {
 }
 ```
 
+## Mongo db operation
+
+```go
+package main
+import (
+	"github.com/wjpxxx/letgo/db/mongo"
+)
+func main() {
+	type Student struct {
+		Name string `json:"name"`
+		Age int `json:"age"`
+	}
+	entity:=Student{"wjp", 1}
+	tb:=mongo.NewModel("databaseName","collectionName")
+	tb.InsertOne(entity)
+}
+
+```
+
+
 ## RPC
 
 ```go
