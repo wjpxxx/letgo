@@ -83,6 +83,13 @@ func HmacSHA1(str string, key string) string{
 	return r
 }
 
+//HMACSHA256
+func HMACSHA256(data []byte,key []byte) []byte {
+	hash := hmac.New(sha256.New, key)
+	hash.Write(data)
+	return hash.Sum(nil)
+}
+
 //hmac+hex加密
 func HmacHex(str string, key string) string {
 	h := hmac.New(sha256.New, []byte(key))

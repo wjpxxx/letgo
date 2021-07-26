@@ -68,6 +68,7 @@ type Httper interface{
 	WithProxy(proto int, host, port string) Httper
 	WithTimeOut(timeout int) Httper
 	Get(url string,values lib.InRow)*HttpResponse
+	Put(url string) *HttpResponse
 	Post(url string,values lib.InRow)*HttpResponse
 	PostJson(url string,value interface{})*HttpResponse
 	PostXml(url string,value interface{})*HttpResponse
@@ -275,6 +276,13 @@ func(h *HttpClient)Options(url string,values lib.InRow) *HttpResponse{
 func(h *HttpClient)Head(url string) *HttpResponse{
 	client:=h.getClient()
 	req:=h.getRequest(url,"HEAD",nil)
+	return h.getResponse(client.Do(req))
+}
+
+//Put 请求
+func(h *HttpClient)Put(url string) *HttpResponse{
+	client:=h.getClient()
+	req:=h.getRequest(url,"PUT",nil)
 	return h.getResponse(client.Do(req))
 }
 
