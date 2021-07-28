@@ -263,6 +263,90 @@ func main() {
 
 ```
 
+## Dynamic data source
+
+```go
+package main
+
+import (
+	"github.com/wjpxxx/letgo/db/mysql"
+	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/db/mongo"
+	"go.mongodb.org/mongo-driver/bson"
+)
+
+
+func main() {
+    model:=mysql.NewModel("db2","tablename")
+    m:=model.Fields("*").
+            Alias("m").
+            Join("sys_shopee_shop as s").
+            On("m.id","s.master_id").
+            OrOn("s.master_id",1).
+            AndOnRaw("m.id=1 or m.id=2").
+            LeftJoin("sys_lazada_shop as l").
+            On("m.id", "l.master_id").
+            WhereRaw("m.id=1").
+            AndWhere("m.id",2).
+            OrWhereIn("m.id",lib.Int64ArrayToInterfaceArray(ids)).
+            GroupBy("m.id").
+            Having("m.id",1).
+            AndHaving("m.id",1).
+            OrderBy("m.id desc").Find()
+    fmt.Println(model.GetLastSql())
+}
+
+func init(){
+	mysql.InjectCreatePool(func(db *DB)[]mysql.MysqlConnect{
+		var otherConnects []mysql.MysqlConnect
+		model:=mysql.NewModelByConnectName("connectName", "databaseName", "database_config")
+		list:= model.Get()
+		for _,v:=range list{
+			otherConnect:=mysql.MysqlConnect{
+				Master:mysql.SlaveDB{
+					Name:"db2",
+					DatabaseName:"db2",
+					UserName:"userName",
+					Password:"password",
+					Host:"127.0.0.1",
+					Port:"3306",
+					Charset:"utf8mb4",
+					MaxOpenConns:20,
+					MaxIdleConns:10,
+				},
+				Slave:make([]mysql.SlaveDB, 1),
+			}
+			otherConnects=append(otherConnects, otherConnect)
+		}
+		return otherConnects
+	})
+
+	mongo.InjectCreatePool(func(db *DB)[]mongo.MongoConnect{
+		var otherConnects []mongo.MongoConnect
+		var r []bson.D
+		mongo.NewModelByConnectName("connectName", "databaseName", "database_config").Find(nil, &r)
+		for _,v:=range r{
+			otherConnect:=mongo.MongoConnect{
+				Master:mongo.SlaveDB{
+					Name:"db2",
+					DatabaseName:"db2",
+					UserName:"userName",
+					Password:"password",
+					Host:"127.0.0.1",
+					Port:"3306",
+					Charset:"utf8mb4",
+					MaxOpenConns:20,
+					MaxIdleConns:10,
+				},
+				Slave:make([]mysql.SlaveDB, 1),
+			}
+			otherConnects=append(otherConnects, otherConnect)
+		}
+		return otherConnects
+	})
+}
+
+```
 
 ## RPC
 

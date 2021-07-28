@@ -49,6 +49,9 @@ type HttpResponse struct {
 	BodyByte []byte `json:"bodybyte"`
 	Header http.Header
 }
+//RequestBeforeFunc 请求前函数
+type RequestBeforeFunc func(*http.Request)
+
 //String 字符输出
 func (h *HttpResponse)String()string{
 	return lib.ObjectToString(h)
@@ -68,7 +71,7 @@ type Httper interface{
 	WithProxy(proto int, host, port string) Httper
 	WithTimeOut(timeout int) Httper
 	Get(url string,values lib.InRow)*HttpResponse
-	Put(url string) *HttpResponse
+	Put(url string,values lib.InRow) *HttpResponse
 	Post(url string,values lib.InRow)*HttpResponse
 	PostJson(url string,value interface{})*HttpResponse
 	PostXml(url string,value interface{})*HttpResponse
@@ -79,12 +82,14 @@ type Httper interface{
 	Connect(url string,values lib.InRow)*HttpResponse
 	Trace(url string, values lib.InRow)*HttpResponse
 	Patch(url string,values lib.InRow)*HttpResponse
+	WithRequestBefore(fun RequestBeforeFunc)Httper
 }
 //Http 类
 type HttpClient struct {
 	options lib.IntRow
 	headers lib.InRow
 	cookie []*http.Cookie
+	fun RequestBeforeFunc
 }
 //WithHeader 自定义头
 func(h *HttpClient)WithHeader(key string, value interface{})Httper{
@@ -99,6 +104,11 @@ func(h *HttpClient)WithHeaders(header lib.InRow) Httper{
 	for k,v:=range header{
 		h.WithHeader(k,v)
 	}
+	return h
+}
+//WithRequestBefore 请求前调用
+func(h *HttpClient)WithRequestBefore(fun RequestBeforeFunc)Httper{
+	h.fun=fun
 	return h
 }
 //WithOption 自定义选项
@@ -280,9 +290,14 @@ func(h *HttpClient)Head(url string) *HttpResponse{
 }
 
 //Put 请求
-func(h *HttpClient)Put(url string) *HttpResponse{
+func(h *HttpClient)Put(url string,values lib.InRow) *HttpResponse{
+	if h.checkIncludeFile(values) {
+		return h.PostMultipart(url,values)
+	}
+	h.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+	body:=strings.NewReader(HttpBuildQuery(values))
 	client:=h.getClient()
-	req:=h.getRequest(url,"PUT",nil)
+	req:=h.getRequest(url,"PUT",body)
 	return h.getResponse(client.Do(req))
 }
 
@@ -406,6 +421,9 @@ func (h *HttpClient)getRequest(url,method string,body io.Reader)*http.Request{
 	}
 	for _,cookie:=range h.cookie{
 		req.AddCookie(cookie)
+	}
+	if (h.fun!=nil){
+		h.fun(req)
 	}
 	return req
 }

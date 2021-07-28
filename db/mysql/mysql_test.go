@@ -40,7 +40,7 @@ func TestDB(t *testing.T){
 	db.SetDB("xingtool_base", "xingtool_base")
 	db.BeginTransaction()
 	table:=NewTable(&db,"sys_user_master")
-	list:=table.Select("*","id=?", 2)
+	list:=table.Select("*","id=?", 1)
 	fmt.Println(list[0]["nick_name"].String())
 	table.Update(lib.SqlIn{
 		"db_code":"001",
@@ -78,4 +78,13 @@ func TestDDL(t *testing.T){
 	db:=Connect("xingtool_base", "xingtool_base")
 	fmt.Println("tables:",db.Desc("sys_admin"))
 	fmt.Println("tables:",db.IsExist("sys_adminxx"))
+}
+
+//注入动态数据连接配置
+func init(){
+	InjectCreatePool(func(db *DB)[]MysqlConnect{
+		//fmt.Println("xxxx============")
+		fmt.Println("==============",db.SetDB("xingtool_base", "xingtool_base").ShowTables())
+		return nil
+	})
 }

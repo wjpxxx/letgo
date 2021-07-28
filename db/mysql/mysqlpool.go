@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"time"
 	"github.com/wjpxxx/letgo/log"
+	"sync"
 )
-
+//configLock
+var configLock sync.Mutex
 //MysqlPooler 全局连接池接口
 type MysqlPooler interface {
 	GetDB(connectName string) *sql.DB
@@ -19,6 +21,8 @@ type MysqlPooler interface {
 	IsTransaction(connectName string)bool
 	Close()
 	Init(connect []MysqlConnect)
+	AddConnect(connect MysqlConnect)
+	AddConnects(connects []MysqlConnect)
 }
 
 type poolDB struct {
@@ -83,18 +87,33 @@ func(m *MysqlPool) Close(){
 func(m *MysqlPool) Init(connects []MysqlConnect){
 	m.pool=make(map[string]*poolDB)
 	for _,connect:=range connects{
-		master:=m.open(connect.Master)
-		if master!=nil{
-			m.pool[connect.Master.Name]=&poolDB{
-				master:master,
-			}
-			for _,connectSlave:=range connect.Slave{
-				slave:=m.open(connectSlave)
-				if slave!=nil{
-					m.pool[connect.Master.Name].slave=append(m.pool[connect.Master.Name].slave,slave)
-				}
+		m.AddConnect(connect)
+	}
+}
+//AddConnect 添加连接
+func(m *MysqlPool)AddConnect(connect MysqlConnect) {
+	configLock.Lock()
+	defer configLock.Unlock()
+	if _,ok:=m.pool[connect.Master.Name];ok{
+		log.PanicPrint("Mysql data connection already exists")
+	}
+	master:=m.open(connect.Master)
+	if master!=nil{
+		m.pool[connect.Master.Name]=&poolDB{
+			master:master,
+		}
+		for _,connectSlave:=range connect.Slave{
+			slave:=m.open(connectSlave)
+			if slave!=nil{
+				m.pool[connect.Master.Name].slave=append(m.pool[connect.Master.Name].slave,slave)
 			}
 		}
+	}
+}
+//AddConnects 添加多个连接
+func(m *MysqlPool)AddConnects(connects []MysqlConnect) {
+	for _,c:=range connects{
+		m.AddConnect(c)
 	}
 }
 //open 打开数据库连接

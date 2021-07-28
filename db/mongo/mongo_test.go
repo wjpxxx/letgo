@@ -10,7 +10,7 @@ import (
 
 func TestDB(t *testing.T){
 	//tb:=NewTable(NewDB().SetDB("xingtool_orders_001", "xingtool_orders_001"), "orders_001")
-	tb:=NewModel("xingtool_orders_002", "orders_002")
+	tb:=NewModel("xingtool_orders_001", "orders_002")
 	/*
 	for i:=0;i<10000; i++ {
 		rs:=tb.InsertOne(bson.D{

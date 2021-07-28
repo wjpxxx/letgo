@@ -995,3 +995,17 @@ func NewModelByConnectName(connectName,dbName,tableName string) Modeler{
 	model:=Model{}
 	return model.InitByConnectName(connectName,dbName,tableName)
 }
+
+//CreateConnectFunc 创建连接
+type CreateConnectFunc func(*DB)[]MysqlConnect
+//InjectCreatePool 注入连接池的创建过程
+//connect 连接mysql配置
+//fun 回调函数返回mysql连接配置
+func InjectCreatePool(fun CreateConnectFunc){
+	if fun!=nil {
+		configs:= fun(db)
+		if len(configs)>0 {
+			db.dbPool.AddConnects(configs)
+		}
+	}
+}

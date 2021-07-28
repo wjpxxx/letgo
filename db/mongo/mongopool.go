@@ -11,7 +11,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
+//configLock
+var configLock sync.Mutex
 //DBInfo
 type DBInfo struct{
 	Client *mongo.Client
@@ -24,7 +25,7 @@ func (d *DBInfo)Close(){
 		ctx,cancel:=context.WithTimeout(context.Background(), 20*time.Second)
 		defer cancel()
 		if err:=d.Client.Disconnect(ctx);err!=nil{
-			panic(err)
+			log.PanicPrint("mongodb close %v",err)
 		}
 	}
 }
@@ -33,6 +34,8 @@ func (d *DBInfo)Close(){
 type MongoPooler interface{
 	GetDB(connectName string)*DBInfo
 	Init(connect []MongoConnect)
+	AddConnect(connect MongoConnect)
+	AddConnects(connects []MongoConnect)
 }
 
 //MongoPool
@@ -46,8 +49,7 @@ func (m *MongoPool)GetDB(connectName string)*DBInfo{
 	defer cancel()
 	client,err:=mongo.Connect(ctx,options.Client().ApplyURI(m.pool[connectName].connect))
 	if err !=nil{
-		log.DebugPrint("mongodb GetDB error %v", err)
-		panic(err)
+		log.PanicPrint("mongodb GetDB error %v", err)
 	}
 	database:=client.Database(m.pool[connectName].config.Database)
 	return &DBInfo{
@@ -62,13 +64,28 @@ func (m *MongoPool)GetDB(connectName string)*DBInfo{
 func (m *MongoPool) Init(connects []MongoConnect){
 	m.pool=make(map[string]*poolDB)
 	for _,connect:=range connects{
-		connectStr:=m.open(connect)
-		if connectStr!=""{
-			m.pool[connect.Name]=&poolDB{
-				config: connect,
-				connect: connectStr,
-			}
+		m.AddConnect(connect)
+	}
+}
+//AddConnect 添加连接
+func(m *MongoPool)AddConnect(connect MongoConnect) {
+	configLock.Lock()
+	defer configLock.Unlock()
+	if _,ok:=m.pool[connect.Name];ok{
+		log.PanicPrint("Mongo data connection already exists")
+	}
+	connectStr:=m.open(connect)
+	if connectStr!=""{
+		m.pool[connect.Name]=&poolDB{
+			config: connect,
+			connect: connectStr,
 		}
+	}
+}
+//AddConnects 添加多个连接
+func(m *MongoPool)AddConnects(connects []MongoConnect) {
+	for _,c:=range connects{
+		m.AddConnect(c)
 	}
 }
 //open
@@ -132,3 +149,17 @@ func NewPools(configs []MongoConnect) MongoPooler{
 	}
 	return pool;
 }
+
+//NewPool 初始化数据库连接
+func NewPool(config MongoConnect) MongoPooler{
+	poolLock.Lock()
+	defer poolLock.Unlock()
+	if pool==nil{
+		var configs []MongoConnect
+		configs=append(configs, config)
+		pool=&MongoPool{}
+		pool.Init(configs)
+	}
+	return pool;
+}
+
