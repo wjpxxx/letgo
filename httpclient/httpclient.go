@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"mime/multipart"
 	"encoding/xml"
+	"net/http/httputil"
 )
 
 const (
@@ -48,6 +49,7 @@ type HttpResponse struct {
 	Err string `json:"err"`
 	BodyByte []byte `json:"bodybyte"`
 	Header http.Header
+	Dump string `json:"dump"`
 }
 //RequestBeforeFunc 请求前函数
 type RequestBeforeFunc func(*http.Request)
@@ -90,6 +92,7 @@ type HttpClient struct {
 	headers lib.InRow
 	cookie []*http.Cookie
 	fun RequestBeforeFunc
+	dump string
 }
 //WithHeader 自定义头
 func(h *HttpClient)WithHeader(key string, value interface{})Httper{
@@ -422,6 +425,8 @@ func (h *HttpClient)getRequest(url,method string,body io.Reader)*http.Request{
 	for _,cookie:=range h.cookie{
 		req.AddCookie(cookie)
 	}
+	dump, _ := httputil.DumpRequest(req, true)
+	h.dump=fmt.Sprintf("%s", dump)
 	if (h.fun!=nil){
 		h.fun(req)
 	}
@@ -461,6 +466,7 @@ func (h *HttpClient)getResponse(response *http.Response,err error) *HttpResponse
 	result.Code=response.StatusCode
 	result.Err=""
 	result.Header=response.Header
+	result.Dump=h.dump
 	return result
 }
 //HttpBuildQuery 生成 URL-encode 之后的请求字符串
