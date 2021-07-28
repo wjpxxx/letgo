@@ -327,18 +327,18 @@ func init(){
 		mongo.NewModelByConnectName("connectName", "databaseName", "database_config").Find(nil, &r)
 		for _,v:=range r{
 			otherConnect:=mongo.MongoConnect{
-				Master:mongo.SlaveDB{
-					Name:"db2",
-					DatabaseName:"db2",
-					UserName:"userName",
-					Password:"password",
-					Host:"127.0.0.1",
-					Port:"3306",
-					Charset:"utf8mb4",
-					MaxOpenConns:20,
-					MaxIdleConns:10,
+				Name:"connectName",
+				Database:"databaseName",
+				UserName:"userName",
+				Password:"password",
+				Hosts:[]Host{
+					Host{
+						Hst:"127.0.0.1",
+						Port:"27017",
+					},
 				},
-				Slave:make([]mysql.SlaveDB, 1),
+				ConnectTimeout: 10,
+				ExecuteTimeout: 10,
 			}
 			otherConnects=append(otherConnects, otherConnect)
 		}
