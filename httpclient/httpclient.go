@@ -478,6 +478,10 @@ func HttpBuildQuery(values lib.InRow) string{
 			for _,s:=range t{
 				paramsValue.Add(k,s)
 			}
+		case []int64:
+			for _,s:=range t{
+				paramsValue.Add(k,fmt.Sprintf("%d",s))
+			}
 		default:
 			vs:=(&lib.Data{Value: v}).String()
 			paramsValue.Add(k,vs)

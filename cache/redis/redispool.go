@@ -47,7 +47,7 @@ func (r *RedisPool) open(connect SlaveDB) *redis.Pool {
 			if _, err := con.Do("SELECT", connect.Db); err != nil {
 				con.Close()
 				if err!=nil{
-					log.PanicPrint("AUTH fail %s",err.Error())
+					log.PanicPrint("SELECT fail %s",err.Error())
 				}
 				return nil, err
 			}

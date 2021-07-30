@@ -626,3 +626,8 @@ func NewRedis()Rediser{
 	var rds Redis
 	return rds.SetPool(NewPool(config))
 }
+//NewRedisByConnect
+func NewRedisByConnect(config RedisConnect)Rediser{
+	var rds Redis
+	return rds.SetPool(NewPool(config))
+}

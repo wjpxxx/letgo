@@ -5,11 +5,16 @@ import (
 	"github.com/wjpxxx/letgo/cache/icache"
 	"github.com/wjpxxx/letgo/cache/memcache"
 	"github.com/wjpxxx/letgo/cache/redis"
+	"sync"
 )
 
 var cacheList map[string]icache.ICacher
 
 var queueList map[string]icache.Quequer
+
+var rds redis.Rediser
+
+var rdsLock sync.Mutex
 
 //Register 注册缓存对象
 func Register(name string, cacher icache.ICacher) {
@@ -24,7 +29,23 @@ func NewCache(name string) icache.ICacher{
 }
 //NewRedis 新建一个redis对象
 func NewRedis()redis.Rediser{
-	return redis.NewRedis()
+	rdsLock.Lock()
+	defer rdsLock.Unlock()
+	if rds!=nil{
+		return rds
+	}else{
+		rds=redis.NewRedis()
+		return rds
+	}
+	
+}
+//GetRedis
+func GetRedis()redis.Master{
+	return NewRedis().Master()
+}
+//GetSlaveRedis
+func GetSlaveRedis(name string)redis.Master{
+	return NewRedis().SlaveByName(name)
 }
 
 //NewQueue
@@ -40,7 +61,8 @@ func RegisterQueue(name string, cacher icache.Quequer) {
 }
 //init 注册系统的
 func init(){
-	Register("redis", redis.NewRedis().Master())
+	rds=redis.NewRedis()
+	Register("redis", rds.Master())
 	Register("file", filecache.NewFileCache())
 	Register("memcache", memcache.NewMemcache())
 	RegisterQueue("redis", redis.NewRedis().Master())
