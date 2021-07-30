@@ -45,7 +45,7 @@ func TestDB(t *testing.T){
 	table.Update(lib.SqlIn{
 		"db_code":"001",
 		"table_code":"004",
-	},nil,"id=?",2)
+	},nil,"id=?",20)
 	i:=table.Delete(nil,"id=?",10)
 	fmt.Println(i)
 	time.Sleep(1*time.Second)
@@ -62,7 +62,7 @@ func TestNewDB(t *testing.T) {
 	table.Update(lib.SqlIn{
 		"db_code":"001",
 		"table_code":"004",
-	},nil,"id=?",2)
+	},nil,"id=?",10)
 	i:=table.Delete(nil,"id=?",10)
 	fmt.Println(i)
 	time.Sleep(1*time.Second)

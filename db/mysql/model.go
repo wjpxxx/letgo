@@ -63,7 +63,7 @@ type Modeler interface{
 	OrderBy(orderBy string)OrderByer
 	Limit(offset,count int)Limiter
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
-	Update(data lib.SqlIn)
+	Update(data lib.SqlIn)int64
 	Insert(row lib.SqlIn)int64
 	Create(row lib.SqlIn)int64
 	Replace(row lib.SqlIn) int64
@@ -109,7 +109,7 @@ type Aliaser interface{
 	OrderBy(orderBy string)OrderByer
 	Limit(offset,count int)Limiter
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
-	Update(data lib.SqlIn)
+	Update(data lib.SqlIn)int64
 }
 //Joiner 连接接口
 type Joiner interface{
@@ -143,7 +143,7 @@ type Oner interface{
 	Limit(offset,count int)Limiter
 	Union(model Modeler) Unioner
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
-	Update(data lib.SqlIn)
+	Update(data lib.SqlIn)int64
 }
 //Wherer 条件接口
 type Wherer interface{
@@ -163,7 +163,7 @@ type Wherer interface{
 	Limit(offset,count int)Limiter
 	Union(model Modeler) Unioner
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
-	Update(data lib.SqlIn)
+	Update(data lib.SqlIn)int64
 	Delete() int64
 }
 //GroupByer 分组接口
@@ -253,7 +253,9 @@ func (m *Model)GetSqlInfo()(string,[]interface{}){
 //Alias 命名
 func (m *Model)Alias(name string) Aliaser{
 	m.aliasName=name
-	m.tableName=fmt.Sprintf("%s as %s", m.tableName, name)
+	if strings.Index(m.tableName, " as ")==-1{
+		m.tableName=fmt.Sprintf("%s as %s", m.tableName, name)
+	}
 	return m
 }
 //Join 连接查询
@@ -889,15 +891,16 @@ func (m *Model)Limit(offset,count int)Limiter{
 	return m
 }
 //Update 更新操作
-func (m *Model)Update(data lib.SqlIn){
+func (m *Model)Update(data lib.SqlIn)int64{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
 	table:=NewTable(db,tableName)
 	data=m.addDeleteTime(data)
-	table.Update(data,values,where,whereValues...)
+	i:=table.Update(data,values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
 	m.clear()
+	return i
 }
 //Insert 插入操作
 func (m *Model)Insert(row lib.SqlIn)int64{

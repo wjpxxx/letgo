@@ -304,8 +304,13 @@ func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
 func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,whereParams ...interface{})int64{
 	var setsArray []string
 	var vars []interface{}
+	tbn:=t.tableName
 	if len(onParams)>0{
-		vars=append(vars, onParams...)
+		for _,v:=range onParams{
+			tbn=strings.Replace(tbn,"?", lib.InterfaceToString(v),1)
+		}
+		//log.DebugPrint(tbn)
+		//vars=append(vars, onParams...)
 	}
 	for key,value:=range row {
 		setsArray=append(setsArray, fmt.Sprintf("%s=?",key))
@@ -313,19 +318,22 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 	}
 	vars=append(vars,whereParams...)
 	sets:=strings.Join(setsArray,",")
-	sql:=fmt.Sprintf("update %s set %s where %s", t.tableName,sets,where)
+	sql:=fmt.Sprintf("update %s set %s where %s", tbn,sets,where)
 	t.sql(sql,vars...)
 	smt,err:=t.db.prepare(sql)
 	if err!=nil{
+		log.DebugPrint("update error1 %v", err)
 		return -1
 	}
 	defer smt.Close()
 	result, err :=smt.Exec(vars...)
 	if err!=nil{
+		log.DebugPrint("update error2 %v", err)
 		return -2
 	}
 	effects, err := result.RowsAffected()
 	if err!=nil{
+		log.DebugPrint("update error3 %v", err)
 		return -3
 	}
 	return effects

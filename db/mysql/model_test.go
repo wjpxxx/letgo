@@ -52,7 +52,11 @@ func TestUpdateModel(t *testing.T) {
 	model.Alias("m").Join("sys_shopee_shop as s").On("m.id","s.master_id").Where("m.id",2).Update(lib.SqlIn{
 		"db_code":"300",
 	})
-	fmt.Println(model.GetLastSql())
+
+	model.Alias("m").Join("sys_shopee_shop as s").On("m.id","s.master_id").Where("m.id",2).Update(lib.SqlIn{
+		"db_code":"500",
+	})
+	fmt.Println("======================xxxxx==============",model.GetLastSql())
 }
 
 func TestInsertModel(t *testing.T) {
@@ -64,3 +68,4 @@ func TestInsertModel(t *testing.T) {
 		"mobile":"15860541821",
 	})
 }
+
