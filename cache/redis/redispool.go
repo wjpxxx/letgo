@@ -27,6 +27,7 @@ type RedisPool struct {
 func (r *RedisPool) open(connect SlaveDB) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle: connect.MaxIdle,
+		MaxActive: connect.MaxActive,
 		IdleTimeout: time.Duration(connect.IdleTimeout) * time.Second,
 		Dial: func () (redis.Conn, error) {
 			address:=fmt.Sprintf("%s:%s",connect.Host,connect.Port)

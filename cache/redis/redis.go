@@ -614,6 +614,7 @@ func NewRedis()Rediser{
 			Port:"6379",
 			MaxIdle:20,
 			IdleTimeout:10,
+			MaxActive: 100,
 		}
 		config=RedisConnect{
 			Master:master,

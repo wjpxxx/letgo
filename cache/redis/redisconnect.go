@@ -21,4 +21,5 @@ type SlaveDB struct {
 	Port string `json:"port"`
 	MaxIdle int `json:"maxIdle"`
 	IdleTimeout int `json:"idleTimeout"`
+	MaxActive int `json:"maxActive"`
 }
