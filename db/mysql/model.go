@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"regexp"
 )
 
 //db 全局变量
@@ -616,8 +617,16 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 	for i,o:=range ons{
 		var q string=""
 		if o.value!=nil{
-			values=append(values, o.value)
-			q="?"
+			s:=lib.InterfaceToString(o.value)
+			regex,_:=regexp.Compile("\\.`[\\s\\S]+?`")
+			if regex.MatchString(s){
+				q=s
+			}else{
+				values=append(values, o.value)
+				q="?"
+			}
+			//values=append(values, o.value)
+			//q="?"
 		}
 		if i==0{
 			on+=fmt.Sprintf("%s %s %s "+q,o.logic,o.field,o.symbol)

@@ -15,7 +15,7 @@ func TestModel(t *testing.T) {
 	model.Fields("*").
 	Alias("m").
 	Join("sys_shopee_shop as s").
-	On("m.id","s.master_id").
+	On("m.`id`","s.`master_id`").
 	OrOn("s.master_id",1).
 	AndOnRaw("m.id=1 or m.id=2").
 	LeftJoin("sys_lazada_shop as l").
@@ -49,11 +49,11 @@ func TestPagerModel(t *testing.T) {
 
 func TestUpdateModel(t *testing.T) {
 	model:=NewModel("xingtool_base","sys_user_master")
-	model.Alias("m").Join("sys_shopee_shop as s").On("m.id","s.master_id").Where("m.id",2).Update(lib.SqlIn{
+	model.Alias("m").Join("sys_shopee_shop as s").On("m.`id`","s.`master_id`").Where("m.id",2).Update(lib.SqlIn{
 		"db_code":"300",
 	})
 
-	model.Alias("m").Join("sys_shopee_shop as s").On("m.id","s.master_id").Where("m.id",2).Update(lib.SqlIn{
+	model.Alias("m").Join("sys_shopee_shop as s").On("m.`id`","s.`master_id`").Where("m.id",2).Update(lib.SqlIn{
 		"db_code":"500",
 	})
 	fmt.Println("======================xxxxx==============",model.GetLastSql())

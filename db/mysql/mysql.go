@@ -8,7 +8,6 @@ import (
 	"github.com/wjpxxx/letgo/log"
 	"fmt"
 	"sync"
-	"regexp"
 	_ "github.com/go-sql-driver/mysql"
 )
 //全局实现者
@@ -307,18 +306,7 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 	var vars []interface{}
 	tbn:=t.tableName
 	if len(onParams)>0{
-		for i,v:=range onParams{
-			s:=lib.InterfaceToString(v)
-			regex,_:=regexp.Compile("\\.`[\\s\\S]+?`")
-			if regex.MatchString(s){
-				tbn=lib.ReplaceIndex(tbn,"?", s,i)
-			}else{
-				vars=append(vars, v)
-			}
-			//tbn=strings.Replace(tbn,"?", s,1)
-		}
-		//log.DebugPrint(tbn)
-		//vars=append(vars, onParams...)
+		vars=append(vars, onParams...)
 	}
 	for key,value:=range row {
 		setsArray=append(setsArray, fmt.Sprintf("%s=?",key))
