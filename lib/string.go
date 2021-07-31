@@ -1,6 +1,9 @@
 package lib
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 //SubString 字符串截取
 //参数str：输入字符串
@@ -53,4 +56,19 @@ func ResolveAddress(addr []string)string{
 	default:
 		panic("too many parameters")
 	}
+}
+//ReplaceIndex 替换指定第n个处
+func ReplaceIndex(s,old,new string,n int)string{
+	arr:=strings.Split(s, old)
+	r:=""
+	for i,v:=range arr{
+		if v!="" {
+			if i==n{
+				r+=v+new
+			}else{
+				r+=v+old
+			}
+		}
+	}
+	return r
 }
