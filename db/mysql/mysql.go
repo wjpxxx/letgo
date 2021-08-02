@@ -306,6 +306,19 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 	var vars []interface{}
 	tbn:=t.tableName
 	if len(onParams)>0{
+		/*
+		for i,v:=range onParams{
+			s:=lib.InterfaceToString(v)
+			regex,_:=regexp.Compile("\\.`[\\s\\S]+?`")
+			if regex.MatchString(s){
+				tbn=lib.ReplaceIndex(tbn,"?", s,i)
+			}else{
+				vars=append(vars, v)
+			}
+			//tbn=strings.Replace(tbn,"?", s,1)
+		}
+		*/
+		//log.DebugPrint(tbn)
 		vars=append(vars, onParams...)
 	}
 	for key,value:=range row {
@@ -462,7 +475,8 @@ func NewTable(db *DB,tableName string) Tabler{
 
 //Connect 连接到数据库
 func Connect(connectName,databaseName string)*DB{
-	db:=NewDB()
+	db:=&DB{}
+	db.SetPool(pool)
 	db.SetDB(connectName, databaseName)
 	return db
 }

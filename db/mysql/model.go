@@ -27,7 +27,7 @@ type Model struct{
 	preSql string
 	preParams []interface{}
 	unionModel Modeler
-	db DBer
+	db *DB
 	SoftDelete bool
 }
 //cond 操作
@@ -224,14 +224,14 @@ type Unioner interface{
 func (m *Model) Init(dbName,tableName string) Modeler{
 	m.tableName=tableName
 	m.dbName=dbName
-	m.db=db.SetDB(m.dbName,m.dbName)
+	m.db=Connect(m.dbName,m.dbName)
 	return m
 }
 //Init 初始化
 func (m *Model) InitByConnectName(connectName,dbName,tableName string) Modeler{
 	m.tableName=tableName
 	m.dbName=dbName
-	m.db=db.SetDB(connectName,m.dbName)
+	m.db=Connect(connectName,m.dbName)
 	return m
 }
 //DBer 获得数据库接口
@@ -605,6 +605,7 @@ func (m *Model)getTables() (string,[]interface{}){
 		if len(v)>0{
 			values=append(values, v...)
 		}
+		//fmt.Println(ons)
 		table+=fmt.Sprintf(" %s %s",joinTable.tableName,ons) 
 		
 	}
@@ -634,6 +635,7 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 			on+=fmt.Sprintf(" %s %s %s "+q,o.logic,o.field,o.symbol)
 		}
 	}
+	//fmt.Println(on,values)
 	return on,values
 }
 //getWhere
@@ -768,7 +770,7 @@ func (m *Model)CountByClear(isClear bool)int64{
 		}
 	}
 	where=where+" LIMIT 0,1"
-	table:=NewTable(db,tableName)
+	table:=NewTable(m.db,tableName)
 	rows:= table.Select("count(1) as c",where,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -812,7 +814,7 @@ func (m *Model)GetByClear(isClear bool)lib.SqlRows{
 	}
 	where=where+m.getOrderBy()
 	where=where+m.getLimit()
-	table:=NewTable(db,tableName)
+	table:=NewTable(m.db,tableName)
 	fields:=m.getFields()
 	rows:= table.Select(fields,where,values...)
 	m.lastSql=table.GetLastSql()
@@ -849,7 +851,7 @@ func (m *Model)Find()lib.SqlRow{
 	}
 	where=where+m.getOrderBy()
 	where=where+" LIMIT 0,1"
-	table:=NewTable(db,tableName)
+	table:=NewTable(m.db,tableName)
 	fields:=m.getFields()
 	rows:= table.Select(fields,where,values...)
 	m.lastSql=table.GetLastSql()
@@ -903,7 +905,7 @@ func (m *Model)Limit(offset,count int)Limiter{
 func (m *Model)Update(data lib.SqlIn)int64{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
-	table:=NewTable(db,tableName)
+	table:=NewTable(m.db,tableName)
 	data=m.addDeleteTime(data)
 	i:=table.Update(data,values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
@@ -913,7 +915,7 @@ func (m *Model)Update(data lib.SqlIn)int64{
 }
 //Insert 插入操作
 func (m *Model)Insert(row lib.SqlIn)int64{
-	table:=NewTable(db,m.tableName)
+	table:=NewTable(m.db,m.tableName)
 	row=m.addDeleteTime(row)
 	id:=table.Insert(row)
 	m.lastSql=table.GetLastSql()
@@ -941,7 +943,7 @@ func (m *Model)addDeleteTime(row lib.SqlIn)lib.SqlIn{
 }
 //Replace 插入操作
 func (m *Model)Replace(row lib.SqlIn) int64{
-	table:=NewTable(db,m.tableName)
+	table:=NewTable(m.db,m.tableName)
 	row=m.addDeleteTime(row)
 	effects:=table.Replace(row)
 	m.lastSql=table.GetLastSql()
@@ -951,7 +953,7 @@ func (m *Model)Replace(row lib.SqlIn) int64{
 }
 //InsertOnDuplicate 如果你插入的记录导致一个UNIQUE索引或者primary key(主键)出现重复，那么就会认为该条记录存在，则执行update语句而不是insert语句，反之，则执行insert语句而不是更新语句。
 func (m *Model)InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
-	table:=NewTable(db,m.tableName)
+	table:=NewTable(m.db,m.tableName)
 	row=m.addDeleteTime(row)
 	effects:=table.InsertOnDuplicate(row,updateRow)
 	m.lastSql=table.GetLastSql()
@@ -961,7 +963,7 @@ func (m *Model)InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
 }
 //Drop 删除表
 func (m *Model)Drop() int64 {
-	table:=NewTable(db,m.tableName)
+	table:=NewTable(m.db,m.tableName)
 	effects:=table.Drop()
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -970,7 +972,7 @@ func (m *Model)Drop() int64 {
 }
 //Truncate 清空表
 func (m *Model)Truncate() int64{
-	table:=NewTable(db,m.tableName)
+	table:=NewTable(m.db,m.tableName)
 	effects:=table.Truncate()
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
@@ -981,7 +983,7 @@ func (m *Model)Truncate() int64{
 func (m *Model)Delete() int64{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
-	table:=NewTable(db,tableName)
+	table:=NewTable(m.db,tableName)
 	effects:=table.Delete(values,where,whereValues...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
