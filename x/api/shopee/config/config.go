@@ -8,6 +8,7 @@ import(
 	logisticsEntity "github.com/wjpxxx/letgo/x/api/shopee/logistics/entity"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 //Config
@@ -42,7 +43,12 @@ func (c *Config)GetCommonParam(method string) string{
 	}
 	if c.shopInfo!=nil{
 		param["access_token"]=c.shopInfo.AccessToken
-		param["shop_id"]=c.shopInfo.ShopID
+		if strings.Index(method,"merchant")!=-1{
+			param["merchant_id"]=c.shopInfo.ShopID
+		}else{
+			param["shop_id"]=c.shopInfo.ShopID
+		}
+		
 		baseString:=fmt.Sprintf("%d%s%d%s%d",c.PartnerID,c.GetApiPath(method),ti,c.shopInfo.AccessToken,c.shopInfo.ShopID)
 		param["sign"]=Sign(c.PartnerKey,baseString)
 	}else{
@@ -61,6 +67,10 @@ func (c *Config)HttpPost(method string,data interface{},out interface{})error{
 	return c.Http("POST", method,data,out)
 }
 
+//HttpPostFile
+func (c *Config)HttpPostFile(method string,data interface{},out interface{})error{
+	return c.Http("POSTFILE", method,data,out)
+}
 //Http 请求
 func (c *Config)Http(requestMethod,method string,data interface{},out interface{})error{
 	query:=c.GetCommonParam(method)
@@ -69,11 +79,16 @@ func (c *Config)Http(requestMethod,method string,data interface{},out interface{
 	var result *httpclient.HttpResponse
 	if requestMethod=="GET"{
 		result=ihttp.Get(fullURL,data.(lib.InRow))
-	}else{
+	}else if requestMethod=="POSTFILE"{
+		result=ihttp.Post(fullURL,data.(lib.InRow))
+	} else{
 		result=ihttp.PostJson(fullURL,data)
 	}
 	if result.Err!=""{
 		return errors.New(result.Err)
+	}
+	if result.Code!=200{
+		return errors.New("请求失败")
 	}
 	if method=="logistics/download_shipping_document"{
 		//下载快递单
@@ -85,8 +100,6 @@ func (c *Config)Http(requestMethod,method string,data interface{},out interface{
 	}else{
 		lib.StringToObject(result.Body(),out)
 	}
-	
-	//fmt.Println(method,result.Body())
 	return nil
 }
 

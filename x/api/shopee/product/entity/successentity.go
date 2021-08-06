@@ -35,3 +35,25 @@ type UpdatePriceSuccessEntity struct{
 func(d UpdatePriceSuccessEntity)String()string{
 	return lib.ObjectToString(d)
 }
+
+
+//UpdateStockSuccessEntity
+type UpdateStockSuccessEntity struct{
+	ModelID int64 `json:"model_id"`
+	NormalStock int `json:"normal_stock"`
+}
+
+//String
+func(d UpdateStockSuccessEntity)String()string{
+	return lib.ObjectToString(d)
+}
+//GetItemPromotionSuccessEntity
+type GetItemPromotionSuccessEntity struct{
+	ItemID int64 `json:"item_id"`
+	Promotion []PromotionEntity `json:"promotion"`
+}
+
+//String
+func(d GetItemPromotionSuccessEntity)String()string{
+	return lib.ObjectToString(d)
+}

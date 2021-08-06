@@ -8,6 +8,7 @@ import (
 type BrandEntity struct{
 	BrandID int64 `json:"brand_id"`
 	OriginalBrandName string `json:"original_brand_name"`
+	DisplayBrandName string `json:"display_brand_name"`
 }
 
 //String

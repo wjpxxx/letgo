@@ -18,11 +18,21 @@ const (
 	BANNED ItemStatus="BANNED"
 	DELETED ItemStatus="DELETED"
 	UNLIST ItemStatus="UNLIST"
+	NORMAL_BRAND BrandStatus =1
+	PENDING_BRAND BrandStatus =2
+	REQUIRES_ATTRIBUTE AttributeStatus=1
+	OPTIONAL_ATTRIBUTE AttributeStatus=2
 )
 //AttributeType
 type AttributeType string
 
+//ItemStatus
 type ItemStatus string
+
+//BrandStatus
+type BrandStatus int
+//AttributeStatus
+type AttributeStatus int
 
 //Product
 type Product struct{
@@ -310,7 +320,7 @@ func (p *Product)InitTierVariation(itemID int64,tierVariation entity.TierVariati
 //UpdateTierVariation
 //@Title Update item tier-variation struct.
 //@Description https://open.shopee.com/documents?module=89&type=1&id=647&version=2
-func (p *Product)UpdateTierVariation(itemID int64,tierVariation entity.TierVariationEntity)entity.UpdateTierVariationResult{
+func (p *Product)UpdateTierVariation(itemID int64,tierVariation []entity.TierVariationEntity)entity.UpdateTierVariationResult{
 	method:="product/update_tier_variation"
 	result:=entity.UpdateTierVariationResult{}
 	params:=lib.InRow{
@@ -328,7 +338,7 @@ func (p *Product)UpdateTierVariation(itemID int64,tierVariation entity.TierVaria
 //UpdateModel
 //@Title Update seller sku for model.
 //@Description https://open.shopee.com/documents?module=89&type=1&id=648&version=2
-func (p *Product)UpdateModel(itemID int64,model entity.UpdateModelEntity)entity.UpdateModelResult{
+func (p *Product)UpdateModel(itemID int64,model []entity.UpdateModelEntity)entity.UpdateModelResult{
 	method:="product/update_model"
 	result:=entity.UpdateModelResult{}
 	params:=lib.InRow{
@@ -390,6 +400,150 @@ func (p *Product)UpdatePrice(itemID int64,priceList []entity.UpdatePricePriceInf
 		"price_list":priceList,
 	}
 	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+//UpdateStock
+//@Title Update stock.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=652&version=2
+func (p *Product)UpdateStock(itemID int64,stockList []entity.UpdateStockStockInfoEntity)entity.UpdateStockResult{
+	method:="product/update_stock"
+	result:=entity.UpdateStockResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"stock_list":stockList,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+//GetCategory
+//@Title Get category.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=653&version=2
+func (p *Product)GetCategory(language string)entity.GetCategoryResult{
+	method:="product/get_category"
+	result:=entity.GetCategoryResult{}
+	params:=lib.InRow{
+		"language":language,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//GetAttributes
+//@Title Get attributes.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=655&version=2
+func (p *Product)GetAttributes(language string,categoryID int64)entity.GetAttributesResult{
+	method:="product/get_attributes"
+	result:=entity.GetAttributesResult{}
+	params:=lib.InRow{
+		"language":language,
+		"category_id":categoryID,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+//GetBrandList
+//@Title Use this call to get a list of brand.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=684&version=2
+func (p *Product)GetBrandList(offset,pageSize int,categoryID int64,status BrandStatus)entity.GetBrandListResult{
+	method:="product/get_brand_list"
+	result:=entity.GetBrandListResult{}
+	params:=lib.InRow{
+		"offset":offset,
+		"page_size":pageSize,
+		"category_id":categoryID,
+		"status":status,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//CategoryRecommend
+//@Title Recommend category by item name.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=702&version=2
+func (p *Product)CategoryRecommend(itemName string)entity.CategoryRecommendResult{
+	method:="product/category_recommend"
+	result:=entity.CategoryRecommendResult{}
+	params:=lib.InRow{
+		"item_name":itemName,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+//GetItemPromotion
+//@Title Get item promotion info.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=661&version=2
+func (p *Product)GetItemPromotion(itemIdList []int64)entity.GetItemPromotionResult{
+	method:="product/get_item_promotion"
+	result:=entity.GetItemPromotionResult{}
+	params:=lib.InRow{
+		"item_name":itemIdList,
+	}
+	err:=p.Config.HttpGet(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//UpdateSipItemPrice
+//@Title Update sip item price.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=662&version=2
+func (p *Product)UpdateSipItemPrice(itemID int64,sipItemPrice []entity.SipItemPriceEntity)entity.UpdateSipItemPriceResult{
+	method:="product/update_sip_item_price"
+	result:=entity.UpdateSipItemPriceResult{}
+	params:=lib.InRow{
+		"item_id":itemID,
+		"sip_item_price":sipItemPrice,
+	}
+	err:=p.Config.HttpPost(method,params,&result)
+	if err!=nil{
+		result.Error=err.Error()
+	}
+	return result
+}
+
+
+//SearchItem
+//@Title Use this call to search item.
+//@Description https://open.shopee.com/documents?module=89&type=1&id=701&version=2
+func (p *Product)SearchItem(offset string,pageSize int,itemName string,attributeStatus AttributeStatus)entity.SearchItemResult{
+	method:="product/search_item"
+	result:=entity.SearchItemResult{}
+	params:=lib.InRow{
+		"page_size":pageSize,
+	}
+	if offset!=""{
+		params["offset"]=offset
+	}
+	if itemName!=""{
+		params["item_name"]=itemName
+	}
+	if attributeStatus>0{
+		params["attribute_status"]=attributeStatus
+	}
+	err:=p.Config.HttpGet(method,params,&result)
 	if err!=nil{
 		result.Error=err.Error()
 	}

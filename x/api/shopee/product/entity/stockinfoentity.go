@@ -17,3 +17,14 @@ type StockInfoEntity struct{
 func(s StockInfoEntity)String()string{
 	return lib.ObjectToString(s)
 }
+
+//UpdateStockStockInfoEntity
+type UpdateStockStockInfoEntity struct{
+	ModelID int64 `json:"model_id"`
+	NormalStock int `json:"normal_stock"`
+}
+
+//String
+func(p UpdateStockStockInfoEntity)String()string{
+	return lib.ObjectToString(p)
+}

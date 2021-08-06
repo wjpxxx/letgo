@@ -8,7 +8,9 @@ import (
 
 //UpdateItemResult
 type UpdateItemResult struct{
-	AddItemResult
+	commonentity.Result
+	Warning string `json:"warning"`
+	Response ItemEntity `json:"response"`
 }
 
 //String
