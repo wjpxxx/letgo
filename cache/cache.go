@@ -65,5 +65,5 @@ func init(){
 	Register("redis", rds.Master())
 	Register("file", filecache.NewFileCache())
 	Register("memcache", memcache.NewMemcache())
-	RegisterQueue("redis", redis.NewRedis().Master())
+	RegisterQueue("redis", rds.Master())
 }

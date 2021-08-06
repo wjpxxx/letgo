@@ -118,14 +118,16 @@ func (r *Redis)SetPool(pooler RedisPooler)Rediser {
 }
 //Set set操作
 func (r *Redis)Set(key string, value interface{}, overtime int64) bool{
+	rds:=r.getRedis().Get()
+	defer rds.Close()
 	if overtime>-1{
-		_, err :=r.getRedis().Get().Do("SET",key,lib.Serialize(value),"EX",overtime)
+		_, err :=rds.Do("SET",key,lib.Serialize(value),"EX",overtime)
 		if err != nil {
 			log.DebugPrint("redis set fail: %s", err.Error())
 			return false
 		}
 	}else{
-		_, err :=r.getRedis().Get().Do("SET",key,lib.Serialize(value))
+		_, err :=rds.Do("SET",key,lib.Serialize(value))
 		if err != nil {
 			log.DebugPrint("redis set fail: %s", err.Error())
 			return false
@@ -135,7 +137,9 @@ func (r *Redis)Set(key string, value interface{}, overtime int64) bool{
 }
 //SetNx SetNx 操作
 func (r *Redis)SetNx(key string, value interface{}) bool{
-	v, err :=redis.Int64(r.getRedis().Get().Do("SETNX", key, value))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int64(rds.Do("SETNX", key, value))
 	if err!=nil{
 		log.DebugPrint("redis setNx fail: %s", err.Error())
 		return false
@@ -147,7 +151,9 @@ func (r *Redis)SetNx(key string, value interface{}) bool{
 }
 //Get Get操作
 func (r *Redis)Get(key string, value interface{}) bool{
-	v, err :=redis.Bytes(r.getRedis().Get().Do("GET", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Bytes(rds.Do("GET", key))
 	if err!=nil{
 		log.DebugPrint("redis get fail: %s", err.Error())
 		return false
@@ -157,7 +163,9 @@ func (r *Redis)Get(key string, value interface{}) bool{
 }
 //Del Del操作
 func (r *Redis)Del(key string) bool{
-	_, err := r.getRedis().Get().Do("DEL", key)
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	_, err := rds.Do("DEL", key)
 	if err!=nil{
 		log.DebugPrint("redis del fail: %s", err.Error())
 		return false
@@ -166,7 +174,9 @@ func (r *Redis)Del(key string) bool{
 }
 //Ttl Ttl操作
 func (r *Redis)Ttl(key string) int64{
-	v, err :=redis.Int64(r.getRedis().Get().Do("TTL", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int64(rds.Do("TTL", key))
 	if err!=nil{
 		log.DebugPrint("redis ttl fail: %s", err.Error())
 		return -1
@@ -175,7 +185,9 @@ func (r *Redis)Ttl(key string) int64{
 }
 //Expire Expire操作
 func (r *Redis)Expire(key string, overtime int64) bool{
-	_, err :=r.getRedis().Get().Do("EXPIRE", key, overtime)
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	_, err :=rds.Do("EXPIRE", key, overtime)
 	if err!=nil{
 		log.DebugPrint("redis expire fail: %s", err.Error())
 		return false
@@ -184,7 +196,9 @@ func (r *Redis)Expire(key string, overtime int64) bool{
 }
 //Len Len操作
 func (r *Redis)Len(key string) int64{
-	v, err :=redis.Int64(r.getRedis().Get().Do("LLEN", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int64(rds.Do("LLEN", key))
 	if err!=nil{
 		log.DebugPrint("redis llen fail: %s", err.Error())
 		return -1
@@ -193,7 +207,9 @@ func (r *Redis)Len(key string) int64{
 }
 //FlushDB FlushDB操作
 func (r *Redis)FlushDB() bool{
-	_, err :=r.getRedis().Get().Do("FLUSHDB")
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	_, err :=rds.Do("FLUSHDB")
 	if err != nil {
 		log.DebugPrint("redis flushdb fail: %s", err.Error())
 		return false
@@ -202,7 +218,9 @@ func (r *Redis)FlushDB() bool{
 }
 //Exists Exists操作
 func (r *Redis)Exists(key string) bool{
-	v, err :=redis.Int(r.getRedis().Get().Do("EXISTS",key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int(rds.Do("EXISTS",key))
 	if err != nil {
 		log.DebugPrint("redis exists fail: %s", err.Error())
 		return false
@@ -215,7 +233,9 @@ func (r *Redis)Exists(key string) bool{
 }
 //Keys Keys操作
 func (r *Redis)Keys(key string) []string{
-	v, err := redis.Strings(r.getRedis().Get().Do("KEYS", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Strings(rds.Do("KEYS", key))
 	if err != nil {
 		log.DebugPrint("redis keys fail: %s", err.Error())
 		return nil
@@ -229,7 +249,9 @@ func (r *Redis)RPush(key string, value ...interface{}) int64{
 	for _, d := range value {
 		arg = append(arg, lib.Serialize(d))
 	}
-	v, err :=redis.Int64(r.getRedis().Get().Do("Rpush", arg...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int64(rds.Do("Rpush", arg...))
 	if err != nil {
 		log.DebugPrint("redis rpush fail: %s", err.Error())
 		return -1
@@ -243,7 +265,9 @@ func (r *Redis)LPush(key string, value ...interface{}) int64{
 	for _, d := range value {
 		arg = append(arg, lib.Serialize(d))
 	}
-	v, err :=redis.Int64(r.getRedis().Get().Do("Lpush", arg...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.Int64(rds.Do("Lpush", arg...))
 	if err != nil {
 		log.DebugPrint("redis lpush fail: %s", err.Error())
 		return -1
@@ -252,7 +276,9 @@ func (r *Redis)LPush(key string, value ...interface{}) int64{
 }
 //LPop LPop操作
 func (r *Redis)LPop(key string, value interface{})bool{
-	v, err := redis.Bytes(r.getRedis().Get().Do("Lpop", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Bytes(rds.Do("Lpop", key))
 	if err != nil {
 		log.DebugPrint("redis lpop fail: %s", err.Error())
 		return false
@@ -262,7 +288,9 @@ func (r *Redis)LPop(key string, value interface{})bool{
 }
 //RPop RPop操作
 func (r *Redis)RPop(key string, value interface{}) bool{
-	v, err := redis.Bytes(r.getRedis().Get().Do("Rpop", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Bytes(rds.Do("Rpop", key))
 	if err != nil {
 		log.DebugPrint("redis rpop fail: %s", err.Error())
 		return false
@@ -284,7 +312,9 @@ func (r *Redis)Pop(key string, value interface{}) bool{
 }
 //Type Type操作
 func (r *Redis)Type(key string) (string, bool){
-	v, err := redis.String(r.getRedis().Get().Do("TYPE", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.String(rds.Do("TYPE", key))
 	if err!=nil{
 		log.DebugPrint("redis type fail: %s", err.Error())
 		return "",false
@@ -293,7 +323,9 @@ func (r *Redis)Type(key string) (string, bool){
 }
 //Ping Ping操作
 func (r *Redis)Ping() bool{
-	v, err := redis.String(r.getRedis().Get().Do("PING"))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.String(rds.Do("PING"))
 	if err!=nil{
 		log.DebugPrint("redis ping fail: %s", err.Error())
 		return false
@@ -306,7 +338,9 @@ func (r *Redis)Ping() bool{
 }
 //GetRequirepass GetRequirepass操作
 func (r *Redis)GetRequirepass() bool{
-	v, err := redis.Strings(r.getRedis().Get().Do("CONFIG", "get", "requirepass"))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Strings(rds.Do("CONFIG", "get", "requirepass"))
 	if err != nil {
 		log.DebugPrint("redis config get requirepass fail: %s", err.Error())
 		return false
@@ -320,7 +354,9 @@ func (r *Redis)GetRequirepass() bool{
 }
 //SetRequirepass SetRequirepass操作
 func (r *Redis)SetRequirepass(password string) bool{
-	v, err := redis.String(r.getRedis().Get().Do("CONFIG", "set", "requirepass", password))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.String(rds.Do("CONFIG", "set", "requirepass", password))
 	if err != nil {
 		log.DebugPrint("redis config set requirepass fail: %s", err.Error())
 		return false
@@ -333,7 +369,9 @@ func (r *Redis)SetRequirepass(password string) bool{
 }
 //Select 选择数据库
 func (r *Redis)Select(index int) bool{
-	v, err := redis.String(r.getRedis().Get().Do("SELECT", index))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.String(rds.Do("SELECT", index))
 	if err != nil {
 		log.DebugPrint("redis select fail: %s", err.Error())
 		return false
@@ -353,7 +391,9 @@ func (r *Redis)HMset(key string, value lib.InRow) bool{
 		arg = append(arg, k)
 		arg = append(arg, lib.Serialize(iv))
 	}
-	v, err := redis.String(r.getRedis().Get().Do("HMSET", arg...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.String(rds.Do("HMSET", arg...))
 	if err != nil {
 		log.DebugPrint("redis hmset fail: %s", err.Error())
 		return false
@@ -372,7 +412,9 @@ func (r *Redis)HDel(key string, field ...string) int{
 	for _, v := range field {
 		args = append(args, v)
 	}
-	v, err := redis.Int(r.getRedis().Get().Do("HDEL", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("HDEL", args...))
 	if err != nil {
 		log.DebugPrint("redis hdel fail: %s", err.Error())
 		return 0
@@ -382,7 +424,9 @@ func (r *Redis)HDel(key string, field ...string) int{
 
 //HExists HExists操作
 func (r *Redis)HExists(key string, field string) int{
-	v, err := redis.Int(r.getRedis().Get().Do("HEXISTS", key, field))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("HEXISTS", key, field))
 	if err != nil {
 		log.DebugPrint("redis hexists fail: %s", err.Error())
 		return -1
@@ -392,7 +436,9 @@ func (r *Redis)HExists(key string, field string) int{
 
 //HGet HGet操作
 func (r *Redis)HGet(key string, field string, value interface{}) bool{
-	v, err := redis.Bytes(r.getRedis().Get().Do("HGET", key, field))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Bytes(rds.Do("HGET", key, field))
 	if err != nil {
 		log.DebugPrint("redis hget fail: %s", err.Error())
 		return false
@@ -403,7 +449,9 @@ func (r *Redis)HGet(key string, field string, value interface{}) bool{
 
 //HGetAll HGetAll操作
 func (r *Redis)HGetAll(key string)lib.Row{
-	v, err :=redis.ByteSlices(r.getRedis().Get().Do("HGETALL", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err :=redis.ByteSlices(rds.Do("HGETALL", key))
 	if err != nil {
 		log.DebugPrint("redis hgetall fail: %s", err.Error())
 		return nil
@@ -419,7 +467,9 @@ func (r *Redis)HGetAll(key string)lib.Row{
 
 //HLen HLen操作
 func (r *Redis)HLen(key string) int{
-	v, err := redis.Int(r.getRedis().Get().Do("HLEN", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("HLEN", key))
 	if err != nil {
 		log.DebugPrint("redis hlen fail: %s", err.Error())
 		return -1
@@ -429,7 +479,9 @@ func (r *Redis)HLen(key string) int{
 
 //HKeys HKeys操作
 func (r *Redis)HKeys(key string) []string{
-	v, err := redis.Strings(r.getRedis().Get().Do("HKEYS", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Strings(rds.Do("HKEYS", key))
 	if err != nil {
 		log.DebugPrint("redis hkeys fail: %s", err.Error())
 		return nil
@@ -439,7 +491,9 @@ func (r *Redis)HKeys(key string) []string{
 
 //HSet HSet操作
 func (r *Redis)HSet(key string, field string, value interface{}) int{
-	v, err := redis.Int(r.getRedis().Get().Do("HSET", key, field, lib.Serialize(value)))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("HSET", key, field, lib.Serialize(value)))
 	if err != nil {
 		log.DebugPrint("redis hset fail: %s", err.Error())
 		return -1
@@ -449,7 +503,9 @@ func (r *Redis)HSet(key string, field string, value interface{}) int{
 
 //HSetNx HSetNx操作
 func (r *Redis)HSetNx(key string, field string, value interface{}) bool{
-	v, err := redis.Int(r.getRedis().Get().Do("HSETNX", key, field, lib.Serialize(value)))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("HSETNX", key, field, lib.Serialize(value)))
 	if err != nil {
 		log.DebugPrint("redis hsetnx fail: %s", err.Error())
 		return false
@@ -466,7 +522,9 @@ func (r *Redis) SAdd(key string, values ...interface{}) int {
 	for _, v := range values {
 		args = append(args, lib.Serialize(v))
 	}
-	v, err := redis.Int(r.getRedis().Get().Do("SADD", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SADD", args...))
 	if err != nil {
 		log.DebugPrint("redis sadd fail: %s", err.Error())
 		return -1
@@ -475,7 +533,9 @@ func (r *Redis) SAdd(key string, values ...interface{}) int {
 }
 //SCard SCard 操作
 func (r *Redis)SCard(key string) int{
-	v, err := redis.Int(r.getRedis().Get().Do("SCARD", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SCARD", key))
 	if err != nil {
 		log.DebugPrint("redis scard fail: %s", err.Error())
 		return -1
@@ -488,7 +548,9 @@ func (r *Redis)SDiff(keys ...string)[][]byte{
 	for _, k := range keys {
 		args = append(args, k)
 	}
-	v, err := redis.ByteSlices(r.getRedis().Get().Do("SDIFF", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.ByteSlices(rds.Do("SDIFF", args...))
 	if err != nil {
 		log.DebugPrint("redis sdiff fail: %s", err.Error())
 		return nil
@@ -502,7 +564,9 @@ func (r *Redis)SDiffStore(destination string, keys ...string) int{
 	for _, k := range keys {
 		args = append(args, k)
 	}
-	v, err := redis.Int(r.getRedis().Get().Do("SDIFFSTORE", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SDIFFSTORE", args...))
 	if err != nil {
 		log.DebugPrint("redis sdiffstore fail: %s", err.Error())
 		return -1
@@ -515,7 +579,9 @@ func (r *Redis)SInter(keys ...string)[][]byte{
 	for _, k := range keys {
 		args = append(args, k)
 	}
-	v, err := redis.ByteSlices(r.getRedis().Get().Do("SINTER", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.ByteSlices(rds.Do("SINTER", args...))
 	if err != nil {
 		log.DebugPrint("redis sinter fail: %s", err.Error())
 		return nil
@@ -529,7 +595,9 @@ func (r *Redis)SInterStore(destination string, keys ...string) int{
 	for _, k := range keys {
 		args = append(args, k)
 	}
-	v, err := redis.Int(r.getRedis().Get().Do("SINTERSTORE", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SINTERSTORE", args...))
 	if err != nil {
 		log.DebugPrint("redis sinterstore fail: %s", err.Error())
 		return -1
@@ -538,7 +606,9 @@ func (r *Redis)SInterStore(destination string, keys ...string) int{
 }
 //SIsMember SIsMember 命令判断成员元素是否是集合的成员。
 func (r *Redis)SIsMember(key string, value interface{}) bool{
-	v, err := redis.Int(r.getRedis().Get().Do("SISMEMBER", key, lib.Serialize(value)))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SISMEMBER", key, lib.Serialize(value)))
 	if err != nil {
 		log.DebugPrint("redis sismember fail: %s", err.Error())
 		return false
@@ -550,7 +620,9 @@ func (r *Redis)SIsMember(key string, value interface{}) bool{
 }
 //SMembers SMembers 命令返回集合中的所有的成员。 不存在的集合 key 被视为空集合。
 func (r *Redis)SMembers(key string) [][]byte{
-	v, err := redis.ByteSlices(r.getRedis().Get().Do("SMEMBERS", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.ByteSlices(rds.Do("SMEMBERS", key))
 	if err != nil {
 		log.DebugPrint("redis smembers fail: %s", err.Error())
 		return nil
@@ -559,7 +631,9 @@ func (r *Redis)SMembers(key string) [][]byte{
 }
 //SMove SMove 将 member 元素从 source 集合移动到 destination 集合
 func (r *Redis)SMove(source, destination string, member interface{}) int{
-	v, err := redis.Int(r.getRedis().Get().Do("SMOVE", source, destination, lib.Serialize(member)))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SMOVE", source, destination, lib.Serialize(member)))
 	if err != nil {
 		log.DebugPrint("redis smove fail: %s", err.Error())
 		return -1
@@ -568,7 +642,9 @@ func (r *Redis)SMove(source, destination string, member interface{}) int{
 }
 //SPop SPop 移除并返回集合中的一个随机元素
 func (r *Redis)SPop(key string,value interface{}) bool{
-	v, err := redis.Bytes(r.getRedis().Get().Do("SPOP", key))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Bytes(rds.Do("SPOP", key))
 	if err != nil {
 		log.DebugPrint("redis spop fail: %s", err.Error())
 		return false
@@ -578,7 +654,9 @@ func (r *Redis)SPop(key string,value interface{}) bool{
 }
 //SRandMember SRandMember 返回集合中一个或多个随机数
 func (r *Redis)SRandMember(key string, count int) [][]byte{
-	v, err := redis.ByteSlices(r.getRedis().Get().Do("SRANDMEMBER", key, count))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.ByteSlices(rds.Do("SRANDMEMBER", key, count))
 	if err != nil {
 		log.DebugPrint("redis srandmember fail: %s", err.Error())
 		return nil
@@ -592,7 +670,9 @@ func (r *Redis)SRem(key string, members ...interface{}) int{
 	for _, k := range members {
 		args = append(args, lib.Serialize(k))
 	}
-	v, err := redis.Int(r.getRedis().Get().Do("SREM", args...))
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	v, err := redis.Int(rds.Do("SREM", args...))
 	if err != nil {
 		log.DebugPrint("redis srem fail: %s", err.Error())
 		return -1
@@ -601,6 +681,7 @@ func (r *Redis)SRem(key string, members ...interface{}) int{
 }
 //NewRedis 新建一个redis
 func NewRedis()Rediser{
+	//log.DebugPrint("#############################创建1")
 	redisFile:="config/redis.config"
 	cfgFile:=file.GetContent(redisFile)
 	var config RedisConnect
@@ -629,6 +710,7 @@ func NewRedis()Rediser{
 }
 //NewRedisByConnect
 func NewRedisByConnect(config RedisConnect)Rediser{
+	//log.DebugPrint("#############################创建2")
 	var rds Redis
 	return rds.SetPool(NewPool(config))
 }

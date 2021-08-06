@@ -27,11 +27,13 @@ type RedisPool struct {
 func (r *RedisPool) open(connect SlaveDB) *redis.Pool {
 	return &redis.Pool{
 		MaxIdle: connect.MaxIdle,
+		Wait: true,
 		MaxActive: connect.MaxActive,
 		IdleTimeout: time.Duration(connect.IdleTimeout) * time.Second,
 		Dial: func () (redis.Conn, error) {
 			address:=fmt.Sprintf("%s:%s",connect.Host,connect.Port)
 			con,err:=redis.Dial("tcp", address)
+			//log.DebugPrint("=========================建立连接:%d",r.pool.master.ActiveCount())
 			if err!=nil{
 				log.PanicPrint("open connect fail %s",err.Error())
 				return nil,err
