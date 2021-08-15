@@ -133,6 +133,15 @@ func StringToObject(str string, data interface{}) bool {
 	}
 	return false
 }
+//JSONToMap
+func JSONToMap(str string) InRow {
+	var tempMap InRow
+	err := json.Unmarshal([]byte(str), &tempMap)
+	if err != nil {
+		return nil
+	}
+	return tempMap
+}
 //Int64ArrayToInterfaceArray int64转[]interface{}
 func Int64ArrayToInterfaceArray(data []int64)[]interface{}{
 	var it []interface{}

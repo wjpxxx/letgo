@@ -497,6 +497,17 @@ func UrlEncode(queryString string)string{
 	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(qs, "+", "%20"),"*", "%2A"),"%7E","~")
 }
 
+//GetUrlParam
+func GetUrlParam(ul,key string)string{
+	u,_:=url.Parse(ul)
+	m, _ := url.ParseQuery(u.RawQuery)
+	if _,ok:=m[key];ok{
+		return m[key][0]
+	}
+	return ""
+}
+
+
 //New
 func New()*HttpClient{
 	return &HttpClient{}
