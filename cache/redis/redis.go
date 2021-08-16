@@ -153,12 +153,15 @@ func (r *Redis)SetNx(key string, value interface{}) bool{
 func (r *Redis)Get(key string, value interface{}) bool{
 	rds:=r.getRedis().Get()
 	defer rds.Close()
-	v, err :=redis.Bytes(rds.Do("GET", key))
+	tv, err :=rds.Do("GET", key)
 	if err!=nil{
 		log.DebugPrint("redis get fail: %s", err.Error())
 		return false
 	}
-	lib.UnSerialize(v, value)
+	if(tv!=nil){
+		v:=lib.Data{Value:tv}
+		lib.UnSerialize(v.ArrayByte(), value)
+	}	
 	return true
 }
 //Del Del操作
