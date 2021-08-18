@@ -237,7 +237,12 @@ func(h *HttpClient)PostMultipart(url string,values lib.InRow)*HttpResponse{
 	defer writer.Close()
 	for k,v:=range values{
 		if k[0] == '@' {
-			err:=h.addFile(writer,k[1:],v.(string))
+			var err error
+			if vs, ok := v.(string); ok {
+				err=h.addFile(writer,k[1:],vs)
+			}else if vs, ok := v.([]byte); ok {
+				err=h.addFileBytes(writer,k[1:],vs)
+			}
 			if err!=nil{
 				return h.responseErr(err)
 			}
@@ -257,6 +262,15 @@ func(h *HttpClient)addFile(writer *multipart.Writer, name,path string)error{
 		return err
 	}
 	_,err=part.Write([]byte(file.GetContent(path)))
+	return err
+}
+//addFileBytes
+func(h *HttpClient)addFileBytes(writer *multipart.Writer, name string,fileData []byte)error{
+	part,err:=writer.CreateFormField(name)
+	if err!=nil{
+		return err
+	}
+	_,err=part.Write(fileData)
 	return err
 }
 //Delete 请求
