@@ -564,3 +564,6 @@ func main() {
 }
 
 ```
+
+After execution, the model source code will be generated in the current directory model / and the entity source 
+code will be generated in the directory model / entity
