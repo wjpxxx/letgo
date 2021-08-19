@@ -527,3 +527,40 @@ func main() {
 }
 
 ```
+
+## Automatic generation model
+
+```go
+
+package main
+import (
+	"github.com/wjpxxx/letgo/db/mysql"
+)
+func main() {
+	//自动生成数据的所有表的model和entity源码
+	mysql.GenModelAndEntity("module name",
+		SlaveDB{
+		Name:"name",
+		DatabaseName:"name",
+		UserName:"user",
+		Password:"password",
+		Host:"127.0.0.1",
+		Port:"3306",
+		Charset:"utf8mb4",
+		Prefix: "cd",
+	},false)
+	//自动生成单张表的model和entity源码
+	mysql.GenModelAndEntityByTableName("module name","table name",
+		SlaveDB{
+		Name:"name",
+		DatabaseName:"name",
+		UserName:"user",
+		Password:"password",
+		Host:"127.0.0.1",
+		Port:"3306",
+		Charset:"utf8mb4",
+		Prefix: "cd",
+	},false)
+}
+
+```

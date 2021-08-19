@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/wjpxxx/letgo/lib"
-	"fmt"
+	//"fmt"
 	"testing"
 )
 
@@ -27,7 +27,7 @@ func TestModel(t *testing.T) {
 	Having("m.id",1).
 	AndHaving("m.id",1).
 	OrderBy("m.id desc").Find()
-	fmt.Println(model.GetLastSql())
+	//fmt.Println(model.GetLastSql())
 }
 
 func TestUnionModel(t *testing.T) {
@@ -35,7 +35,7 @@ func TestUnionModel(t *testing.T) {
 	model2:=NewModel("xingtool_base","sys_user_master")
 	model2.Fields("*")
 	model.Fields("*").Union(model2).Find()
-	fmt.Println(model.GetLastSql())
+	//fmt.Println(model.GetLastSql())
 }
 
 func TestPagerModel(t *testing.T) {
@@ -44,7 +44,7 @@ func TestPagerModel(t *testing.T) {
 	x:=lib.SqlRow{}
 	s:=lib.Serialize(a)
 	lib.UnSerialize(s,&x)
-	fmt.Println("序列化1",x)
+	//fmt.Println("序列化1",x)
 }
 
 func TestUpdateModel(t *testing.T) {
@@ -56,7 +56,7 @@ func TestUpdateModel(t *testing.T) {
 	model.Alias("m").Join("sys_shopee_shop as s").On("m.`id`","s.`master_id`").Where("m.id",2).Update(lib.SqlIn{
 		"db_code":"500",
 	})
-	fmt.Println("======================xxxxx==============",model.GetLastSql())
+	//fmt.Println("======================xxxxx==============",model.GetLastSql())
 }
 
 func TestInsertModel(t *testing.T) {

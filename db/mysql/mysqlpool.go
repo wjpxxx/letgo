@@ -85,7 +85,10 @@ func(m *MysqlPool) Close(){
 
 //Init 初始化连接池
 func(m *MysqlPool) Init(connects []MysqlConnect){
-	m.pool=make(map[string]*poolDB)
+	//log.DebugPrint("初始化pool")
+	if m.pool==nil{
+		m.pool=make(map[string]*poolDB)
+	}
 	for _,connect:=range connects{
 		m.AddConnect(connect)
 	}
@@ -97,18 +100,24 @@ func(m *MysqlPool)AddConnect(connect MysqlConnect) {
 	if _,ok:=m.pool[connect.Master.Name];ok{
 		log.PanicPrint("Mysql data connection already exists")
 	}
+	//log.DebugPrint("初始化数据库%s",connect.Master.Name)
 	master:=m.open(connect.Master)
 	if master!=nil{
+		//log.DebugPrint("初始化数据库%s",connect.Master.Name)
 		m.pool[connect.Master.Name]=&poolDB{
 			master:master,
 		}
-		for _,connectSlave:=range connect.Slave{
-			slave:=m.open(connectSlave)
-			if slave!=nil{
-				m.pool[connect.Master.Name].slave=append(m.pool[connect.Master.Name].slave,slave)
+		if connect.Slave!=nil{
+			for _,connectSlave:=range connect.Slave{
+				slave:=m.open(connectSlave)
+				if slave!=nil{
+					m.pool[connect.Master.Name].slave=append(m.pool[connect.Master.Name].slave,slave)
+				}
 			}
 		}
+		
 	}
+	//fmt.Println("=====================pl",m.pool)
 }
 //AddConnects 添加多个连接
 func(m *MysqlPool)AddConnects(connects []MysqlConnect) {
@@ -138,5 +147,6 @@ func(m *MysqlPool)open(connect SlaveDB) *sql.DB{
 
 //IsTransaction 是否开启事务
 func(m *MysqlPool) IsTransaction(connectName string) bool{
+	//fmt.Println("=============",m.pool)
 	return m.pool[connectName].isTransaction
 }

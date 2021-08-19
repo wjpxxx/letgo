@@ -2,7 +2,7 @@ package mysql
 
 import (
 	"github.com/wjpxxx/letgo/lib"
-    "fmt"
+    //"fmt"
     "testing"
 	"time"
 )
@@ -41,13 +41,14 @@ func TestDB(t *testing.T){
 	db.BeginTransaction()
 	table:=NewTable(&db,"sys_user_master")
 	list:=table.Select("*","id=?", 1)
-	fmt.Println(list[0]["nick_name"].String())
+	list.ToOutput()
+	//fmt.Println(list[0]["nick_name"].String())
 	table.Update(lib.SqlIn{
 		"db_code":"001",
 		"table_code":"004",
 	},nil,"id=?",20)
-	i:=table.Delete(nil,"id=?",10)
-	fmt.Println(i)
+	table.Delete(nil,"id=?",10)
+	//fmt.Println(i)
 	time.Sleep(1*time.Second)
 	db.Commit()
 }
@@ -58,33 +59,34 @@ func TestNewDB(t *testing.T) {
 	db.BeginTransaction()
 	table:=NewTable(db,"sys_user_master")
 	list:=table.Select("*","id=?", 2)
-	fmt.Println(list[0]["nick_name"].String())
+	list.ToOutput()
+	//fmt.Println(list[0]["nick_name"].String())
 	table.Update(lib.SqlIn{
 		"db_code":"001",
 		"table_code":"004",
 	},nil,"id=?",10)
-	i:=table.Delete(nil,"id=?",10)
-	fmt.Println(i)
+	table.Delete(nil,"id=?",10)
+	//fmt.Println(i)
 	time.Sleep(1*time.Second)
 	db.Commit()
 }
 
 func TestShowTables(t *testing.T){
-	db:=Connect("xingtool_base", "xingtool_base")
-	fmt.Println("tables:",db.ShowTables())
+	Connect("xingtool_base", "xingtool_base")
+	//fmt.Println("tables:",db.ShowTables())
 }
 
 func TestDDL(t *testing.T){
-	db:=Connect("xingtool_base", "xingtool_base")
-	fmt.Println("tables:",db.Desc("sys_admin"))
-	fmt.Println("tables:",db.IsExist("sys_adminxx"))
+	Connect("xingtool_base", "xingtool_base")
+	//fmt.Println("tables:",db.Desc("sys_admin"))
+	//fmt.Println("tables:",db.IsExist("sys_adminxx"))
 }
 
 //注入动态数据连接配置
 func init(){
 	InjectCreatePool(func(db *DB)[]MysqlConnect{
 		//fmt.Println("xxxx============")
-		fmt.Println("==============",db.SetDB("xingtool_base", "xingtool_base").ShowTables())
+		//fmt.Println("==============",db.SetDB("xingtool_base", "xingtool_base").ShowTables())
 		return nil
 	})
 }

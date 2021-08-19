@@ -23,4 +23,6 @@ type SlaveDB struct {
 	MaxOpenConns int `json:"maxOpenConns"`
 	MaxIdleConns int `json:"maxIdleConns"`
 	MaxLifetime int `json:"maxLifetime"`
+	Prefix string `json:"prefix"`
+	Suffix string `json:"suffix"`
 }
