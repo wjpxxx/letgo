@@ -19,6 +19,7 @@ import (
 	"mime/multipart"
 	"encoding/xml"
 	"net/http/httputil"
+	"net/textproto"
 )
 
 const (
@@ -234,7 +235,6 @@ func(h *HttpClient)PostXml(url string,value interface{})*HttpResponse {
 func(h *HttpClient)PostMultipart(url string,values lib.InRow)*HttpResponse{
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	defer writer.Close()
 	for k,v:=range values{
 		if k[0] == '@' {
 			var err error
@@ -250,7 +250,11 @@ func(h *HttpClient)PostMultipart(url string,values lib.InRow)*HttpResponse{
 			writer.WriteField(k,(&lib.Data{Value:v}).String())
 		}
 	}
-	h.WithHeader("Content-Type",writer.FormDataContentType())
+	writer.Close()
+	if _,ok:=h.headers["Content-Type"];!ok{
+		h.WithHeader("Content-Type",writer.FormDataContentType())
+	}
+	h.WithHeader("Content-Length",len(body.Bytes()))
 	client:=h.getClient()
 	req:=h.getRequest(url,"POST",body)
 	return h.getResponse(client.Do(req))
@@ -266,7 +270,10 @@ func(h *HttpClient)addFile(writer *multipart.Writer, name,path string)error{
 }
 //addFileBytes
 func(h *HttpClient)addFileBytes(writer *multipart.Writer, name string,fileData []byte)error{
-	part,err:=writer.CreateFormField(name)
+	k := make(textproto.MIMEHeader)
+	k.Set("Content-Disposition",fmt.Sprintf(`form-data; name="%s"; filename="%s"`,name,name))
+	k.Set("Content-Type", "application/octet-stream")
+	part,err:=writer.CreatePart(k)
 	if err!=nil{
 		return err
 	}
@@ -439,7 +446,7 @@ func (h *HttpClient)getRequest(url,method string,body io.Reader)*http.Request{
 	for _,cookie:=range h.cookie{
 		req.AddCookie(cookie)
 	}
-	dump, _ := httputil.DumpRequest(req, true)
+	dump, _ := httputil.DumpRequestOut(req, true)
 	h.dump=fmt.Sprintf("%s", dump)
 	if (h.fun!=nil){
 		h.fun(req)
@@ -459,6 +466,7 @@ func (h *HttpClient)getResponse(response *http.Response,err error) *HttpResponse
 	if err!=nil {
 		return h.responseErr(err)
 	}
+	dumprs,_:=httputil.DumpResponse(response,true)
 	result:=&HttpResponse{}
 	defer response.Body.Close()
 	var reader io.ReadCloser
@@ -480,7 +488,7 @@ func (h *HttpClient)getResponse(response *http.Response,err error) *HttpResponse
 	result.Code=response.StatusCode
 	result.Err=""
 	result.Header=response.Header
-	result.Dump=h.dump
+	result.Dump=h.dump+fmt.Sprintf("\n\n===================================\n\n%s",dumprs) 
 	return result
 }
 //HttpBuildQuery 生成 URL-encode 之后的请求字符串
