@@ -28,6 +28,7 @@ func (s *Server)Run(addr ...string)error {
 			log.DebugPrint("RPC Accept error %v",err)
 			return err
 		}
+		log.DebugPrint("客户端:%s,连接上来了",conn.RemoteAddr().String())
 		rpc.ServeCodec(jsonrpc.NewServerCodec(conn))
 	}
 }

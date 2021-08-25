@@ -20,6 +20,7 @@ func (f *FileSync)Run(values ...interface{})interface{}{
 		return false
 	}
 	defer client.Close()
+	log.DebugPrint("连接到服务器: %s 成功",config.Server.IP)
 	//同步文件
 	f.SyncFile(client)
 	return true
