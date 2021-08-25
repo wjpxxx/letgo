@@ -28,17 +28,18 @@ func Walk(dirname string,options *Options){
 		}else{
 			fullPath:=filepath.Join(dirname,p.Name())
 			if options.Callback!=nil&&filter(fullPath,options){
-				options.Callback(dirname,p.Name(),fullPath)
+				options.Callback(dirname,p.Name(),fullPath,options.LocationPath,Options.RemotePath)
 			}
 		}
 	}
 }
-type WalkFunc func(pathName,fileName,fullName string)
+type WalkFunc func(pathName,fileName,fullName,LocationPath,RemotePath string)
 //Options
 type Options struct{
 	Callback WalkFunc
 	Filter []string //Filter files
 	LocationPath string
+	RemotePath string
 }
 //filter
 func filter(fullPath string,options *Options)bool{

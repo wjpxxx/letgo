@@ -13,10 +13,14 @@ func init() {
 	clientFile:="config/sync_client.config"
 	cfgFile:=file.GetContent(clientFile)
 	if cfgFile==""{
-		clientConfig:=syncconfig.ClientConfig{
+		var paths []syncconfig.PathList
+		paths=append(paths,syncconfig.PathList{
 			LocationPath: "./",
 			RemotePath: "./",
 			Filter:[]string{},
+		})
+		clientConfig:=syncconfig.ClientConfig{
+			Paths:paths,
 			Server: syncconfig.SyncServer{
 				Server: syncconfig.Server{
 					IP: "127.0.0.1",

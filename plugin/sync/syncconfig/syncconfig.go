@@ -7,14 +7,23 @@ import (
 
 //ClientConfig 客户端配置文件
 type ClientConfig struct {
-	LocationPath string `json:"locationPath"`
-	RemotePath string `json:"remotePath"`
-	Filter []string `json:"filter"`
+	Paths []PathList `json:"paths"`
 	Server SyncServer `json:"server"`
 }
 
+
 //String
 func (c ClientConfig)String()string{
+	return lib.ObjectToString(c)
+}
+//PathList
+type PathList struct{
+	LocationPath string `json:"locationPath"`
+	RemotePath string `json:"remotePath"`
+	Filter []string `json:"filter"`
+}
+//String
+func (c PathList)String()string{
 	return lib.ObjectToString(c)
 }
 //SyncServer

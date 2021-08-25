@@ -28,38 +28,41 @@ func (f *FileSync)Run(values ...interface{})interface{}{
 
 //SyncFile 同步文件
 func (f *FileSync) SyncFile(client *rpc.Client){
-	walkdir.Walk(config.LocationPath,&walkdir.Options{
-		Callback: func(pathName, fileName, fullName string) {
-			filer:=file.NewFile(fullName)
-			if f.getFileModifyTime(fullName)!=filer.ModifyTime(){
-				//文件变化了
-				fsize:=filer.Size()
-				var size int64=1024*1024
-				var success bool =false
-				for {
-					buf,seek:=filer.ReadBlock(size)
-					if seek>=0{
-						//文件有内容并存在
-						message:=f.packedFileSync(buf,seek,filer)
-						//log.DebugPrint("%v",message)
-						f.rpcCall(client,message,seek,filer)
-						if fsize==seek{
-							success=true
+	for _,c:=range config.Paths{
+		walkdir.Walk(c.LocationPath,&walkdir.Options{
+			Callback: func(pathName, fileName, fullName,LocationPath,RemotePath string) {
+				filer:=file.NewFile(fullName)
+				if f.getFileModifyTime(fullName)!=filer.ModifyTime(){
+					//文件变化了
+					fsize:=filer.Size()
+					var size int64=1024*1024
+					var success bool =false
+					for {
+						buf,seek:=filer.ReadBlock(size)
+						if seek>=0{
+							//文件有内容并存在
+							message:=f.packedFileSync(buf,seek,filer,LocationPath,RemotePath)
+							//log.DebugPrint("%v",message)
+							f.rpcCall(client,message,seek,filer)
+							if fsize==seek{
+								success=true
+								break
+							}
+						}else{
 							break
 						}
-					}else{
-						break
+					}
+					if success{
+						//发送成功
+						f.saveFileModifyTime(fullName,filer)
 					}
 				}
-				if success{
-					//发送成功
-					f.saveFileModifyTime(fullName,filer)
-				}
-			}
-		},
-		Filter: config.Filter,
-		LocationPath:config.LocationPath,
-	})
+			},
+			Filter: c.Filter,
+			LocationPath:c.LocationPath,
+			RemotePath:c.RemotePath,
+		})
+	}
 }
 
 
@@ -107,17 +110,17 @@ func (f *FileSync) showProccess(seek int64,filer file.Filer){
 }
 
 //packed 打包
-func (f *FileSync) packedFileSync(data []byte,seek int64,filer file.Filer) syncconfig.FileSyncMessage{
-	var locationPath string=config.LocationPath
-	if !filepath.IsAbs(config.LocationPath) {
-		locationPath,_=filepath.Abs(config.LocationPath)
+func (f *FileSync) packedFileSync(data []byte,seek int64,filer file.Filer,LocationPath,RemotePath string) syncconfig.FileSyncMessage{
+	var locationPath string=LocationPath
+	if !filepath.IsAbs(LocationPath) {
+		locationPath,_=filepath.Abs(LocationPath)
 	}else{
-		locationPath=filepath.FromSlash(config.LocationPath)
+		locationPath=filepath.FromSlash(LocationPath)
 	}
 	relPath,_:=filepath.Rel(locationPath,filer.Path())
 	return syncconfig.FileSyncMessage{
 		LocationPath: locationPath,
-		RemotePath: config.RemotePath,
+		RemotePath: RemotePath,
 		RelPath:relPath,
 		File: syncconfig.FileData{
 			Name: filer.Name(),
