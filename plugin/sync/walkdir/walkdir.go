@@ -28,7 +28,7 @@ func Walk(dirname string,options *Options){
 		}else{
 			fullPath:=filepath.Join(dirname,p.Name())
 			if options.Callback!=nil&&filter(fullPath,options){
-				options.Callback(dirname,p.Name(),fullPath,options.LocationPath,Options.RemotePath)
+				options.Callback(dirname,p.Name(),fullPath,options.LocationPath,options.RemotePath)
 			}
 		}
 	}
