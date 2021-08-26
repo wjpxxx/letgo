@@ -107,7 +107,7 @@ func (c *Context)ContentType()string{
 
 //DumpRequest
 func (c *Context)DumpRequest()string{
-	dump, _ := httputil.DumpRequestOut(c.Request, true)
+	dump, _ := httputil.DumpRequest(c.Request, true)
 	return string(dump);
 }
 //GetHeader
