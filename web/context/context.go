@@ -6,6 +6,7 @@ import (
 	"github.com/wjpxxx/letgo/web/output"
 	"github.com/wjpxxx/letgo/web/tmpl"
 	"github.com/wjpxxx/letgo/web/session"
+	"net/http/httputil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -102,6 +103,12 @@ func (c *Context)SetSameSite(sameSite http.SameSite) {
 //ContentType
 func (c *Context)ContentType()string{
 	return c.Input.ContentType()
+}
+
+//DumpRequest
+func (c *Context)DumpRequest()string{
+	dump, _ := httputil.DumpRequestOut(c.Request, true)
+	return string(dump);
 }
 //GetHeader
 func (c *Context)GetHeader(key string)string{
