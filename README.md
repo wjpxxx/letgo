@@ -407,16 +407,16 @@ start server
 
 ```go
 {
-	"paths":[
-		{
-			"locationPath":"D:/Development/go/web/src/sync-v2", //Local directory to be synchronized
-			"remotePath":"/root/new/buyer2",	//Directory stored on the server
-			"filter":[			//Filter out files that are not synchronized to the server
-				"main.go",
-				"runtime/cache/sync/*"
-			]
-		}
-	],
+    "paths":[
+        {
+            "locationPath":"D:/Development/go/web/src/sync-v2", //Local directory to be synchronized
+            "remotePath":"/root/new/buyer2",	//Directory stored on the server
+            "filter":[			//Filter out files that are not synchronized to the server
+                "main.go",
+                "runtime/cache/sync/*"
+            ]
+        }
+    ],
     "server":{
         "ip":"127.0.0.1",	//Server IP
         "port":"5566",
