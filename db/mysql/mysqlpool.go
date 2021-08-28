@@ -98,7 +98,8 @@ func(m *MysqlPool)AddConnect(connect MysqlConnect) {
 	configLock.Lock()
 	defer configLock.Unlock()
 	if _,ok:=m.pool[connect.Master.Name];ok{
-		log.PanicPrint("Mysql data connection already exists")
+		//log.PanicPrint("Mysql data connection already exists")
+		return 
 	}
 	//log.DebugPrint("初始化数据库%s",connect.Master.Name)
 	master:=m.open(connect.Master)
