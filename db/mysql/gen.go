@@ -239,7 +239,6 @@ func (g *genInfo)getEntityTemplate()string{
 	tmp:=`package entity
 
 import (
-    "fmt"
     "github.com/wjpxxx/letgo/lib"
 )
 
