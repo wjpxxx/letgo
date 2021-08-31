@@ -213,10 +213,10 @@ func Get%s() *%s{
 func (m *%s)SaveByEntity(data entity.%s) int64{
     var inData lib.SqlIn
     lib.StringToObject(data.String(), &inData)
-    if data.ID>0{
+    if data.Id>0{
         delete(inData,"create_time")
-        m.Where("id", data.ID).Update(inData)
-        return data.ID
+        m.Where("id", data.Id).Update(inData)
+        return data.Id
     }else{
         delete(inData,"id")
         delete(inData,"update_time")
