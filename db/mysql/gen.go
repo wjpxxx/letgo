@@ -123,6 +123,7 @@ func (g *genInfo) genModel(table string){
 		g.getSmallTableName(table),
 		modelName,
 		entityName,
+		modelName,
 		entityName,
 		entityName,
 	)
@@ -209,7 +210,7 @@ func Get%s() *%s{
     return model
 }
 //SaveByEntity
-func (m *%s)SaveByEntity(data %s) int64{
+func (m *%s)SaveByEntity(data entity.%s) int64{
     var inData lib.SqlIn
     lib.StringToObject(data.String(), &inData)
     if data.ID>0{
@@ -223,8 +224,8 @@ func (m *%s)SaveByEntity(data %s) int64{
     }
 }
 //GetEntityById 通过id获得数据
-func (m *AmazonShopModel) GetEntityById(id int64) %s{
-    var out %s
+func (m *%s) GetEntityById(id int64) entity.%s{
+    var out entity.%s
     data:= m.Where("id", id).Find()
     data.Bind(&out)
     return out
