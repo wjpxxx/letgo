@@ -110,6 +110,9 @@ func(m *MysqlPool)AddConnect(connect MysqlConnect) {
 		}
 		if connect.Slave!=nil{
 			for _,connectSlave:=range connect.Slave{
+				if connectSlave.Host==""{
+					continue
+				}
 				slave:=m.open(connectSlave)
 				if slave!=nil{
 					m.pool[connect.Master.Name].slave=append(m.pool[connect.Master.Name].slave,slave)
@@ -133,6 +136,7 @@ func(m *MysqlPool)open(connect SlaveDB) *sql.DB{
 	if err!=nil{
 		log.PanicPrint("open connect fail %s",err.Error())
 	}
+	log.DebugPrint("=================加载数据源:%s 成功",connect.DatabaseName)
 	if connect.MaxIdleConns>0{
 		db.SetMaxIdleConns(connect.MaxIdleConns)
 	}

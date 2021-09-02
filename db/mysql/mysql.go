@@ -287,15 +287,18 @@ func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
 	smt,err:=t.db.prepare(sql)
 	t.sql(sql,vars...)
 	if err!=nil{
+		log.DebugPrint("===========执行TransSql 转原生 sql失败:%s",err.Error())
 		return -1
 	}
 	defer smt.Close()
 	result, err :=smt.Exec(vars...)
 	if err!=nil{
+		log.DebugPrint("===========执行sql失败:%s",err.Error())
 		return -2
 	}
 	effects, err := result.LastInsertId()
 	if err!=nil{
+		log.DebugPrint("===========获取插入ID失败:%s",err.Error())
 		return -3
 	}
 	return effects

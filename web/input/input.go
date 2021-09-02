@@ -35,7 +35,15 @@ func (i *Input)R()*http.Request{
 	return i.request
 }
 //Param 获得参数
-func (i *Input)Param(key string) *lib.Data{
+func (i *Input)Param(key string,value ...interface{}) *lib.Data{
+	if _,ok:=i.params[key];!ok{
+		if(value[0]!=nil){
+			return &lib.Data{Value:value[0]}
+		}
+	}
+	if i.params[key]==nil&&value[0]!=nil{
+		return &lib.Data{Value:value[0]}
+	}
 	return i.params[key]
 }
 //SetParam 设置参数
@@ -47,7 +55,15 @@ func (i *Input)ParamRaw() lib.Row{
 	return i.params
 }
 //Get 获得参数
-func (i *Input)Get(key string) *lib.Data{
+func (i *Input)Get(key string,value ...interface{}) *lib.Data{
+	if _,ok:=i.get[key];!ok{
+		if(value[0]!=nil){
+			return &lib.Data{Value:value[0]}
+		}
+	}
+	if i.get[key]==nil&&value[0]!=nil{
+		return &lib.Data{Value:value[0]}
+	}
 	return i.get[key]
 }
 
@@ -73,7 +89,15 @@ func (i *Input)Body()string{
 }
 
 //Post 获得参数
-func (i *Input)Post(key string) *lib.Data{
+func (i *Input)Post(key string,value ...interface{}) *lib.Data{
+	if _,ok:=i.post[key];!ok{
+		if(value[0]!=nil){
+			return &lib.Data{Value:value[0]}
+		}
+	}
+	if i.post[key]==nil&&value[0]!=nil{
+		return &lib.Data{Value:value[0]}
+	}
 	return i.post[key]
 }
 //GetRaw 获得参数
