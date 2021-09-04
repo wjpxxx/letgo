@@ -5,6 +5,7 @@ import (
 	"github.com/wjpxxx/letgo/web/context"
 	"github.com/wjpxxx/letgo/web/router"
 	"github.com/wjpxxx/letgo/web/tmpl"
+	//"github.com/wjpxxx/letgo/log"
 	syscontext "context"
 	"net/http"
 	"sync"
@@ -22,6 +23,7 @@ func NewServer()*Server{
 		route: router.HttpRouter(),
 	}
 	sr.pool.New=func()interface{}{
+		//log.DebugPrint("新建一个context")
 		return context.NewContext()
 	}
 	return sr
@@ -31,6 +33,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	c:=s.pool.Get().(*context.Context)
 	c.Request=r
 	c.Writer=w
+	//log.DebugPrint("请求过来了%s,%s,%v",r.Method,r.Host,w)
 	c.Reset()
 	s.handleHttpRequest(c)
 	s.pool.Put(c)

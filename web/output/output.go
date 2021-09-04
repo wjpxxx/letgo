@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"net/http"
 )
-
 //Output
 type Output struct{
 	writer http.ResponseWriter
@@ -25,7 +24,10 @@ func (o *Output)Init(writer http.ResponseWriter,in *input.Input,templ *template.
 }
 //Header 设置头
 func (o *Output)Header(key,value string){
-	o.writer.Header().Set(key,value)
+	if o!=nil&&o.writer!=nil&&o.writer.Header()!=nil{
+		o.writer.Header().Set(key,value)
+	}
+	
 }
 //JSON
 func (o *Output)JSON(code int, value interface{})error{

@@ -18,7 +18,7 @@ var initRouter *Router
 var onceDo sync.Once
 //Router 路由
 type Router struct {
-	ctx *context.Context
+	//ctx *context.Context
 	routerInfo []*RouterInfo
 }
 //RouterInfo 路由信息
@@ -40,14 +40,14 @@ func HttpRouter() *Router{
 }
 //HandleHttpRequest 处理http请求
 func (r *Router)HandleHttpRequest(ctx *context.Context){
-	r.ctx=ctx
-	r.ctx.Init()
+	//r.ctx=ctx
+	ctx.Init()
 	//过滤
-	filter.ExecFilter(filter.BEFORE_ROUTER,r.ctx)
-	requestPath:=strings.ToLower(r.ctx.Request.URL.Path)
+	filter.ExecFilter(filter.BEFORE_ROUTER,ctx)
+	requestPath:=strings.ToLower(ctx.Request.URL.Path)
 	found:=false
 	for _,router:=range r.routerInfo{
-		if router.method!="ANY"&&r.ctx.Request.Method!=router.method {
+		if router.method!="ANY"&&ctx.Request.Method!=router.method {
 			continue
 		}
 		if !router.regex.MatchString(requestPath){
@@ -60,30 +60,30 @@ func (r *Router)HandleHttpRequest(ctx *context.Context){
 		}
 		if len(router.params)>0 {
 			for i,match:=range matches[1:]{
-				r.ctx.Input.SetParam(router.params[i], match)
+				ctx.Input.SetParam(router.params[i], match)
 			}
 		}
-		filter.ExecFilter(filter.BEFORE_EXEC,r.ctx)
+		filter.ExecFilter(filter.BEFORE_EXEC,ctx)
 		//初始化参数
-		r.ctx.RouterPath=router.path
-		if !r.ctx.Output.HasOutput() {
-			router.handler(r.ctx)
+		ctx.RouterPath=router.path
+		if !ctx.Output.HasOutput() {
+			router.handler(ctx)
 		}
-		filter.ExecFilter(filter.AFTER_EXEC,r.ctx)
+		filter.ExecFilter(filter.AFTER_EXEC,ctx)
 		found=true
 	}
 	//no found
 	if !found {
 		ctx.Output.NotFound()
 	}else{
-		filter.ExecFilter(filter.AFTER_ROUTER,r.ctx)
+		filter.ExecFilter(filter.AFTER_ROUTER,ctx)
 	}
 	
 }
 
 //File 输出文件
-func (r *Router)File(filePath string) {
-	http.ServeFile(r.ctx.Writer,r.ctx.Request,filePath)
+func (r *Router)File(filePath string,ctx *context.Context) {
+	http.ServeFile(ctx.Writer,ctx.Request,filePath)
 }
 //StaticFile 静态文件
 func (r *Router)StaticFile(relativePath, filePath string) {
@@ -92,7 +92,7 @@ func (r *Router)StaticFile(relativePath, filePath string) {
 	}
 	handler := func(c *context.Context) {
 		filter.ExecFilter(filter.BEFORE_STATIC,c)
-		r.File(filePath)
+		r.File(filePath,c)
 	}
 	r.RegisterRouter(http.MethodGet,relativePath,handler)
 	r.RegisterRouter(http.MethodHead,relativePath,handler)
