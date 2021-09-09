@@ -231,7 +231,7 @@ func GetDayByTimeInt(t int) int {
 }
 //GetTimeByDay 获得当月指定日期的时间戳
 func GetTimeByDay(day int)int{
-	t:=time.Date(GetYear(), GetMonth(), day, GetHour(), GetMinute(), 0 , 0, time.Local)
+	t:=time.Date(GetYear(),time.Month(GetMonth()) , day, GetHour(), GetMinute(), 0 , 0, time.Local)
 	return int(t.Unix())
 }
 
