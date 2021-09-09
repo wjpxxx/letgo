@@ -223,10 +223,16 @@ func GetDayByTimeLong(t int64) int {
 	tm := time.Unix(t1, 0)
 	return tm.Day()
 }
+//GetDayByTimeInt
 func GetDayByTimeInt(t int) int {
 	var t1 int64 = int64(t)
 	tm := time.Unix(t1, 0)
 	return tm.Day()
+}
+//GetTimeByDay 获得当月指定日期的时间戳
+func GetTimeByDay(day int)int{
+	t:=time.Date(tm.Year(), tm.Month(), day, GetHour(), GetMinute(), 0 , 0, time.Local)
+	return int(t.Unix())
 }
 
 //获得当前时间的小时数

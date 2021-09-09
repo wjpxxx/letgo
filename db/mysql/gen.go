@@ -71,6 +71,7 @@ func (g *genInfo)FieldName(feild string)string{
 	return m
 }
 func (g *genInfo)getTableName(table string)string{
+	table=g.getSmallTableName(table)
 	arr:=strings.Split(table,"_")
 	m:=""
 	for i,k:=range arr{
@@ -81,6 +82,21 @@ func (g *genInfo)getTableName(table string)string{
 		}
 	}
 	return m
+}
+//getDbName
+func (g *genInfo)getDbName(dbName string)string{
+	arr:=strings.Split(dbName,"_")
+	var arr2 []string
+	for i,k:=range arr{
+		if g.isCode{
+			if i!=len(arr)-1{
+				arr2=append(arr2, k)
+			}
+		}else{
+			arr2=append(arr2, k)
+		}
+	}
+	return strings.Join(arr2,"_")
 }
 //getSmallTableName
 func (g *genInfo)getSmallTableName(table string)string{
@@ -119,7 +135,7 @@ func (g *genInfo) genModel(table string){
 		modelName,
 		modelName,
 		modelName,
-		g.dbConfig.DatabaseName,
+		g.getDbName(g.dbConfig.DatabaseName),
 		g.getSmallTableName(table),
 		modelName,
 		entityName,
@@ -208,19 +224,21 @@ func Get%s() *%s{
     //开启软删除
     model.SoftDelete=true
     return model
-}
+}`
+	}
+	tmp+=`
 //SaveByEntity
 func (m *%s)SaveByEntity(data entity.%s) int64{
     var inData lib.SqlIn
     lib.StringToObject(data.String(), &inData)
-	inData["delete_time"]=-1
+    inData["delete_time"]=-1
     if data.Id>0{
-		inData["update_time"]=lib.Time()
+        inData["update_time"]=lib.Time()
         delete(inData,"create_time")
         m.Where("id", data.Id).Update(inData)
         return data.Id
     }else{
-		inData["create_time"]=lib.Time()
+        inData["create_time"]=lib.Time()
         delete(inData,"id")
         delete(inData,"update_time")
         return m.Insert(inData)
@@ -233,7 +251,6 @@ func (m *%s) GetEntityById(id int64) entity.%s{
     data.Bind(&out)
     return out
 }`
-	}
 	return tmp
 }
 
