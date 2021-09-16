@@ -89,7 +89,7 @@ func (f *FileSync) rpcCall(client *rpc.Client,message syncconfig.FileSyncMessage
 		//fmt.Println(fmt.Sprintf("message:%s",message))
 		client.Call("FileSync.Sync",message, &result)
 		if result.Success {
-			f.showProccess(seek,filer)
+			f.showProccess(message,seek,filer)
 			break
 		}else{
 			//发送失败
@@ -99,14 +99,14 @@ func (f *FileSync) rpcCall(client *rpc.Client,message syncconfig.FileSyncMessage
 }
 
 //showProccess
-func (f *FileSync) showProccess(seek int64,filer file.Filer){
+func (f *FileSync) showProccess(message syncconfig.FileSyncMessage,seek int64,filer file.Filer){
 	var sended float32
 	if filer.Size()>0{
 		sended=float32(seek)/float32(filer.Size())*100
 	}else{
 		sended=100
 	}
-	log.DebugPrint("正在发送文件%s,已发送%.2f%s",filer.FullPath(),sended,"%")
+	log.DebugPrint("正在发送文件%s,位置:%d#%d#%d,已发送%.2f%s",filer.FullPath(),seek,len(message.File.Data),message.File.Size,sended,"%")
 }
 
 //packed 打包

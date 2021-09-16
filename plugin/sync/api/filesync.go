@@ -5,7 +5,7 @@ import (
 	"github.com/wjpxxx/letgo/net/rpc"
 	"github.com/wjpxxx/letgo/plugin/sync/syncconfig"
 	"path/filepath"
-	//"github.com/wjpxxx/letgo/log"
+	"github.com/wjpxxx/letgo/log"
 	//"fmt"
 )
 
@@ -46,7 +46,8 @@ func (f *FileSync)saveFile(message syncconfig.FileSyncMessage){
 	//fmt.Println("fullName:",fullName)
 	//log.DebugPrint("fullName:%s",fullName)
 	fn:=file.NewFile(fullName)
-	fn.WriteAt(message.File.Data,message.File.Size-message.File.Seek)
+	fn.WriteAt(message.File.Data,message.File.Seek-int64(len(message.File.Data)))
+	log.DebugPrint("文件:%s,从位置:%d开始写入,写入:%d字节,文件大小到达:%d字节",message.File.Name,message.File.Seek-int64(len(message.File.Data)),len(message.File.Data),message.File.Seek)
 }
 //sendSlave
 func (f *FileSync)sendSlave(message syncconfig.FileSyncMessage)error{
