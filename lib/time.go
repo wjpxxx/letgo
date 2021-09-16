@@ -53,6 +53,14 @@ func StrToTimeFormat(date string, format string) int {
 	return int(timestamp / 1000)
 }
 
+//将字符串转时间戳按格式
+func StrToTimeFormatByLocal(date string, format,localName string) int {
+	loc, _ := time.LoadLocation(localName)
+	tm, _ := time.ParseInLocation(format, date, loc)
+	timestamp := tm.UnixNano() / 1000000
+	return int(timestamp / 1000)
+}
+
 //获得当前时间
 func Now() string {
 	tm := time.Unix(int64(Time()), 0)

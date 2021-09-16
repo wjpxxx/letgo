@@ -106,7 +106,7 @@ func (f *FileSync) showProccess(message syncconfig.FileSyncMessage,seek int64,fi
 	}else{
 		sended=100
 	}
-	log.DebugPrint("正在发送文件%s,位置:%d#%d#%d,已发送%.2f%s",filer.FullPath(),seek,len(message.File.Data),message.File.Size,sended,"%")
+	log.DebugPrint("正在发送文件%s,已发送%.2f%s",filer.FullPath(),sended,"%")
 }
 
 //packed 打包
