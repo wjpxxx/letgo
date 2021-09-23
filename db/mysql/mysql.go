@@ -205,6 +205,7 @@ type Tabler interface{
 	Truncate() int64
 	Delete(onParams []interface{},where string,whereParams ...interface{}) int64
 	Update(row lib.SqlIn,onParams []interface{},where string,whereParams ...interface{})int64
+	SelectByHasWhere(fields string, where string,hasWhere bool, whereParams ...interface{})lib.SqlRows
 	Select(fields string, where string, whereParams ...interface{})lib.SqlRows
 	GetLastSql()string
 	GetSqlInfo()(string,[]interface{})
@@ -352,9 +353,17 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 }
 //Select 查询
 func (t *Table) Select(fields string, where string, whereParams ...interface{})lib.SqlRows{
+	return t.SelectByHasWhere(fields,where, true,whereParams...)
+}
+//SelectByHasWhere 查询
+func (t *Table) SelectByHasWhere(fields string, where string,hasWhere bool, whereParams ...interface{})lib.SqlRows{
 	var sql string
 	if where!=""{
-		sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
+		if (hasWhere){
+			sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
+		}else{
+			sql=fmt.Sprintf("select %s from %s %s", fields,t.tableName, where)
+		}
 	}else{
 		sql=fmt.Sprintf("select %s from %s", fields,t.tableName)
 	}

@@ -5,7 +5,7 @@ import (
 	"github.com/wjpxxx/letgo/web/context"
 	"github.com/wjpxxx/letgo/web/router"
 	"github.com/wjpxxx/letgo/web/tmpl"
-	//"github.com/wjpxxx/letgo/log"
+	"github.com/wjpxxx/letgo/log"
 	syscontext "context"
 	"net/http"
 	"sync"
@@ -46,6 +46,7 @@ func (s *Server)handleHttpRequest(c *context.Context){
 func (s *Server)Run(addr ...string)error {
 	address:=lib.ResolveAddress(addr)
 	//fmt.Println(address)
+	log.DebugPrint("Start server address:%s",address)
 	s.httpServer = &http.Server{Addr: address, Handler: s}
 	return s.httpServer.ListenAndServe()
 }

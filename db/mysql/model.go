@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"github.com/wjpxxx/letgo/lib"
+	//"github.com/wjpxxx/letgo/log"
 	"fmt"
 	"math"
 	"strings"
@@ -791,8 +792,13 @@ func (m *Model)Get()lib.SqlRows{
 func (m *Model)GetByClear(isClear bool)lib.SqlRows{
 	tableName,values:=m.getTables()
 	where,whereValues:=m.getWhere()
+	//log.DebugPrint("%v",whereValues)
+	hasWhere:=false
 	if len(whereValues)>0{
 		values=append(values, whereValues...)
+	}
+	if where!=""{
+		hasWhere=true
 	}
 	group,groupValues:=m.getGroup()
 	if group!=""{
@@ -816,7 +822,7 @@ func (m *Model)GetByClear(isClear bool)lib.SqlRows{
 	where=where+m.getLimit()
 	table:=NewTable(m.db,tableName)
 	fields:=m.getFields()
-	rows:= table.Select(fields,where,values...)
+	rows:= table.SelectByHasWhere(fields,where,hasWhere,values...)
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
 	if isClear {

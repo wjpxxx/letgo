@@ -32,8 +32,10 @@ type Rediser interface {
 //Master 从接口
 type Master interface{
 	Set(key string, value interface{}, overtime int64) bool
+	SetNoFix(key string, value interface{}, overtime int64) bool
 	SetNx(key string, value interface{}) bool
 	Get(key string, value interface{}) bool
+	GetNoFix(key string, value interface{}) bool
 	Del(key string) bool
 	Ttl(key string) int64
 	Expire(key string, overtime int64) bool
@@ -135,6 +137,25 @@ func (r *Redis)Set(key string, value interface{}, overtime int64) bool{
 	}
 	return true
 }
+//Set set操作
+func (r *Redis)SetNoFix(key string, value interface{}, overtime int64) bool{
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	if overtime>-1{
+		_, err :=rds.Do("SET",key,lib.SerializeNoFix(value),"EX",overtime)
+		if err != nil {
+			log.DebugPrint("redis set fail: %s", err.Error())
+			return false
+		}
+	}else{
+		_, err :=rds.Do("SET",key,lib.SerializeNoFix(value))
+		if err != nil {
+			log.DebugPrint("redis set fail: %s", err.Error())
+			return false
+		}
+	}
+	return true
+}
 //SetNx SetNx 操作
 func (r *Redis)SetNx(key string, value interface{}) bool{
 	rds:=r.getRedis().Get()
@@ -161,6 +182,23 @@ func (r *Redis)Get(key string, value interface{}) bool{
 	if(tv!=nil){
 		v:=lib.Data{Value:tv}
 		lib.UnSerialize(v.ArrayByte(), value)
+	}	
+	return true
+}
+
+//Get Get操作
+func (r *Redis)GetNoFix(key string, value interface{}) bool{
+	rds:=r.getRedis().Get()
+	defer rds.Close()
+	tv, err :=rds.Do("GET", key)
+	if err!=nil{
+		log.DebugPrint("redis get fail: %s", err.Error())
+		return false
+	}
+	log.DebugPrint("key:%s,getnofix:%v",key,tv)
+	if(tv!=nil){
+		v:=lib.Data{Value:tv}
+		lib.UnSerializeNoFix(v.ArrayByte(), value)
 	}	
 	return true
 }
