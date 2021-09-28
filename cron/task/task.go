@@ -142,6 +142,11 @@ func (t *taskManager)managerStop(){
 func RegisterTask(name string,taskNums int,call DoFunc){
 	globalTaskManager.RegisterTask(name,taskNums,call)
 }
+
+//RegisterTaskByMethod
+func RegisterTaskByMethod(name string,taskNums int,call func(*context.Context)){
+	globalTaskManager.RegisterTask(name,taskNums,call)
+}
 //Start start task
 func Start(){
 	globalTaskManager.Start()
