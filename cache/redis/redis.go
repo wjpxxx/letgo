@@ -319,25 +319,33 @@ func (r *Redis)LPush(key string, value ...interface{}) int64{
 func (r *Redis)LPop(key string, value interface{})bool{
 	rds:=r.getRedis().Get()
 	defer rds.Close()
-	v, err := redis.Bytes(rds.Do("Lpop", key))
+	tv, err :=rds.Do("Lpop", key)
 	if err != nil {
 		log.DebugPrint("redis lpop fail: %s", err.Error())
 		return false
 	}
-	lib.UnSerialize(v,value)
-	return true
+	if tv!=nil{
+		v:=lib.Data{Value:tv}
+		lib.UnSerialize(v.ArrayByte(),value)
+		return true
+	}
+	return false
 }
 //RPop RPop操作
 func (r *Redis)RPop(key string, value interface{}) bool{
 	rds:=r.getRedis().Get()
 	defer rds.Close()
-	v, err := redis.Bytes(rds.Do("Rpop", key))
+	tv, err :=rds.Do("Rpop", key)
 	if err != nil {
 		log.DebugPrint("redis rpop fail: %s", err.Error())
 		return false
 	}
-	lib.UnSerialize(v,value)
-	return true
+	if tv!=nil{
+		v:=lib.Data{Value:tv}
+		lib.UnSerialize(v.ArrayByte(),value)
+		return true
+	}
+	return false
 }
 //Push Push操作
 func (r *Redis)Push(key string, value interface{}) bool{
@@ -479,13 +487,17 @@ func (r *Redis)HExists(key string, field string) int{
 func (r *Redis)HGet(key string, field string, value interface{}) bool{
 	rds:=r.getRedis().Get()
 	defer rds.Close()
-	v, err := redis.Bytes(rds.Do("HGET", key, field))
+	tv,err:=rds.Do("HGET", key, field)
 	if err != nil {
 		log.DebugPrint("redis hget fail: %s", err.Error())
 		return false
 	}
-	lib.UnSerialize(v,value)
-	return true
+	if tv!=nil{
+		v:=lib.Data{Value:tv}
+		lib.UnSerialize(v.ArrayByte(),value)
+		return true
+	}
+	return false
 }
 
 //HGetAll HGetAll操作
