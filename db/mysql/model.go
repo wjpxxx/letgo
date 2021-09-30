@@ -672,7 +672,7 @@ func (m *Model)getWhere()(string,[]interface{}){
 			where+=fmt.Sprintf(" %s %s %s ",logic,m.aliasName+"."+m.getDeleteName(),"=?")
 			values=append(values,-1)
 		}else{
-			where+=fmt.Sprintf(" %s %s %s ",logic,+m.getDeleteName(),"=?")
+			where+=fmt.Sprintf(" %s %s %s ",logic,m.getDeleteName(),"=?")
 			values=append(values,-1)
 		}
 		//fmt.Println(where,values);
