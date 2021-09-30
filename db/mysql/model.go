@@ -30,6 +30,7 @@ type Model struct{
 	unionModel Modeler
 	db *DB
 	SoftDelete bool
+	DeleteName string
 }
 //cond 操作
 type cond struct{
@@ -639,6 +640,13 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 	//fmt.Println(on,values)
 	return on,values
 }
+//getDeleteName 获得删除字段名称
+func (m *Model)getDeleteName()string{
+	if m.DeleteName==""{
+		return "delete_time"
+	}
+	return m.DeleteName
+}
 //getWhere
 func (m *Model)getWhere()(string,[]interface{}){
 	where:=""
@@ -661,10 +669,10 @@ func (m *Model)getWhere()(string,[]interface{}){
 			logic=""
 		}
 		if m.aliasName!="" {
-			where+=fmt.Sprintf(" %s %s %s ",logic,m.aliasName+".delete_time","=?")
+			where+=fmt.Sprintf(" %s %s %s ",logic,m.aliasName+"."+m.getDeleteName(),"=?")
 			values=append(values,-1)
 		}else{
-			where+=fmt.Sprintf(" %s %s %s ",logic,"delete_time","=?")
+			where+=fmt.Sprintf(" %s %s %s ",logic,+m.getDeleteName(),"=?")
 			values=append(values,-1)
 		}
 		//fmt.Println(where,values);
@@ -936,12 +944,12 @@ func (m *Model)Create(row lib.SqlIn)int64{
 //判断是否添加软删除
 func (m *Model)addDeleteTime(row lib.SqlIn)lib.SqlIn{
 	if m.SoftDelete {
-		if _,ok:=row["delete_time"];!ok{
-			row["delete_time"]=-1
+		if _,ok:=row[m.getDeleteName()];!ok{
+			row[m.getDeleteName()]=-1
 		}else{
-			d:=lib.Data{Value:row["delete_time"]}
+			d:=lib.Data{Value:row[m.getDeleteName()]}
 			if d.Int()==0{
-				row["delete_time"]=-1
+				row[m.getDeleteName()]=-1
 			}
 		}
 	}
