@@ -379,7 +379,7 @@ func (m *Model)OnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setJoinCond(field,"in", "and", valuesStr)
 	return m
 }
@@ -404,7 +404,7 @@ func (m *Model)OrOnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setJoinCond(field,"in", "or", valuesStr)
 	return m
 }
@@ -429,7 +429,7 @@ func (m *Model)AndOnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setJoinCond(field,"in", "and", valuesStr)
 	return m
 }
@@ -459,7 +459,7 @@ func (m *Model)WhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setWhereCond(field,"in", "and",valuesStr)
 	return m
 }
@@ -484,7 +484,7 @@ func (m *Model)AndWhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setWhereCond(field,"in", "and",valuesStr)
 	return m
 }
@@ -510,7 +510,7 @@ func (m *Model)OrWhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setWhereCond(field,"in", "or",valuesStr)
 	return m
 }
@@ -542,7 +542,7 @@ func (m *Model)HavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setHavingCond(field,"in", "and",valuesStr)
 	return m
 }
@@ -568,7 +568,7 @@ func (m *Model)AndHavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setHavingCond(field,"in", "and",valuesStr)
 	return m
 }
@@ -594,7 +594,7 @@ func (m *Model)OrHavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("(%s)",strings.Join(values,",")) 
+	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
 	m.setHavingCond(field,"in", "or",valuesStr)
 	return m
 }
@@ -626,7 +626,11 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 				q=s
 			}else{
 				values=append(values, o.value)
-				q="?"
+				if o.symbol=="in" {
+					q="(?)"
+				}else{
+					q="?"
+				}
 			}
 			//values=append(values, o.value)
 			//q="?"
@@ -655,7 +659,11 @@ func (m *Model)getWhere()(string,[]interface{}){
 		var q string=""
 		if w.value!=nil{
 			values=append(values, w.value)
-			q="?"
+			if w.symbol=="in" {
+				q="(?)"
+			}else{
+				q="?"
+			}
 		}
 		if i==0{
 			where+=fmt.Sprintf("%s %s %s "+q,w.logic,w.field,w.symbol)
@@ -693,7 +701,11 @@ func (m *Model)getGroup()(string,[]interface{}){
 		var q string=""
 		if w.value!=nil{
 			values=append(values, w.value)
-			q="?"
+			if w.symbol=="in" {
+				q="(?)"
+			}else{
+				q="?"
+			}
 		}
 		if i==0{
 			group+=fmt.Sprintf("%s %s %s "+q,w.logic,w.field,w.symbol)
