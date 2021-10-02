@@ -297,7 +297,7 @@ func main() {
 }
 
 func init(){
-	mysql.InjectCreatePool(func(db *DB)[]mysql.MysqlConnect{
+	mysql.InjectCreatePool(func(db *mysql.DB)[]mysql.MysqlConnect{
 		var otherConnects []mysql.MysqlConnect
 		model:=mysql.NewModelByConnectName("connectName", "databaseName", "database_config")
 		list:= model.Get()
@@ -321,7 +321,7 @@ func init(){
 		return otherConnects
 	})
 
-	mongo.InjectCreatePool(func(db *DB)[]mongo.MongoConnect{
+	mongo.InjectCreatePool(func(db *mysql.DB)[]mongo.MongoConnect{
 		var otherConnects []mongo.MongoConnect
 		var r []bson.D
 		mongo.NewModelByConnectName("connectName", "databaseName", "database_config").Find(nil, &r)
