@@ -260,9 +260,19 @@ func Serialize(data interface{}) []byte {
 //反序列化数据
 //参数data:序列化数据
 //参数rdata:反序列化后的数据
-func UnSerialize(data []byte, rdata interface{}) {
+func UnSerialize(data []byte, rdata interface{}) bool{
+	if (len(data)<len(fix)){
+		//序列化失败
+		fmt.Println("序列化失败,数据缺少前缀")
+		return false
+	}
 	decoder := gob.NewDecoder(bytes.NewReader(data[len(fix):]))
-	decoder.Decode(rdata)
+	err:=decoder.Decode(rdata)
+	if err!=nil{
+		fmt.Println(fmt.Sprintf("序列化失败:%s",err.Error()))
+		return false
+	}
+	return true
 }
 
 
@@ -279,7 +289,12 @@ func SerializeNoFix(data interface{}) []byte {
 //反序列化数据
 //参数data:序列化数据
 //参数rdata:反序列化后的数据
-func UnSerializeNoFix(data []byte, rdata interface{}) {
+func UnSerializeNoFix(data []byte, rdata interface{}) bool{
 	decoder := gob.NewDecoder(bytes.NewReader(data))
-	decoder.Decode(rdata)
+	err:=decoder.Decode(rdata)
+	if err!=nil{
+		fmt.Println(fmt.Sprintf("序列化失败:%s",err.Error()))
+		return false
+	}
+	return true
 }
