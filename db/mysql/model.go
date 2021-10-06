@@ -517,8 +517,26 @@ func (m *Model)OrWhereIn(field string, value []interface{}) Wherer{
 
 //GroupBy 分组
 func (m *Model)GroupBy(field ...string) GroupByer{
-	m.groupBy=field
+	var newField []string
+	for _,v:=range field{
+		newField=append(newField,m.getGroupBy(v))
+	}
+	m.groupBy=newField
 	return m
+}
+
+func (m *Model)getGroupBy(field string) string{
+	farr:=strings.Split(field,".")
+	if len(farr)==1{
+		if strings.Index(farr[0],"`")==-1{
+			return "`"+farr[0]+"`"
+		}
+	}else if len(farr)==2{
+		if strings.Index(farr[1],"`")==-1{
+			return farr[0]+".`"+farr[1]+"`"
+		}
+	}
+	return field
 }
 
 //Having having条件
@@ -636,9 +654,9 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 			//q="?"
 		}
 		if i==0{
-			on+=fmt.Sprintf("%s %s %s "+q,o.logic,o.field,o.symbol)
+			on+=fmt.Sprintf("%s %s %s "+q,o.logic,m.getField(o.field,o.symbol) ,o.symbol)
 		}else{
-			on+=fmt.Sprintf(" %s %s %s "+q,o.logic,o.field,o.symbol)
+			on+=fmt.Sprintf(" %s %s %s "+q,o.logic,m.getField(o.field,o.symbol),o.symbol)
 		}
 	}
 	//fmt.Println(on,values)
@@ -647,9 +665,9 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 //getDeleteName 获得删除字段名称
 func (m *Model)getDeleteName()string{
 	if m.DeleteName==""{
-		return "delete_time"
+		return "`delete_time`"
 	}
-	return m.DeleteName
+	return "`"+m.DeleteName+"`"
 }
 //getWhere
 func (m *Model)getWhere()(string,[]interface{}){
@@ -666,9 +684,9 @@ func (m *Model)getWhere()(string,[]interface{}){
 			}
 		}
 		if i==0{
-			where+=fmt.Sprintf("%s %s %s "+q,w.logic,w.field,w.symbol)
+			where+=fmt.Sprintf("%s %s %s "+q,w.logic,m.getField(w.field,w.symbol),w.symbol)
 		}else{
-			where+=fmt.Sprintf(" %s %s %s "+q,w.logic,w.field,w.symbol)
+			where+=fmt.Sprintf(" %s %s %s "+q,w.logic,m.getField(w.field,w.symbol),w.symbol)
 		}
 	}
 	if m.SoftDelete {
@@ -708,19 +726,65 @@ func (m *Model)getGroup()(string,[]interface{}){
 			}
 		}
 		if i==0{
-			group+=fmt.Sprintf("%s %s %s "+q,w.logic,w.field,w.symbol)
+			group+=fmt.Sprintf("%s %s %s "+q,w.logic,m.getField(w.field,w.symbol),w.symbol)
 		}else{
-			group+=fmt.Sprintf(" %s %s %s "+q,w.logic,w.field,w.symbol)
+			group+=fmt.Sprintf(" %s %s %s "+q,w.logic,m.getField(w.field,w.symbol),w.symbol)
 		}
 	}
 	return group,values
 }
+//getField
+func (m *Model) getField(field,symbol string) string{
+	if symbol==""{
+		return field
+	}
+	farr:=strings.Split(field,".")
+	if len(farr)==1{
+		if strings.Index(farr[0],"`")==-1{
+			return "`"+farr[0]+"`"
+		}
+	}else if len(farr)==2{
+		if strings.Index(farr[1],"`")==-1{
+			return farr[0]+".`"+farr[1]+"`"
+		}
+	}
+	return field
+}
 //getOrderBy 获得排序
 func (m *Model)getOrderBy()string{
 	if m.orderBy!=""{
-		return fmt.Sprintf(" ORDER BY %s",m.orderBy)
+		return fmt.Sprintf(" ORDER BY %s",m.getOrderByField(m.orderBy))
 	}
 	return ""
+}
+//getOrderByField
+func (m *Model)getOrderByField(field string) string{
+	field=strings.ReplaceAll(field,"	"," ")
+	farr:=strings.Split(field,",")
+	for k,v:=range farr{
+		nfarr:=strings.Split(v,".")
+		if len(nfarr)==1{
+			if strings.Index(nfarr[0],"`")==-1{
+				nn:=strings.Split(nfarr[0]," ")
+				if len(nn)>=2{
+					farr[k]="`"+nn[0]+"` "+nn[len(nn)-1]
+				}else{
+					farr[k]= "`"+nfarr[0]+"`"
+				}
+			}
+		}else if len(nfarr)==2{
+			if strings.Index(nfarr[1],"`")==-1{
+				nn:=strings.Split(nfarr[1]," ")
+				//fmt.Println(nn)
+				if len(nn)>=2{
+					farr[k]= nfarr[0]+".`"+nn[0]+"` "+nn[len(nn)-1]
+				}else{
+					farr[k]= nfarr[0]+".`"+nfarr[1]+"`"
+				}
+			}
+		}
+	}
+	return strings.Join(farr,",")
 }
 //getLimit 分页
 func (m *Model)getLimit()string{

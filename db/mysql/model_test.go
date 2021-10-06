@@ -27,13 +27,13 @@ func TestModel(t *testing.T) {
 	Having("m.id",1).
 	AndHaving("m.id",1).
 	OrderBy("m.id desc").Find()
-	//fmt.Println(model.GetLastSql())
+	fmt.Println(model.GetLastSql())
 }
 
 func TestPage(t *testing.T){
 	model:=NewModel("xingtool_base","sys_user_master")
 	model.Fields("*").Limit(0,10).Get()
-	fmt.Println(model.GetLastSql())
+	//fmt.Println(model.GetLastSql())
 }
 
 func TestUnionModel(t *testing.T) {

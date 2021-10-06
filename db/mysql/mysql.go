@@ -326,7 +326,7 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 		vars=append(vars, onParams...)
 	}
 	for key,value:=range row {
-		setsArray=append(setsArray, fmt.Sprintf("%s=?",key))
+		setsArray=append(setsArray, fmt.Sprintf("%s=?",t.getSetField(key)))
 		vars=append(vars, value)
 	}
 	vars=append(vars,whereParams...)
@@ -350,6 +350,20 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 		return -3
 	}
 	return effects
+}
+//getSetField
+func (t *Table) getSetField(field string)string{
+	farr:=strings.Split(field,".")
+	if len(farr)==1{
+		if strings.Index(farr[0],"`")==-1{
+			return "`"+farr[0]+"`"
+		}
+	}else if len(farr)==2{
+		if strings.Index(farr[1],"`")==-1{
+			return farr[0]+".`"+farr[1]+"`"
+		}
+	}
+	return field
 }
 //Select 查询
 func (t *Table) Select(fields string, where string, whereParams ...interface{})lib.SqlRows{
