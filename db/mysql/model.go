@@ -669,6 +669,13 @@ func (m *Model)getDeleteName()string{
 	}
 	return "`"+m.DeleteName+"`"
 }
+//getAddDeleteName 获得删除字段名称,在增改的时候使用
+func (m *Model)getAddDeleteName()string{
+	if m.DeleteName==""{
+		return "delete_time"
+	}
+	return m.DeleteName
+}
 //getWhere
 func (m *Model)getWhere()(string,[]interface{}){
 	where:=""
@@ -1020,12 +1027,12 @@ func (m *Model)Create(row lib.SqlIn)int64{
 //判断是否添加软删除
 func (m *Model)addDeleteTime(row lib.SqlIn)lib.SqlIn{
 	if m.SoftDelete {
-		if _,ok:=row[m.getDeleteName()];!ok{
-			row[m.getDeleteName()]=-1
+		if _,ok:=row[m.getAddDeleteName()];!ok{
+			row[m.getAddDeleteName()]=-1
 		}else{
-			d:=lib.Data{Value:row[m.getDeleteName()]}
+			d:=lib.Data{Value:row[m.getAddDeleteName()]}
 			if d.Int()==0{
-				row[m.getDeleteName()]=-1
+				row[m.getAddDeleteName()]=-1
 			}
 		}
 	}

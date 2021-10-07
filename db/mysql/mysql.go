@@ -280,7 +280,11 @@ func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
 	var valuesArray []string
 	var vars []interface{}
 	for k,value:=range row{
-		feildsArray=append(feildsArray,fmt.Sprintf("`%s`",k))
+		if strings.Index(k,"`")==-1{
+			feildsArray=append(feildsArray,fmt.Sprintf("`%s`",k))
+		}else{
+			feildsArray=append(feildsArray,fmt.Sprintf("%s",k))
+		}
 		valuesArray=append(valuesArray,"?")
 		vars=append(vars,value)
 	}
@@ -289,6 +293,7 @@ func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
 	t.sql(sql,vars...)
 	if err!=nil{
 		log.DebugPrint("===========执行TransSql 转原生 sql失败:%s",err.Error())
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -1
 	}
 	defer smt.Close()
