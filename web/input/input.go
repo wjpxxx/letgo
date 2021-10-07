@@ -37,11 +37,11 @@ func (i *Input)R()*http.Request{
 //Param 获得参数
 func (i *Input)Param(key string,value ...interface{}) *lib.Data{
 	if _,ok:=i.params[key];!ok{
-		if(value[0]!=nil){
+		if len(value)>0&&value[0]!=nil{
 			return &lib.Data{Value:value[0]}
 		}
 	}
-	if i.params[key]==nil&&value[0]!=nil{
+	if i.params[key]==nil&&len(value)>0&&value[0]!=nil{
 		return &lib.Data{Value:value[0]}
 	}
 	return i.params[key]
@@ -57,11 +57,11 @@ func (i *Input)ParamRaw() lib.Row{
 //Get 获得参数
 func (i *Input)Get(key string,value ...interface{}) *lib.Data{
 	if _,ok:=i.get[key];!ok{
-		if(value[0]!=nil){
+		if len(value)>0&&value[0]!=nil{
 			return &lib.Data{Value:value[0]}
 		}
 	}
-	if i.get[key]==nil&&value[0]!=nil{
+	if i.get[key]==nil&&len(value)>0&&value[0]!=nil{
 		return &lib.Data{Value:value[0]}
 	}
 	return i.get[key]
@@ -91,11 +91,11 @@ func (i *Input)Body()string{
 //Post 获得参数
 func (i *Input)Post(key string,value ...interface{}) *lib.Data{
 	if _,ok:=i.post[key];!ok{
-		if(value[0]!=nil){
+		if len(value)>0&&value[0]!=nil{
 			return &lib.Data{Value:value[0]}
 		}
 	}
-	if i.post[key]==nil&&value[0]!=nil{
+	if i.post[key]==nil&&len(value)>0&&value[0]!=nil{
 		return &lib.Data{Value:value[0]}
 	}
 	return i.post[key]
