@@ -3,6 +3,7 @@ package lib
 import (
 	"fmt"
 	"strings"
+	"regexp"
 )
 
 //SubString 字符串截取
@@ -71,4 +72,10 @@ func ReplaceIndex(s,old,new string,n int)string{
 		}
 	}
 	return r
+}
+//IsFloat 判断字符串是否是一个小数
+func IsFloat(s string) bool{
+	match1,_:=regexp.MatchString(`^[\+-]?\d*\.\d+$`,s)
+	match2,_:=regexp.MatchString(`^[\+-]?\d+\.\d*$`,s)
+	return match1||match2
 }

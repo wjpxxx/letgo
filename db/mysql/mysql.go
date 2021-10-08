@@ -300,11 +300,13 @@ func (t *Table)add(row lib.SqlIn,opBefore,opAfter string)int64{
 	result, err :=smt.Exec(vars...)
 	if err!=nil{
 		log.DebugPrint("===========执行sql失败:%s",err.Error())
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -2
 	}
 	effects, err := result.LastInsertId()
 	if err!=nil{
 		log.DebugPrint("===========获取插入ID失败:%s",err.Error())
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -3
 	}
 	return effects

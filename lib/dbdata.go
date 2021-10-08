@@ -22,21 +22,26 @@ func (s SqlRows)ToOutput()[]InRow{
 		d:=make(InRow)
 		for k,v:=range data{
 			if v.Value!=nil{
-				typeOf :=reflect.TypeOf(v.Value)
-				switch typeOf.String() {
-					case "int64":
-						d[k]=v.Int64()
-					case "int":
-						d[k]=v.Int()
-					case "float64":
-						d[k]=v.Float64()
-					case "float32":
-						d[k]=v.Float32()
-					case "bool":
-						d[k]=v.Value
-					default:
-						d[k]=v.String()
+				if IsFloat(v.String()){
+					d[k]=v.Float32()
+				}else{
+					typeOf :=reflect.TypeOf(v.Value)
+					switch typeOf.String() {
+						case "int64":
+							d[k]=v.Int64()
+						case "int":
+							d[k]=v.Int()
+						case "float64":
+							d[k]=v.Float64()
+						case "float32":
+							d[k]=v.Float32()
+						case "bool":
+							d[k]=v.Value
+						default:
+							d[k]=v.String()
+					}
 				}
+				
 			}else{
 				d[k]=v.Value
 			}
@@ -59,20 +64,24 @@ func (s SqlRow)ToOutput()InRow{
 	d:=make(InRow)
 	for k,v:=range s{
 		if v.Value!=nil{
-			typeOf :=reflect.TypeOf(v.Value)
-			switch typeOf.String() {
-				case "int64":
-					d[k]=v.Int64()
-				case "int":
-					d[k]=v.Int()
-				case "float64":
-					d[k]=v.Float64()
-				case "float32":
-					d[k]=v.Float32()
-				case "bool":
-					d[k]=v.Value
-				default:
-					d[k]=v.String()
+			if IsFloat(v.String()){
+				d[k]=v.Float32()
+			}else{
+				typeOf :=reflect.TypeOf(v.Value)
+				switch typeOf.String() {
+					case "int64":
+						d[k]=v.Int64()
+					case "int":
+						d[k]=v.Int()
+					case "float64":
+						d[k]=v.Float64()
+					case "float32":
+						d[k]=v.Float32()
+					case "bool":
+						d[k]=v.Value
+					default:
+						d[k]=v.String()
+				}
 			}
 		}else{
 			d[k]=v.Value
