@@ -261,10 +261,21 @@ func PutContent(fullPath,content string) {
 	f.Write([]byte(content))
 }
 
+//PutContentBytes 往文件写入数据
+func PutContentBytes(fullPath string,content []byte) {
+	f:=NewFile(fullPath)
+	f.Write(content)
+}
+
 //PutContentAppend 往文件写入数据以追加的 形式
 func PutContentAppend(fullPath,content string) {
 	f:=NewFile(fullPath)
 	f.WriteAppend([]byte(content))
+}
+//PutContentBytesAppend 往文件写入数据以追加的 形式
+func PutContentBytesAppend(fullPath string,content []byte) {
+	f:=NewFile(fullPath)
+	f.WriteAppend(content)
 }
 //GetContent 获得文件内容
 func GetContent(fullPath string) string{

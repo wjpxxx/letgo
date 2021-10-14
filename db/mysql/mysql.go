@@ -343,17 +343,20 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 	smt,err:=t.db.prepare(sql)
 	if err!=nil{
 		log.DebugPrint("update error1 %v", err)
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -1
 	}
 	defer smt.Close()
 	result, err :=smt.Exec(vars...)
 	if err!=nil{
 		log.DebugPrint("update error2 %v", err)
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -2
 	}
 	effects, err := result.RowsAffected()
 	if err!=nil{
 		log.DebugPrint("update error3 %v", err)
+		log.DebugPrint("===========错误sql:%s",t.GetLastSql())
 		return -3
 	}
 	return effects

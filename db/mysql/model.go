@@ -379,8 +379,8 @@ func (m *Model)OnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "and", valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setJoinCond(field,"in", "and", values)
 	return m
 }
 //OrOn Join 条件on
@@ -404,8 +404,8 @@ func (m *Model)OrOnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "or", valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setJoinCond(field,"in", "or", values)
 	return m
 }
 //AndOn Join 条件on
@@ -429,8 +429,8 @@ func (m *Model)AndOnIn(field string, value []interface{}) Oner{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "and", valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setJoinCond(field,"in", "and", values)
 	return m
 }
 //Union 联合查询
@@ -459,8 +459,8 @@ func (m *Model)WhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "and",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setWhereCond(field,"in", "and",values)
 	return m
 }
 //AndWhere where条件
@@ -484,8 +484,8 @@ func (m *Model)AndWhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "and",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setWhereCond(field,"in", "and",values)
 	return m
 }
 //OrWhere where条件
@@ -510,8 +510,8 @@ func (m *Model)OrWhereIn(field string, value []interface{}) Wherer{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "or",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setWhereCond(field,"in", "or",values)
 	return m
 }
 
@@ -560,8 +560,8 @@ func (m *Model)HavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "and",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setHavingCond(field,"in", "and",values)
 	return m
 }
 
@@ -586,8 +586,8 @@ func (m *Model)AndHavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "and",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setHavingCond(field,"in", "and",values)
 	return m
 }
 
@@ -612,8 +612,8 @@ func (m *Model)OrHavingIn(field string, value []interface{}) Havinger{
 	for _,v:=range value{
 		values=append(values, lib.InterfaceToString(v))
 	}
-	valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "or",valuesStr)
+	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
+	m.setHavingCond(field,"in", "or",values)
 	return m
 }
 //getTables 表名
@@ -643,10 +643,43 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 			if regex.MatchString(s){
 				q=s
 			}else{
-				values=append(values, o.value)
 				if o.symbol=="in" {
-					q="(?)"
+					var mq []string
+					switch o.value.(type) {
+					case []int:
+						vs:=o.value.([]int)
+						for _,v:=range vs{
+							values=append(values, v)
+							mq=append(mq, "?")
+						}
+					case []int64:
+						vs:=o.value.([]int64)
+						for _,v:=range vs{
+							values=append(values, v)
+							mq=append(mq, "?")
+						}
+					case []string:
+						vs:=o.value.([]string)
+						for _,v:=range vs{
+							values=append(values, v)
+							mq=append(mq, "?")
+						}
+					case []float32:
+						vs:=o.value.([]float32)
+						for _,v:=range vs{
+							values=append(values, v)
+							mq=append(mq, "?")
+						}
+					case []float64:
+						vs:=o.value.([]float64)
+						for _,v:=range vs{
+							values=append(values, v)
+							mq=append(mq, "?")
+						}
+					}
+					q="("+strings.Join(mq,",")+")"
 				}else{
+					values=append(values, o.value)
 					q="?"
 				}
 			}
@@ -683,10 +716,43 @@ func (m *Model)getWhere()(string,[]interface{}){
 	for i,w:=range m.where{
 		var q string=""
 		if w.value!=nil{
-			values=append(values, w.value)
 			if w.symbol=="in" {
-				q="(?)"
+				var mq []string
+				switch w.value.(type) {
+				case []int:
+					vs:=w.value.([]int)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []int64:
+					vs:=w.value.([]int64)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []string:
+					vs:=w.value.([]string)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []float32:
+					vs:=w.value.([]float32)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []float64:
+					vs:=w.value.([]float64)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				}
+				q="("+strings.Join(mq,",")+")"
 			}else{
+				values=append(values, w.value)
 				q="?"
 			}
 		}
@@ -725,10 +791,43 @@ func (m *Model)getGroup()(string,[]interface{}){
 	for i,w:=range m.having{
 		var q string=""
 		if w.value!=nil{
-			values=append(values, w.value)
 			if w.symbol=="in" {
-				q="(?)"
+				var mq []string
+				switch w.value.(type) {
+				case []int:
+					vs:=w.value.([]int)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []int64:
+					vs:=w.value.([]int64)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []string:
+					vs:=w.value.([]string)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []float32:
+					vs:=w.value.([]float32)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				case []float64:
+					vs:=w.value.([]float64)
+					for _,v:=range vs{
+						values=append(values, v)
+						mq=append(mq, "?")
+					}
+				}
+				q="("+strings.Join(mq,",")+")"
 			}else{
+				values=append(values, w.value)
 				q="?"
 			}
 		}

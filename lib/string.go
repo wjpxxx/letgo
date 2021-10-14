@@ -79,3 +79,8 @@ func IsFloat(s string) bool{
 	match2,_:=regexp.MatchString(`^[\+-]?\d+\.\d*$`,s)
 	return match1||match2
 }
+//IsInt  判断字符串是否是一个整型
+func IsInt(s string)bool{
+	match1,_:=regexp.MatchString(`^[\+-]?\d+$`,s)
+	return match1
+}

@@ -24,7 +24,9 @@ func (s SqlRows)ToOutput()[]InRow{
 			if v.Value!=nil{
 				if IsFloat(v.String()){
 					d[k]=v.Float32()
-				}else{
+				}else if IsInt(v.String()) {
+					d[k]=v.Int64()
+				} else{
 					typeOf :=reflect.TypeOf(v.Value)
 					switch typeOf.String() {
 						case "int64":
@@ -66,7 +68,9 @@ func (s SqlRow)ToOutput()InRow{
 		if v.Value!=nil{
 			if IsFloat(v.String()){
 				d[k]=v.Float32()
-			}else{
+			}else if IsInt(v.String()) {
+				d[k]=v.Int64()
+			} else{
 				typeOf :=reflect.TypeOf(v.Value)
 				switch typeOf.String() {
 					case "int64":

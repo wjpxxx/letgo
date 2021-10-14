@@ -263,7 +263,7 @@ func Serialize(data interface{}) []byte {
 func UnSerialize(data []byte, rdata interface{}) bool{
 	if (len(data)<len(fix)){
 		//序列化失败
-		fmt.Println("序列化失败,数据缺少前缀")
+		fmt.Println("序列化失败,数据缺少前缀",data)
 		return false
 	}
 	decoder := gob.NewDecoder(bytes.NewReader(data[len(fix):]))
