@@ -225,7 +225,7 @@ func main() {
             On("m.`id`", "l.`master_id`").
             WhereRaw("m.id=1").
             AndWhere("m.id",2).
-            OrWhereIn("m.id",lib.Int64ArrayToInterfaceArray(ids)).
+            OrWhereIn("m.id",ids).
             GroupBy("m.id").
             Having("m.id",1).
             AndHaving("m.id",1).
@@ -288,7 +288,7 @@ func main() {
             On("m.`id`", "l.`master_id`").
             WhereRaw("m.id=1").
             AndWhere("m.id",2).
-            OrWhereIn("m.id",lib.Int64ArrayToInterfaceArray(ids)).
+            OrWhereIn("m.id",ids).
             GroupBy("m.id").
             Having("m.id",1).
             AndHaving("m.id",1).
