@@ -59,7 +59,8 @@ type Modeler interface{
 	Where(field string, value interface{}) Wherer
 	WhereRaw(where string) Wherer
 	WhereSymbol(field, symbol string, value interface{}) Wherer
-	WhereIn(field string, value []interface{}) Wherer
+	WhereIn(field string, value interface{}) Wherer
+	WhereNotIn(field string, value interface{}) Wherer
 	GroupBy(field ...string) GroupByer
 	Get()lib.SqlRows
 	Find()lib.SqlRow
@@ -86,7 +87,8 @@ type Fielder interface{
 	Where(field string, value interface{}) Wherer
 	WhereRaw(where string) Wherer
 	WhereSymbol(field, symbol string, value interface{}) Wherer
-	WhereIn(field string, value []interface{}) Wherer
+	WhereIn(field string, value interface{}) Wherer
+	WhereNotIn(field string, value interface{}) Wherer
 	GroupBy(field ...string) GroupByer
 	Count()int64
 	Get()lib.SqlRows
@@ -104,7 +106,8 @@ type Aliaser interface{
 	Where(field string, value interface{}) Wherer
 	WhereRaw(where string) Wherer
 	WhereSymbol(field, symbol string, value interface{}) Wherer
-	WhereIn(field string, value []interface{}) Wherer
+	WhereIn(field string, value interface{}) Wherer
+	WhereNotIn(field string, value interface{}) Wherer
 	GroupBy(field ...string) GroupByer
 	Count()int64
 	Get()lib.SqlRows
@@ -119,22 +122,26 @@ type Joiner interface{
 	On(field string, value interface{}) Oner
 	OnRaw(on string) Oner
 	OnSymbol(field, symbol string, value interface{}) Oner
-	OnIn(field string, value []interface{}) Oner
+	OnIn(field string, value interface{}) Oner
+	OnNotIn(field string, value interface{}) Oner
 }
 //Oner on连接条件
 type Oner interface{
 	OrOn(field string, value interface{}) Oner
 	OrOnRaw(on string) Oner
 	OrOnSymbol(field, symbol string, value interface{}) Oner
-	OrOnIn(field string, value []interface{}) Oner
+	OrOnIn(field string, value interface{}) Oner
+	OrOnNotIn(field string, value interface{}) Oner
 	AndOn(field string, value interface{}) Oner
 	AndOnRaw(on string) Oner
 	AndOnSymbol(field, symbol string, value interface{}) Oner
-	AndOnIn(field string, value []interface{}) Oner
+	AndOnIn(field string, value interface{}) Oner
+	AndOnNotIn(field string, value interface{}) Oner
 	Where(field string, value interface{}) Wherer
 	WhereRaw(where string) Wherer
 	WhereSymbol(field, symbol string, value interface{}) Wherer
-	WhereIn(field string, value []interface{}) Wherer
+	WhereIn(field string, value interface{}) Wherer
+	WhereNotIn(field string, value interface{}) Wherer
 	Join(tableName string) Joiner
 	LeftJoin(tableName string) Joiner
 	RightJoin(tableName string) Joiner
@@ -153,11 +160,13 @@ type Wherer interface{
 	AndWhere(field string, value interface{}) Wherer
 	AndWhereRaw(where string) Wherer
 	AndWhereSymbol(field, symbol string, value interface{}) Wherer
-	AndWhereIn(field string, value []interface{}) Wherer
+	AndWhereIn(field string, value interface{}) Wherer
+	AndWhereNotIn(field string, value interface{}) Wherer
 	OrWhere(field string, value interface{}) Wherer
 	OrWhereRaw(where string) Wherer
 	OrWhereSymbol(field, symbol string, value interface{}) Wherer
-	OrWhereIn(field string, value []interface{}) Wherer
+	OrWhereIn(field string, value interface{}) Wherer
+	OrWhereNotIn(field string, value interface{}) Wherer
 	GroupBy(field ...string) GroupByer
 	Get()lib.SqlRows
 	Find()lib.SqlRow
@@ -174,7 +183,8 @@ type GroupByer interface{
 	Having(field string, value interface{})Havinger
 	HavingRaw(having string)Havinger
 	HavingSymbol(field, symbol string, value interface{})Havinger
-	HavingIn(field string, value []interface{})Havinger
+	HavingIn(field string, value interface{})Havinger
+	HavingNotIn(field string, value interface{})Havinger
 	Get()lib.SqlRows
 	Find()lib.SqlRow
 	Count()int64
@@ -188,11 +198,13 @@ type Havinger interface{
 	AndHaving(field string, value interface{})Havinger
 	AndHavingRaw(having string)Havinger
 	AndHavingSymbol(field, symbol string, value interface{})Havinger
-	AndHavingIn(field string, value []interface{})Havinger
+	AndHavingIn(field string, value interface{})Havinger
+	AndHavingNotIn(field string, value interface{})Havinger
 	OrHaving(field string, value interface{})Havinger
 	OrHavingRaw(having string)Havinger
 	OrHavingSymbol(field, symbol string, value interface{})Havinger
-	OrHavingIn(field string, value []interface{})Havinger
+	OrHavingIn(field string, value interface{})Havinger
+	OrHavingNotIn(field string, value interface{})Havinger
 	Get()lib.SqlRows
 	Find()lib.SqlRow
 	Count()int64
@@ -374,13 +386,13 @@ func (m *Model)OnSymbol(field, symbol string, value interface{}) Oner{
 	return m
 }
 //OnIn Join 条件on
-func (m *Model)OnIn(field string, value []interface{}) Oner{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "and", values)
+func (m *Model)OnIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"in", "and", value)
+	return m
+}
+//OnNotIn Join 条件on
+func (m *Model)OnNotIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"not in", "and", value)
 	return m
 }
 //OrOn Join 条件on
@@ -399,13 +411,13 @@ func (m *Model)OrOnSymbol(field, symbol string, value interface{}) Oner{
 	return m
 }
 //OrOnIn Join 条件on
-func (m *Model)OrOnIn(field string, value []interface{}) Oner{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "or", values)
+func (m *Model)OrOnIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"in", "or", value)
+	return m
+}
+//OrOnNotIn Join 条件on
+func (m *Model)OrOnNotIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"not in", "or", value)
 	return m
 }
 //AndOn Join 条件on
@@ -424,13 +436,14 @@ func (m *Model)AndOnSymbol(field, symbol string, value interface{}) Oner{
 	return m
 }
 //AndOnIn Join 条件on
-func (m *Model)AndOnIn(field string, value []interface{}) Oner{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setJoinCond(field,"in", "and", values)
+func (m *Model)AndOnIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"in", "and", value)
+	return m
+}
+
+//AndOnNotIn Join 条件on
+func (m *Model)AndOnNotIn(field string, value interface{}) Oner{
+	m.setJoinCond(field,"not in", "and", value)
 	return m
 }
 //Union 联合查询
@@ -454,13 +467,13 @@ func (m *Model)WhereSymbol(field, symbol string, value interface{}) Wherer{
 	return m
 }
 //WhereIn where条件
-func (m *Model)WhereIn(field string, value []interface{}) Wherer{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "and",values)
+func (m *Model)WhereIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"in", "and",value)
+	return m
+}
+//WhereNotIn where条件
+func (m *Model)WhereNotIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"not in", "and",value)
 	return m
 }
 //AndWhere where条件
@@ -479,13 +492,13 @@ func (m *Model)AndWhereSymbol(field, symbol string, value interface{}) Wherer{
 	return m
 }
 //AndWhereIn where条件
-func (m *Model)AndWhereIn(field string, value []interface{}) Wherer{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "and",values)
+func (m *Model)AndWhereIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"in", "and",value)
+	return m
+}
+//AndWhereNotIn where条件
+func (m *Model)AndWhereNotIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"not in", "and",value)
 	return m
 }
 //OrWhere where条件
@@ -504,17 +517,15 @@ func (m *Model)OrWhereSymbol(field, symbol string, value interface{}) Wherer{
 	return m
 }
 //OrWhereIn where条件
-func (m *Model)OrWhereIn(field string, value []interface{}) Wherer{
-	var values []string
-
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setWhereCond(field,"in", "or",values)
+func (m *Model)OrWhereIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"in", "or",value)
 	return m
 }
-
+//OrWhereNotIn where条件
+func (m *Model)OrWhereNotIn(field string, value interface{}) Wherer{
+	m.setWhereCond(field,"not in", "or",value)
+	return m
+}
 //GroupBy 分组
 func (m *Model)GroupBy(field ...string) GroupByer{
 	var newField []string
@@ -555,16 +566,15 @@ func (m *Model)HavingSymbol(field, symbol string, value interface{}) Havinger{
 	return m
 }
 //HavingIn having条件
-func (m *Model)HavingIn(field string, value []interface{}) Havinger{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "and",values)
+func (m *Model)HavingIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"in", "and",value)
 	return m
 }
-
+//HavingNotIn having条件
+func (m *Model)HavingNotIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"not in", "and",value)
+	return m
+}
 //AndHaving having条件
 func (m *Model)AndHaving(field string, value interface{}) Havinger{
 	m.setHavingCond(field,"=", "and",value)
@@ -581,16 +591,15 @@ func (m *Model)AndHavingSymbol(field, symbol string, value interface{}) Havinger
 	return m
 }
 //AndHavingIn having条件
-func (m *Model)AndHavingIn(field string, value []interface{}) Havinger{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "and",values)
+func (m *Model)AndHavingIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"in", "and",value)
 	return m
 }
-
+//AndHavingNotIn having条件
+func (m *Model)AndHavingNotIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"not in", "and",value)
+	return m
+}
 //OrHaving having条件
 func (m *Model)OrHaving(field string, value interface{}) Havinger{
 	m.setHavingCond(field,"=", "or",value)
@@ -607,13 +616,14 @@ func (m *Model)OrHavingSymbol(field, symbol string, value interface{}) Havinger{
 	return m
 }
 //OrHavingIn having条件
-func (m *Model)OrHavingIn(field string, value []interface{}) Havinger{
-	var values []string
-	for _,v:=range value{
-		values=append(values, lib.InterfaceToString(v))
-	}
-	//valuesStr:=fmt.Sprintf("%s",strings.Join(values,",")) 
-	m.setHavingCond(field,"in", "or",values)
+func (m *Model)OrHavingIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"in", "or",value)
+	return m
+}
+
+//OrHavingNotIn having条件
+func (m *Model)OrHavingNotIn(field string, value interface{}) Havinger{
+	m.setHavingCond(field,"not in", "or",value)
 	return m
 }
 //getTables 表名
@@ -643,7 +653,7 @@ func (m *Model)getOn(ons []cond)(string,[]interface{}){
 			if regex.MatchString(s){
 				q=s
 			}else{
-				if o.symbol=="in" {
+				if o.symbol=="in" ||o.symbol=="not in"{
 					var mq []string
 					switch o.value.(type) {
 					case []int:
@@ -716,7 +726,7 @@ func (m *Model)getWhere()(string,[]interface{}){
 	for i,w:=range m.where{
 		var q string=""
 		if w.value!=nil{
-			if w.symbol=="in" {
+			if w.symbol=="in" ||w.symbol=="not in"{
 				var mq []string
 				switch w.value.(type) {
 				case []int:
@@ -791,7 +801,7 @@ func (m *Model)getGroup()(string,[]interface{}){
 	for i,w:=range m.having{
 		var q string=""
 		if w.value!=nil{
-			if w.symbol=="in" {
+			if w.symbol=="in" ||w.symbol=="not in"{
 				var mq []string
 				switch w.value.(type) {
 				case []int:
