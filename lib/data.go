@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 )
-
+var fix []byte=[]byte{0,1,1,1,1,1}  //序列化前缀
 //Data 数据
 type Data struct{
 	Value interface{}
@@ -26,13 +26,15 @@ func (d *Data)Get()interface{}{
 //String 字符串输出
 func (d *Data) String() string {
 	typeOf :=reflect.TypeOf(d.Value)
+	l:=len(fix)
 	if typeOf!=nil{
 		switch typeOf.String() {
 		case "[]byte":
 			b:=d.Value.([]byte)
-			if len(b)>=6{
-				flg:=[]byte{0,1,1,1,1,1}
-				if string(b[:6])==string(flg){
+			
+			if len(b)>=l{
+				flg:=fix
+				if string(b[:l])==string(flg){
 					var s string
 					UnSerialize(b,&s)
 					return s
@@ -49,9 +51,9 @@ func (d *Data) String() string {
 			return strconv.Itoa(d.Value.(int))
 		case "[]uint8":
 			b:=d.Value.([]uint8)
-			if len(b)>=6{
-				flg:=[]byte{0,1,1,1,1,1}
-				if string(b[:6])==string(flg){
+			if len(b)>=l{
+				flg:=fix
+				if string(b[:l])==string(flg){
 					var s string
 					UnSerialize(b,&s)
 					return s
@@ -246,7 +248,7 @@ func (d *Data) ArrayString() ([]string) {
 	r, _ := d.WhetherArrayString()
 	return r
 }
-var fix []byte=[]byte{0,1,1,1,1,1}
+
 //序列化数据
 //参数data:待序列化数据
 //返回值:序列化后的数据
