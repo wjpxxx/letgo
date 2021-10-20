@@ -95,9 +95,24 @@ func RowsToSqlRows(rows *sql.Rows) SqlRows{
 		return nil
 	}
 	scanArgs := make([]interface{}, len(cols))
-	values := make([]interface{}, len(cols))
-	for j := range values {
-		scanArgs[j] = &values[j]
+	cs,_:=rows.ColumnTypes()
+	for i,v:=range cs{
+		switch v.DatabaseTypeName() {
+		case "VARCHAR","TEXT","UUID","TIMESTAMP":
+			scanArgs[i]=new(sql.NullString)
+			break
+		case "INT","BIGINT","BIT","TINYINT","INTEGER","MEDIUMINT","NUMERIC","SMALLINT":
+			scanArgs[i]=new(sql.NullInt64)
+			break
+		case "DECIMAL","DOUBLE","FLOAT":
+			scanArgs[i]=new(sql.NullFloat64)
+			break
+		case "BOOL":
+			scanArgs[i]=new(sql.NullBool)
+			break
+		default:
+			scanArgs[i]=new(sql.NullString)
+		}
 	}
 	var list SqlRows
 	for rows.Next() {
@@ -106,9 +121,25 @@ func RowsToSqlRows(rows *sql.Rows) SqlRows{
 			break
 		}
 		record := make(SqlRow)
-		for i, col := range values {
+		for i, col := range scanArgs {
 			row := &Data{}
-			row.Set(col)
+			switch cs[i].DatabaseTypeName() {
+			case "VARCHAR","TEXT","UUID","TIMESTAMP":
+				row.Set(col.(*sql.NullString).String)
+				break
+			case "INT","BIGINT","BIT","TINYINT","INTEGER","MEDIUMINT","NUMERIC","SMALLINT":
+				row.Set(col.(*sql.NullInt64).Int64)
+				break
+			case "DECIMAL","DOUBLE","FLOAT":
+				row.Set(col.(*sql.NullFloat64).Float64)
+				break
+			case "BOOL":
+				row.Set(col.(*sql.NullBool).Bool)
+				break
+			default:
+				row.Set(col.(*sql.NullString).String)
+				break
+			}
 			record[cols[i]] = row
 		}
 		list = append(list, record)

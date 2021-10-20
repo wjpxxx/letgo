@@ -383,7 +383,7 @@ func (t *Table) Select(fields string, where string, whereParams ...interface{})l
 func (t *Table) SelectByHasWhere(fields string, where string,hasWhere bool, whereParams ...interface{})lib.SqlRows{
 	var sql string
 	if where!=""{
-		if (hasWhere){
+		if hasWhere&&len(whereParams)>0{
 			sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
 		}else{
 			sql=fmt.Sprintf("select %s from %s %s", fields,t.tableName, where)
