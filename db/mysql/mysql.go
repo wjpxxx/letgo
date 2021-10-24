@@ -250,12 +250,20 @@ func (t *Table) InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64{
 	var vars []interface{}
 	for k,value:=range row{
 		feildsArray=append(feildsArray,fmt.Sprintf("`%s`",k))
-		valuesArray=append(valuesArray,"?")
-		vars=append(vars,value)
+		if v, ok := value.(lib.SqlRaw); ok {
+			valuesArray=append(valuesArray, fmt.Sprintf("%s",v))
+		}else{
+			valuesArray=append(valuesArray,"?")
+			vars=append(vars,value)
+		}
 	}
 	for k,value:=range updateRow{
-		setsArray=append(setsArray, fmt.Sprintf("`%s`=?",k))
-		vars=append(vars,value)
+		if v, ok := value.(lib.SqlRaw); ok {
+			setsArray=append(setsArray, fmt.Sprintf("`%s`=%s",k,v))
+		}else{
+			setsArray=append(setsArray, fmt.Sprintf("`%s`=?",k))
+			vars=append(vars,value)
+		}
 	}
 	sql:=fmt.Sprintf("insert into %s(%s) values(%s) ON DUPLICATE KEY UPDATE %s", t.tableName, strings.Join(feildsArray,","),strings.Join(valuesArray,","),strings.Join(setsArray,","))
 	smt,err:=t.db.prepare(sql)
@@ -333,8 +341,13 @@ func (t *Table) Update(row lib.SqlIn,onParams []interface{},where string,wherePa
 		vars=append(vars, onParams...)
 	}
 	for key,value:=range row {
-		setsArray=append(setsArray, fmt.Sprintf("%s=?",t.getSetField(key)))
-		vars=append(vars, value)
+		if v, ok := value.(lib.SqlRaw); ok {
+			setsArray=append(setsArray, fmt.Sprintf("%s=%s",t.getSetField(key),v))
+		}else{
+			setsArray=append(setsArray, fmt.Sprintf("%s=?",t.getSetField(key)))
+			vars=append(vars, value)
+		}
+		
 	}
 	vars=append(vars,whereParams...)
 	sets:=strings.Join(setsArray,",")

@@ -89,6 +89,7 @@ func (s SqlRow)Bind(value interface{})bool{
 
 //SqlIn sql插入更新数据格式
 type SqlIn InRow
+type SqlRaw string //原生sql语句字符串
 //Row 数据
 type Row map[string] *Data
 //InRow 数据
