@@ -46,7 +46,18 @@ func (o *Output)JSONOK(code int, message string)error{
 }
 
 //JSONOK
-func (o *Output)JSONERROR(code int, message string)error{
+func (o *Output)JSONERROR(code int, message,subCode string)error{
+	return o.JSON(code,lib.InRow{
+		"code":0,
+		"success":false,
+		"msg":"",
+		"err":message,
+		"sub_code":subCode,
+	})
+}
+
+//JSONOK
+func (o *Output)JSONFail(code int, message string)error{
 	return o.JSON(code,lib.InRow{
 		"code":0,
 		"success":false,
