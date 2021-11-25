@@ -198,6 +198,31 @@ func (i *Input)SaveUploadFile(name,dst string)error{
 	_,err=io.Copy(out,src)
 	return err
 }
+//SaveUploadFileByDir
+func (i *Input)SaveUploadFileByDir(name,dir string)(string,error){
+	f,err:=i.File(name)
+	if err!=nil{
+		return "",err
+	}
+	src,err:=f.Open()
+	if err!=nil{
+		return "",err
+	}
+	defer src.Close()
+	file.Mkdir(file.DirName(dir))
+	if dir[len(dir)-1:]=="/"{
+		dir=dir+f.Filename
+	}else{
+		dir=dir+"/"+f.Filename
+	}
+	out,err:=os.Create(dir)
+	if err!=nil{
+		return "",err
+	}
+	defer out.Close()
+	_,err=io.Copy(out,src)
+	return dir,err
+}
 //SaveUploadByFunc
 func (i *Input)SaveUploadByFunc(name string,callback UploadFunc)error{
 	f,err:=i.File(name)
