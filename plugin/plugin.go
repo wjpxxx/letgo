@@ -20,6 +20,10 @@ func Register(name string,plg iplugin.Pluginer){
 func Plugin(name string)iplugin.Pluginer{
 	return pluginList[name]
 }
+//SyncFile 获得文件同步对象
+func SyncFile()*syncclient.FileSync{
+	return syncclient.NewFileSync()
+}
 //init 注册插件
 func init(){
 	Register("sync-server", syncserver.New())

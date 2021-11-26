@@ -25,7 +25,36 @@ func (f *FileSync)Run(values ...interface{})interface{}{
 	f.SyncFile(client)
 	return true
 }
-
+func (f *FileSync) SendOneFile(fullName,RemotePath string) bool{
+	client,err:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	if err!=nil{
+		return false
+	}
+	LocationPath:=file.DirName(fullName)
+	defer client.Close()
+	log.DebugPrint("连接到服务器: %s 成功",config.Server.IP)
+	filer:=file.NewFile(fullName)
+	//文件变化了
+	fsize:=filer.Size()
+	var size int64=1024*1024
+	var success bool =false
+	for {
+		buf,seek:=filer.ReadBlock(size)
+		if seek>=0{
+			//文件有内容并存在
+			message:=f.packedFileSync(buf,seek,filer,LocationPath,RemotePath)
+			//log.DebugPrint("%v",message)
+			f.rpcCall(client,message,seek,filer)
+			if fsize==seek{
+				success=true
+				break
+			}
+		}else{
+			break
+		}
+	}
+	return success
+}
 //SyncFile 同步文件
 func (f *FileSync) SyncFile(client *rpc.Client){
 	for _,c:=range config.Paths{
