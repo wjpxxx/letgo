@@ -16,7 +16,7 @@ type DoFunc func(*context.Context)
 type task struct{
 	context *context.Context
 	do DoFunc
-	filter func()bool
+	filter func(*context.Context)bool
 }
 
 //globalTaskManager
@@ -71,11 +71,11 @@ func (t *taskManager)RegisterTask(name string,taskNums int,call DoFunc){
 	t.registerTask(name,taskNums,call, nil)
 }
 //RegisterTask
-func (t *taskManager)RegisterTaskByFilter(name string,taskNums int,call DoFunc,filter func()bool){
+func (t *taskManager)RegisterTaskByFilter(name string,taskNums int,call DoFunc,filter func(*context.Context)bool){
 	t.registerTask(name,taskNums,call, filter)
 }
 //RegisterTask
-func (t *taskManager)registerTask(name string,taskNums int,call DoFunc,filter func()bool){
+func (t *taskManager)registerTask(name string,taskNums int,call DoFunc,filter func(*context.Context)bool){
 	t.taskLock.Lock()
 	for i:=0;i<taskNums;i++{
 		ctx:=context.NewContext()
@@ -124,7 +124,7 @@ func (t *taskManager)startTask(sortList taskMapSort){
 				defer t.wait.Done()
 				tsk.context.Now=lib.Time()
 				if tk.filter!=nil{
-					if tk.filter(){
+					if tk.filter(tk.context){
 						tk.do(tk.context)
 					}
 				}else{
@@ -164,7 +164,7 @@ func RegisterTaskByMethod(name string,taskNums int,call func(*context.Context)){
 	globalTaskManager.RegisterTask(name,taskNums,call)
 }
 //RegisterTaskByMethodAndFilter
-func RegisterTaskByMethodAndFilter(name string,taskNums int,call func(*context.Context),filter func()bool){
+func RegisterTaskByMethodAndFilter(name string,taskNums int,call func(*context.Context),filter func(*context.Context)bool){
 	globalTaskManager.RegisterTaskByFilter(name,taskNums,call,filter)
 }
 //Start start task

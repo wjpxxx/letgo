@@ -10,9 +10,9 @@ func TestTask(t *testing.T) {
 		fmt.Println(ctx.Name,ctx.TaskNo)
 		//fmt.Println()
 		//time.Sleep(1*time.Second)
-	},func()bool{
+	},func(ctx *context.Context)bool{
 		time.Sleep(1*time.Second)
-		fmt.Println("判断")
+		fmt.Println("判断",ctx.Name)
 		return false
 	})
 	go func(){
