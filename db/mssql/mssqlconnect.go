@@ -1,18 +1,19 @@
-package mysql
+package mssql
 
 import (
 	"github.com/wjpxxx/letgo/lib"
 )
-//MysqlConnect mysql连接配置数据
-type MysqlConnect struct {
-	Master SlaveDB `json:"master"`
-	Slave []SlaveDB `json:"slave"`
+
+//MsSqlConnect mssql连接配置数据
+type MsSqlConnect struct {
+	Master DBConfig `json:"master"`
+	Slave []DBConfig `json:"slave"`
 }
-func (m MysqlConnect)String()string{
+func (m MsSqlConnect)String()string{
 	return lib.ObjectToString(m)
 }
-//Slave 从库配置数据
-type SlaveDB struct {
+//DBConfig 从库配置数据
+type DBConfig struct {
 	Name string `json:"name"`
 	DatabaseName string `json:"databaseName"`
 	UserName string `json:"userName"`
@@ -26,5 +27,3 @@ type SlaveDB struct {
 	Prefix string `json:"prefix"`
 	Suffix string `json:"suffix"`
 }
-//数据库配置
-type DBConfig SlaveDB
