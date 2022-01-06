@@ -40,7 +40,7 @@ func (c *Client)Call(serviceMethod string, args interface{}, reply interface{})(
 	var err error
 	err=c.client.Call(serviceMethod,args,reply)
 	if err!=nil{
-		log.DebugPrint("RPC Call error %v",err)
+		log.DebugPrint("IP:%s,RPC Call error %v",c.address,err)
 		return nil,err
 	}
 	return c,nil
