@@ -169,10 +169,23 @@ func ObjectToString(data interface{}) string {
 	}
 	return string(js)
 }
+//StringToJsonObject json字符串转json对象
+func StringToJsonObject(str string, data interface{}) bool {
+	return StringToObject(str, data)
+}
 
 //StringToObject json字符串转对象
 func StringToObject(str string, data interface{}) bool {
 	err := json.Unmarshal([]byte(str), data)
+	if err == nil {
+		return true
+	}
+	return false
+}
+
+//StringToXmlObject xml字符串转对象
+func StringToXmlObject(str string, data interface{}) bool {
+	err := xml.Unmarshal([]byte(str), data)
 	if err == nil {
 		return true
 	}
