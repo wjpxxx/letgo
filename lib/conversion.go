@@ -176,7 +176,9 @@ func StringToJsonObject(str string, data interface{}) bool {
 
 //StringToObject json字符串转对象
 func StringToObject(str string, data interface{}) bool {
-	err := json.Unmarshal([]byte(str), data)
+	js:=json.NewDecoder(bytes.NewReader([]byte(str)))
+	js.UseNumber()
+	err := js.Decode(data)
 	if err == nil {
 		return true
 	}
