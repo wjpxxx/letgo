@@ -519,6 +519,12 @@ func UrlEncode(queryString string)string{
 	return strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(qs, "+", "%20"),"*", "%2A"),"%7E","~")
 }
 
+//UrlDecode url解码
+func UrlDecode(queryString string)string{
+	qs,_:=url.QueryUnescape(queryString)
+	return qs
+}
+
 //GetUrlParam
 func GetUrlParam(ul,key string)string{
 	u,_:=url.Parse(ul)
