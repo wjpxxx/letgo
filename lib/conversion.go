@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"bytes"
 	"math"
+	"encoding/xml"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -147,6 +148,19 @@ func RowsToSqlRows(rows *sql.Rows) SqlRows{
 	return list
 }
 
+//XmlObjectToString 将xml对象转字符串
+func XmlObjectToString(data interface{}) string {
+	js, err := xml.Marshal(data)
+	if err != nil {
+		return ""
+	}
+	return string(js)
+}
+
+//JsonObjectToString 将对象转成json字符串
+func JsonObjectToString(data interface{}) string {
+	return ObjectToString(data)
+}
 //ObjectToString 将对象转成json字符串
 func ObjectToString(data interface{}) string {
 	js, err := json.Marshal(data)
