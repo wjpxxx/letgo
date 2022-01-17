@@ -220,6 +220,16 @@ func StringArrayToInterfaceArray(data []string)[]interface{}{
 	return it
 }
 
+//StringArrayToInt64Array string转[]int64
+func StringArrayToInt64Array(data []string)[]int64{
+	var it []int64
+	for _,v:=range data{
+		it=append(it, StrToInt64(v))
+	}
+	return it
+}
+
+
 //interface转ArrayString
 func InterfaceArrayToArrayString(list []interface{}) []string {
 	var rp []string
