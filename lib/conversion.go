@@ -261,3 +261,12 @@ func Gb2312ToUtf8(src string) string {
 	rts := string(data)
 	return rts
 }
+//JsonArrayStringToStringArray json数组字符串转字符串数组
+func JsonArrayStringToStringArray(in string)[]string{
+	var js []string
+	err := json.Unmarshal([]byte(in), &js)
+	if err == nil {
+		return js
+	}
+	return nil
+}
