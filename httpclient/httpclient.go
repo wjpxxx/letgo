@@ -540,3 +540,19 @@ func GetUrlParam(ul,key string)string{
 func New()*HttpClient{
 	return &HttpClient{}
 }
+
+//保存远程文件到本地
+//remoteFile远程文件地址
+//localFullName本地文件地址
+func SaveRemoteFile(remoteFile, localFullName string) bool {
+	if file.FileExist(localFullName) {
+		return true
+	}
+	ihttp:=New().WithTimeOut(120)
+	rs:=ihttp.Get(remoteFile,nil)
+	if rs.Code == 200 {
+		file.PutContent(localFullName,rs.Body())
+		return true
+	}
+	return false
+}

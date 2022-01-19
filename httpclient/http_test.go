@@ -15,4 +15,5 @@ func TestHttp(t *testing.T){
 		"@a":"httpclient.go",
 		"c":2,
 	}).Body())
+	SaveRemoteFile("https://cdn2.jianshu.io/assets/default_avatar/10-e691107df16746d4a9f3fe9496fd1848.jpg", "a.jpg")
 }
