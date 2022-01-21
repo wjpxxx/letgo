@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"encoding/json"
 	"mime/multipart"
 	"reflect"
 	"strconv"
@@ -45,6 +46,8 @@ func (d *Data) String() string {
 			return d.Value.(string)
 		case "[]string":
 			return "[" + strings.Join(d.Value.([]string), " ") + "]"
+		case "json.Number":
+			return d.Value.(json.Number).String()
 		case "int64":
 			return strconv.FormatInt(d.Int64(), 10)
 		case "int":
@@ -101,6 +104,9 @@ func (d *Data) SqlRow() SqlRow {
 func (d *Data) WhetherFloat64() (float64, bool) {
 	if v, ok := d.Value.(float64); ok {
 		return v, true
+	}else if v2, ok2 := d.Value.(json.Number); ok2 {
+		f,_:=v2.Float64()
+		return f,true
 	} else if v2, ok2 := d.Value.([]byte); ok2 {
 		vv, err := strconv.ParseFloat(string(v2), 32)
 		if err == nil {
@@ -135,7 +141,10 @@ func (d *Data)ArrayByte()[]byte{
 func (d *Data) WhetherFloat32() (float32, bool) {
 	if v, ok := d.Value.(float32); ok {
 		return v, true
-	} else if v2, ok2 := d.Value.([]byte); ok2 {
+	}else if v2, ok2 := d.Value.(json.Number); ok2 { 
+		f,_:=v2.Float64()
+		return float32(f),true
+	}else if v2, ok2 := d.Value.([]byte); ok2 {
 		vv, err := strconv.ParseFloat(string(v2), 32)
 		if err == nil {
 			return float32(vv), true
@@ -169,6 +178,9 @@ func (d *Data) Float32() float32 {
 func (d *Data) WhetherInt() (int, bool) {
 	if v, ok := d.Value.(int); ok {
 		return v, true
+	}else if v2, ok2 := d.Value.(json.Number); ok2 {
+		f,_:=v2.Int64()
+		return int(f),true
 	} else if v2, ok2 := d.Value.([]byte); ok2 {
 		vv, err := strconv.Atoi(string(v2))
 		if err == nil {
@@ -207,6 +219,9 @@ func (d *Data) Int() int {
 func (d *Data) WhetherInt64() (int64, bool) {
 	if v, ok := d.Value.(int64); ok {
 		return v, true
+	}else if v2, ok2 := d.Value.(json.Number); ok2 {
+		f,_:=v2.Int64()
+		return f,true
 	} else if v2, ok2 := d.Value.([]byte); ok2 {
 		vv, err := strconv.ParseInt(string(v2), 10, 64)
 		if err == nil {
