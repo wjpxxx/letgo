@@ -88,6 +88,16 @@ func InterfaceToInt64(data interface{}) int64 {
 func Float64ToInt64(data float64) int64 {
 	return int64(data)
 }
+//InRowToSqlRow 将InRow 转SqlRow
+func InRowToSqlRow(row InRow) SqlRow{
+	record := make(SqlRow)
+	for k,v:=range row{
+		row := &Data{}
+		row.Set(v)
+		record[k] = row
+	}
+	return record
+}
 
 //RowsToSqlRows sql.Rows转 SqlRows
 func RowsToSqlRows(rows *sql.Rows) SqlRows{
