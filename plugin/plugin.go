@@ -29,6 +29,15 @@ func SyncFile()*syncclient.FileSync{
 func SyncFileByConfig(server syncconfig.SyncServer)*syncclient.FileSync{
 	return syncclient.NewFileSyncByConfig(server)
 }
+
+//SyncCmdByConfig 获得远程命令对象
+func SyncCmdByConfig(server syncconfig.SyncServer)*syncclient.CommandSync{
+	return syncclient.NewCommandSyncByConfig(server)
+}
+//SyncCmd 获得远程命令对象
+func SyncCmd()*syncclient.CommandSync{
+	return syncclient.NewCommandSync()
+}
 //init 注册插件
 func init(){
 	Register("sync-server", syncserver.New())

@@ -7,11 +7,13 @@ import (
 )
 
 //CommandSync
-type CommandSync struct{}
+type CommandSync struct{
+	config syncconfig.ClientConfig
+}
 
 //Run
 func (c *CommandSync)Run(values ...interface{})interface{}{
-	client,err:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	client,err:=rpc.NewClient().WithAddress(c.config.Server.IP,c.config.Server.Port)
 	if err!=nil{
 		return nil
 	}
@@ -21,7 +23,16 @@ func (c *CommandSync)Run(values ...interface{})interface{}{
 
 //NewCommandSync
 func NewCommandSync()*CommandSync{
-	return &CommandSync{}
+	return &CommandSync{
+		config:config,
+	}
+}
+//NewCommandSyncByConfig
+func NewCommandSyncByConfig(server syncconfig.SyncServer)*CommandSync{
+	c:=syncconfig.ClientConfig{}
+	c.Paths=config.Paths
+	c.Server=server
+	return &CommandSync{config:c}
 }
 //do
 func (c *CommandSync) do(client *rpc.Client,values ...interface{})map[string]syncconfig.CmdResult{
@@ -58,12 +69,12 @@ func (c *CommandSync)rpcCall(client *rpc.Client,message syncconfig.CmdMessage)ma
 //packed 打包
 func (c *CommandSync) packedCmd(dir,cmd,ip string)syncconfig.CmdMessage{
 	if ip!=""{
-		if ip==config.Server.IP{
+		if ip==c.config.Server.IP{
 			//如果有传IP,则只有IP的服务器执行
 			return syncconfig.CmdMessage{
 				Server: syncconfig.Server{
-					IP: config.Server.IP,
-					Port: config.Server.Port,
+					IP: c.config.Server.IP,
+					Port: c.config.Server.Port,
 				},
 				Dir: dir,
 				Cmd: cmd,
@@ -73,8 +84,8 @@ func (c *CommandSync) packedCmd(dir,cmd,ip string)syncconfig.CmdMessage{
 			//其他台不执行
 			return syncconfig.CmdMessage{
 				Server: syncconfig.Server{
-					IP: config.Server.IP,
-					Port: config.Server.Port,
+					IP: c.config.Server.IP,
+					Port: c.config.Server.Port,
 				},
 				Dir: "",
 				Cmd: "",
@@ -85,8 +96,8 @@ func (c *CommandSync) packedCmd(dir,cmd,ip string)syncconfig.CmdMessage{
 	}else{
 		return syncconfig.CmdMessage{
 			Server: syncconfig.Server{
-				IP: config.Server.IP,
-				Port: config.Server.Port,
+				IP: c.config.Server.IP,
+				Port: c.config.Server.Port,
 			},
 			Dir: dir,
 			Cmd: cmd,
@@ -98,7 +109,7 @@ func (c *CommandSync) packedCmd(dir,cmd,ip string)syncconfig.CmdMessage{
 //cmdSlave
 func (c *CommandSync) cmdSlave(dir,cmd,ip string)[]syncconfig.CmdSlave{
 	var slaves []syncconfig.CmdSlave
-	for _,slave:=range config.Server.Slave{
+	for _,slave:=range c.config.Server.Slave{
 		if ip!=""{
 			if ip==slave.IP{
 				//改台IP执行
