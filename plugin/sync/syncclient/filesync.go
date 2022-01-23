@@ -99,7 +99,7 @@ func (f *FileSync) SyncFile(client *rpc.Client){
 
 //getFileModifyTime 获得文件修改时间
 func (f *FileSync) getFileModifyTime(fullName string) int{
-	path:="runtime/cache/sync/"
+	path:="runtime/cache/sync/"+f.config.Server.IP+"/"
 	icache:=filecache.NewFileCacheByPath(path)
 	var t int
 	icache.Get(encry.Md5(fullName),&t)
