@@ -11,28 +11,30 @@ import (
 	"github.com/wjpxxx/letgo/log"
 )
 //FileSync
-type FileSync struct {}
+type FileSync struct {
+	config syncconfig.ClientConfig
+}
 
 //Run
 func (f *FileSync)Run(values ...interface{})interface{}{
-	client,err:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	client,err:=rpc.NewClient().WithAddress(f.config.Server.IP,f.config.Server.Port)
 	if err!=nil{
 		return false
 	}
 	defer client.Close()
-	log.DebugPrint("连接到服务器: %s 成功",config.Server.IP)
+	log.DebugPrint("连接到服务器: %s 成功",f.config.Server.IP)
 	//同步文件
 	f.SyncFile(client)
 	return true
 }
 func (f *FileSync) SendOneFile(fullName,RemotePath string) bool{
-	client,err:=rpc.NewClient().WithAddress(config.Server.IP,config.Server.Port)
+	client,err:=rpc.NewClient().WithAddress(f.config.Server.IP,f.config.Server.Port)
 	if err!=nil{
 		return false
 	}
 	LocationPath:=file.DirName(fullName)
 	defer client.Close()
-	log.DebugPrint("连接到服务器: %s 成功",config.Server.IP)
+	log.DebugPrint("连接到服务器: %s 成功",f.config.Server.IP)
 	filer:=file.NewFile(fullName)
 	//文件变化了
 	fsize:=filer.Size()
@@ -57,7 +59,7 @@ func (f *FileSync) SendOneFile(fullName,RemotePath string) bool{
 }
 //SyncFile 同步文件
 func (f *FileSync) SyncFile(client *rpc.Client){
-	for _,c:=range config.Paths{
+	for _,c:=range f.config.Paths{
 		walkdir.Walk(c.LocationPath,&walkdir.Options{
 			Callback: func(pathName, fileName, fullName,LocationPath,RemotePath string) {
 				filer:=file.NewFile(fullName)
@@ -158,11 +160,18 @@ func (f *FileSync) packedFileSync(data []byte,seek int64,filer file.Filer,Locati
 			Size: filer.Size(),
 			Data: data,
 		},
-		Slave: config.Server.Slave,
+		Slave: f.config.Server.Slave,
 	}
 }
 
 //NewFileSync
 func NewFileSync()*FileSync{
-	return &FileSync{}
+	return &FileSync{config:config}
+}
+//NewFileSyncByConfig
+func NewFileSyncByConfig(server syncconfig.SyncServer)*FileSync{
+	c:=syncconfig.ClientConfig{}
+	c.Paths=config.Paths
+	c.Server=server
+	return &FileSync{config:c}
 }
