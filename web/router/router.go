@@ -41,7 +41,9 @@ func HttpRouter() *Router{
 //HandleHttpRequest 处理http请求
 func (r *Router)HandleHttpRequest(ctx *context.Context){
 	//r.ctx=ctx
+	//log.DebugPrint("router1请求:%p",&ctx.Writer)
 	ctx.Init()
+	//log.DebugPrint("router2请求:%p",&ctx.Writer)
 	//过滤
 	filter.ExecFilter(filter.BEFORE_ROUTER,ctx)
 	requestPath:=strings.ToLower(ctx.Request.URL.Path)

@@ -33,7 +33,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter,r *http.Request) {
 	c:=s.pool.Get().(*context.Context)
 	c.Request=r
 	c.Writer=w
-	//log.DebugPrint("请求过来了%s,%s,%v",r.Method,r.Host,w)
+	//log.DebugPrint("请求过来了:%p,%p",&w,&c.Writer)
 	c.Reset()
 	s.handleHttpRequest(c)
 	s.pool.Put(c)

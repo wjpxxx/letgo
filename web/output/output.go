@@ -4,6 +4,7 @@ import (
 	"github.com/wjpxxx/letgo/web/binding"
 	"github.com/wjpxxx/letgo/web/input"
 	"github.com/wjpxxx/letgo/lib"
+	//"github.com/wjpxxx/letgo/log"
 	"html/template"
 	"net/http"
 )
@@ -112,6 +113,7 @@ func (o *Output)JSONP(code int, value interface{})error{
 func (o *Output)Render(code int,value interface{},bind binding.Rendering)error{
 	if o.status==0&&code>0{
 		o.status=code
+		//log.DebugPrint("writer:%v",o.writer)
 		err:= bind.Render(code,o.writer,value)
 		return err
 	}

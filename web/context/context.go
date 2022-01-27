@@ -32,6 +32,7 @@ type Context struct {
 func (c *Context)Reset(){
 	c.Input=input.NewInput()
 	c.Output=output.NewOutput()
+	c.Session=session.GetSession(c)
 	c.RouterPath=""
 }
 //Init 初始化
@@ -57,7 +58,7 @@ func (c *Context)SetCookies(name,value string,maxAge int,path,domain string,secu
 	if path=="" {
 		path="/"
 	}
-	http.SetCookie(c.Writer,&http.Cookie{
+	cookie:=http.Cookie{
 		Name: name,
 		Value: url.QueryEscape(value),
 		MaxAge: maxAge,
@@ -66,7 +67,9 @@ func (c *Context)SetCookies(name,value string,maxAge int,path,domain string,secu
 		SameSite: c.sameSite,
 		Secure: secure,
 		HttpOnly: httpOnly,
-	})
+	}
+	//log.DebugPrint("设置cookie:%p",&c.Writer)
+	http.SetCookie(c.Writer,&cookie)
 }
 //SetCookie 设置cookie
 func (c *Context)SetCookie(name,value string) {
@@ -74,6 +77,7 @@ func (c *Context)SetCookie(name,value string) {
 }
 //SetCookieByExpire
 func (c *Context)SetCookieByExpire(name,value string,expire int){
+	//log.DebugPrint("host:%s,name:%s,value:%s",c.Host(),name,value)
 	c.SetCookies(name,value,expire,"",c.Host(),false,false)
 }
 //Host
@@ -122,6 +126,6 @@ func NewContext()*Context{
 		Output: output.NewOutput(),
 		Tmpl:tmpl.GetTmpl(),
 	}
-	ctx.Session=session.GetSession(ctx)
+	//ctx.Session=session.GetSession(ctx)
 	return ctx
 }

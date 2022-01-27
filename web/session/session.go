@@ -46,8 +46,15 @@ func (s *Session)CreateSessionID()string{
 func (s *Session)SessionID()string{
 	cookie:=s.cookie.Cookie(config.Name)
 	if cookie==nil{
-		sid:=s.CreateSessionID()
-		s.cookie.SetCookieByExpire(config.Name,sid,config.Expire)
+		var sid string
+		s.cache.Get(config.Name, &sid)
+		//var success bool
+		if sid==""{
+			sid=s.CreateSessionID()
+			s.cookie.SetCookieByExpire(config.Name,sid,config.Expire)
+			s.cache.Set(config.Name, sid, 1)
+			
+		}
 		return sid
 	}
 	return cookie.String()
@@ -60,6 +67,7 @@ func (s *Session)Start()bool{
 	}
 	return false
 }
+
 //Name
 func (s *Session)Name(key string)string{
 	sid:=s.SessionID()
@@ -82,7 +90,7 @@ type Cookier interface{
 	SetCookieByExpire(name,value string,expire int)
 }
 
-var initSession Sessioner
+var initSession Session
 
 var onceDo sync.Once
 
@@ -107,12 +115,13 @@ func init(){
 //GetSession
 func GetSession(cookie Cookier) Sessioner{
 	onceDo.Do(func() {
-		initSession=&Session{
+		initSession=Session{
 			cache:createCache(),
 			cookie: cookie,
 		}
 	})
-	return initSession
+	initSession.cookie=cookie
+	return &initSession
 }
 //createCache
 func createCache()icache.ICacher{
