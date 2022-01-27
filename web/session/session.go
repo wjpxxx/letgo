@@ -53,7 +53,6 @@ func (s *Session)SessionID()string{
 			sid=s.CreateSessionID()
 			s.cookie.SetCookieByExpire(config.Name,sid,config.Expire)
 			s.cache.Set(config.Name, sid, 1)
-			
 		}
 		return sid
 	}

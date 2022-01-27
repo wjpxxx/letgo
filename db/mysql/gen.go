@@ -140,6 +140,7 @@ func (g *genInfo) genModel(table string){
 		modelName,
 		entityName,
 		modelName,
+		modelName,
 		entityName,
 		entityName,
 	)
@@ -242,6 +243,15 @@ func (m *%s)SaveByEntity(data entity.%s) int64{
         delete(inData,"id")
         delete(inData,"update_time")
         return m.Insert(inData)
+    }
+}
+//SaveByInRow 保存
+func (m *%s)SaveByInRow(id int64,data lib.SqlIn) int64{
+    if id>0{
+        m.Where("id",id).Update(data)
+        return id
+    }else{
+        return m.Insert(data)
     }
 }
 //GetEntityById 通过id获得数据
