@@ -32,7 +32,12 @@ func WithConfig(config EmailConfig) Emailer{
 }
 //发送邮件
 func (e *Email)Send(to,subject,body string)error{
-	e.message.To=[]string{to}
+	return e.Sends([]string{to}, subject,body)
+}
+
+//发送邮件
+func (e *Email)Sends(to []string,subject,body string)error{
+	e.message.To=to
 	e.message.Subject=subject
 	e.message.Body=body
 	addr:=e.config.Host
@@ -70,10 +75,9 @@ func (e *Email)Send(to,subject,body string)error{
 	client.Quit()
 	return nil
 }
-
 //发送邮件
-func (e *Email)SendTLS(to,subject,body string)error{
-	e.message.To=[]string{to}
+func (e *Email)SendTLSs(to []string,subject,body string)error{
+	e.message.To=to
 	e.message.Subject=subject
 	e.message.Body=body
 	tlsconfig := &tls.Config{
@@ -120,6 +124,10 @@ func (e *Email)SendTLS(to,subject,body string)error{
 	w.Close()
 	client.Quit()
 	return nil
+}
+//发送邮件
+func (e *Email)SendTLS(to,subject,body string)error{
+	return e.SendTLSs([]string{to},subject,body)
 }
 //WithAppendByPath 添加附件
 func (e *Email)WithAppendByPath(path string)Emailer{
