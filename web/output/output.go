@@ -91,6 +91,16 @@ func(o *Output)JSONList(code int,list interface{})error{
 		"sub_code":"list.success",
 	})
 }
+//Success 成功输出json
+func(o *Output)SuccessJSON(data lib.InRow) error{
+	return o.JSON(200,lib.MergeInRow(lib.InRow{
+		"code":1,
+		"success":true,
+		"msg":"获取成功",
+		"err":"",
+		"sub_code":"list.success",
+	},data))
+}
 
 //JSONPager
 func(o *Output)JSONPager(code int,list interface{},pager interface{})error{
