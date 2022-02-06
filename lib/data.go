@@ -258,6 +258,23 @@ func (d *Data) WhetherArrayString() ([]string, bool) {
 	return nil, false
 }
 
+
+//WhetherArrayInt64 输出[]int64字符串数组
+func (d *Data) WhetherArrayInt64() ([]int64, bool) {
+	if v, ok := d.Value.([]int64); ok {
+		return v, true
+	} else if v, ok := d.Value.([]interface{}); ok {
+		return InterfaceArrayToArrayInt64(v), true
+	}
+	return nil, false
+}
+
+//ArrayInt64 输出[]string字符串数组
+func (d *Data) ArrayInt64() ([]int64) {
+	r, _ := d.WhetherArrayInt64()
+	return r
+}
+
 //ArrayString 输出[]string字符串数组
 func (d *Data) ArrayString() ([]string) {
 	r, _ := d.WhetherArrayString()

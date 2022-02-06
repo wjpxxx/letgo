@@ -251,6 +251,16 @@ func InterfaceArrayToArrayString(list []interface{}) []string {
 }
 
 //interface转ArrayString
+func InterfaceArrayToArrayInt64(list []interface{}) []int64 {
+	var rp []int64
+	for _, v := range list {
+		data := &Data{Value: v}
+		rp = append(rp, data.Int64())
+	}
+	return rp
+}
+
+//interface转ArrayString
 func Int64ArrayToArrayString(list []int64) []string {
 	var rp []string
 	for _, v := range list {
