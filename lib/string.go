@@ -2,8 +2,8 @@ package lib
 
 import (
 	"fmt"
-	"strings"
 	"regexp"
+	"strings"
 )
 
 //SubString 字符串截取
@@ -46,41 +46,70 @@ func InStringArray(need string, needArr []string) bool {
 }
 
 //ResolveAddress 解析地址
-func ResolveAddress(addr []string)string{
+func ResolveAddress(addr []string) string {
 	switch len(addr) {
 	case 0:
 		return ":1122"
 	case 1:
-		return fmt.Sprintf("%s:1122",addr[0])
+		return fmt.Sprintf("%s:1122", addr[0])
 	case 2:
-		return fmt.Sprintf("%s:%s",addr[0],addr[1])
+		return fmt.Sprintf("%s:%s", addr[0], addr[1])
 	default:
 		panic("too many parameters")
 	}
 }
+
 //ReplaceIndex 替换指定第n个处
-func ReplaceIndex(s,old,new string,n int)string{
-	arr:=strings.Split(s, old)
-	r:=""
-	for i,v:=range arr{
-		if v!="" {
-			if i==n{
-				r+=v+new
-			}else{
-				r+=v+old
+func ReplaceIndex(s, old, new string, n int) string {
+	arr := strings.Split(s, old)
+	r := ""
+	for i, v := range arr {
+		if v != "" {
+			if i == n {
+				r += v + new
+			} else {
+				r += v + old
 			}
 		}
 	}
 	return r
 }
+
 //IsFloat 判断字符串是否是一个小数
-func IsFloat(s string) bool{
-	match1,_:=regexp.MatchString(`^[\+-]?\d*\.\d+$`,s)
-	match2,_:=regexp.MatchString(`^[\+-]?\d+\.\d*$`,s)
-	return match1||match2
+func IsFloat(s string) bool {
+	match1, _ := regexp.MatchString(`^[\+-]?\d*\.\d+$`, s)
+	match2, _ := regexp.MatchString(`^[\+-]?\d+\.\d*$`, s)
+	return match1 || match2
 }
+
 //IsInt  判断字符串是否是一个整型
-func IsInt(s string)bool{
-	match1,_:=regexp.MatchString(`^[\+-]?\d+$`,s)
+func IsInt(s string) bool {
+	match1, _ := regexp.MatchString(`^[\+-]?\d+$`, s)
 	return match1
+}
+
+//正则表达式相关函数
+func Reg(reg string, content string, index int) string {
+	r, _ := regexp.Compile(reg)
+	if r != nil {
+		match := r.FindAllStringSubmatch(content, -1)
+		if len(match) > 0 && len(match[0]) > index {
+			return match[0][index]
+		}
+	}
+	return ""
+}
+
+//GetRootDomain 获得根域名
+func GetRootDomain(ul string) (root string) {
+	pattern := "([a-z0-9--]{1,200})\\.(ac\\.cn|bj\\.cn|sh\\.cn|tj\\.cn|cq\\.cn|he\\.cn|sn\\.cn|sx\\.cn|nm\\.cn|ln\\.cn|jl\\.cn|hl\\.cn|js\\.cn|zj\\.cn|ah\\.cn|fj\\.cn|jx\\.cn|sd\\.cn|ha\\.cn|hb\\.cn|hn\\.cn|gd\\.cn|gx\\.cn|hi\\.cn|sc\\.cn|gz\\.cn|yn\\.cn|gs\\.cn|qh\\.cn|nx\\.cn|xj\\.cn|tw\\.cn|hk\\.cn|mo\\.cn|xz\\.cn" +
+		"|com\\.cn|com\\.net|net\\.cn|org\\.cn|gov\\.cn|我爱你|在线|中国|网址|网店|中文网|公司|网络|集团" +
+		"|com|cn|cc|org|net|xin|xyz|vip|shop|top|club|wang|fun|info|online|tech|store|site|ltd|ink|biz|group|link|work|pro|mobi|ren|kim|name|tv|red" +
+		"|cool|team|live|pub|company|zone|today|video|art|chat|gold|guru|show|life|love|email|fund|city|plus|design|social|center|world|auto):?\\d*$"
+	root = Reg(pattern, ul, 0)
+	if root != "" {
+		arr := strings.Split(root, ":")
+		root = arr[0]
+	}
+	return root
 }
