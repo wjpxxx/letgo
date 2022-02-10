@@ -74,6 +74,7 @@ type Modeler interface{
 	InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64
 	Drop() int64
 	Truncate() int64
+	Optimize() int64
 	Delete() int64
 	DB()DBer
 }
@@ -1180,6 +1181,15 @@ func (m *Model)Drop() int64 {
 func (m *Model)Truncate() int64{
 	table:=NewTable(m.db,m.tableName)
 	effects:=table.Truncate()
+	m.lastSql=table.GetLastSql()
+	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
+	return effects
+}
+//Optimize 清空表
+func (m *Model)Optimize() int64{
+	table:=NewTable(m.db,m.tableName)
+	effects:=table.Optimize()
 	m.lastSql=table.GetLastSql()
 	m.preSql,m.preParams=table.GetSqlInfo()
 	m.clear()
