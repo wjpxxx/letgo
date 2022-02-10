@@ -203,6 +203,7 @@ type Tabler interface{
 	InsertOnDuplicate(row lib.SqlIn,updateRow lib.SqlIn) int64
 	Drop() int64
 	Truncate() int64
+	Optimize() int64
 	Delete(onParams []interface{},where string,whereParams ...interface{}) int64
 	Update(row lib.SqlIn,onParams []interface{},where string,whereParams ...interface{})int64
 	SelectByHasWhere(fields string, where string,hasWhere bool, whereParams ...interface{})lib.SqlRows
@@ -430,6 +431,26 @@ func (t *Table)Drop() int64 {
 	}
 	return effects
 }
+//Optimize
+func (t *Table)Optimize() int64{
+	sql:=fmt.Sprintf("optimize table %s",t.tableName)
+	smt,err:=t.db.prepare(sql)
+	t.sql(sql)
+	if err!=nil{
+		return -1
+	}
+	defer smt.Close()
+	result, err :=smt.Exec()
+	if err!=nil{
+		return -2
+	}
+	effects, err := result.RowsAffected()
+	if err!=nil{
+		return -3
+	}
+	return effects
+}
+
 //Truncate 清空表
 func (t *Table)Truncate() int64 {
 	sql:=fmt.Sprintf("truncate %s",t.tableName)
