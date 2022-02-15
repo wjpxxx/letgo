@@ -290,3 +290,8 @@ func JsonArrayStringToStringArray(in string)[]string{
 	}
 	return nil
 }
+//CopyJSON 拷贝对象
+func CopyJSON(input interface{},out interface{}){
+	aj, _ := json.Marshal(input)
+	_ = json.Unmarshal(aj, out)
+}
