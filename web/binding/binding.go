@@ -15,6 +15,7 @@ type Rendering interface{
 }
 const (
 	MIMEJSON              = "application/json"
+	MIMEJSONUTF8              = "application/json;charset=utf-8"
 	MIMEXML               = "application/xml"
 	MIMEXML2              = "text/xml"
 	MIMEYAML              = "application/x-yaml"
@@ -31,6 +32,8 @@ func NewBind(contentType string)Binding{
 	switch contentType {
 	case MIMEJSON:
 		return JSON
+	case MIMEJSONUTF8:
+		return JSON
 	case MIMEXML,MIMEXML2:
 		return XML
 	case MIMEYAML:
@@ -43,6 +46,8 @@ func NewBind(contentType string)Binding{
 func NewRender(contentType string)Rendering{
 	switch contentType {
 	case MIMEJSON:
+		return JSON
+	case MIMEJSONUTF8:
 		return JSON
 	case MIMEXML,MIMEXML2:
 		return XML
