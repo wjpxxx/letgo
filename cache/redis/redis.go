@@ -485,7 +485,12 @@ func (r *Redis)HExists(key string, field string) int{
 
 //HGet HGet操作
 func (r *Redis)HGet(key string, field string, value interface{}) bool{
-	rds:=r.getRedis().Get()
+	crds:=r.getRedis()
+	if crds==nil{
+		log.DebugPrint("redis hget fail: pool is nil")
+		return false
+	}
+	rds:=crds.Get()
 	defer rds.Close()
 	tv,err:=rds.Do("HGET", key, field)
 	if err != nil {
