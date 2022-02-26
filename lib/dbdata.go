@@ -90,8 +90,71 @@ func (s SqlRow)Bind(value interface{})bool{
 //SqlIn sql插入更新数据格式
 type SqlIn InRow
 type SqlRaw string //原生sql语句字符串
+
+type Rows []Row //Row 数组数据
+
+//ToOutput
+func (s Rows)ToOutput()[]InRow{
+	var list []InRow
+	for _,data:=range s{
+		d:=make(InRow)
+		for k,v:=range data{
+			if v.Value!=nil{
+				typeOf :=reflect.TypeOf(v.Value)
+				switch typeOf.String() {
+					case "int64":
+						d[k]=v.Int64()
+					case "int":
+						d[k]=v.Int()
+					case "float64":
+						d[k]=v.Float64()
+					case "float32":
+						d[k]=v.Float32()
+					case "bool":
+						d[k]=v.Value
+					default:
+						d[k]=v.String()
+				}
+			}else{
+				d[k]=v.Value
+			}
+		}
+		list=append(list, d)
+	}
+	return list
+}
+
 //Row 数据
 type Row map[string] *Data
+
+//ToOutput
+func (s Row)ToOutput()InRow{
+	d:=make(InRow)
+	for k,v:=range s{
+		if v.Value!=nil{
+			typeOf :=reflect.TypeOf(v.Value)
+			switch typeOf.String() {
+				case "int64":
+					d[k]=v.Int64()
+				case "int":
+					d[k]=v.Int()
+				case "float64":
+					d[k]=v.Float64()
+				case "float32":
+					d[k]=v.Float32()
+				case "bool":
+					d[k]=v.Value
+				default:
+					d[k]=v.String()
+			}
+		}else{
+			d[k]=v.Value
+		}
+		
+	}
+	return d
+}
+
 //InRow 数据
 type InRow map[string]interface{}
 //IntRow 整型数据
