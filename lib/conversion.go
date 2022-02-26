@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
+	"strings"
 )
 
 //字符串转float32
@@ -294,4 +295,11 @@ func JsonArrayStringToStringArray(in string)[]string{
 func CopyJSON(input interface{},out interface{}){
 	aj, _ := json.Marshal(input)
 	_ = json.Unmarshal(aj, out)
+}
+//\u00转义
+func U00(str string)string{
+	str=strings.Replace(str,"\\u0026","&",-1)
+	str=strings.Replace(str,"\\u003c","<",-1)
+	str=strings.Replace(str,"\\u003e",">",-1)
+	return str
 }
