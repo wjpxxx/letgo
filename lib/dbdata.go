@@ -35,7 +35,7 @@ func (s SqlRows)ToOutput()[]InRow{
 					case "bool":
 						d[k]=v.Value
 					default:
-						d[k]=U00(v.String())
+						d[k]=v.String()
 				}
 			}else{
 				d[k]=v.Value
@@ -72,7 +72,7 @@ func (s SqlRow)ToOutput()InRow{
 				case "bool":
 					d[k]=v.Value
 				default:
-					d[k]=U00(v.String())
+					d[k]=v.String()
 			}
 		}else{
 			d[k]=v.Value
@@ -113,7 +113,7 @@ func (s Rows)ToOutput()[]InRow{
 					case "bool":
 						d[k]=v.Value
 					default:
-						d[k]=U00(v.String())
+						d[k]=v.String()
 				}
 			}else{
 				d[k]=v.Value
@@ -145,7 +145,7 @@ func (s Row)ToOutput()InRow{
 				case "bool":
 					d[k]=v.Value
 				default:
-					d[k]=U00(v.String())
+					d[k]=v.String()
 			}
 		}else{
 			d[k]=v.Value

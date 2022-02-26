@@ -303,3 +303,10 @@ func U00(str string)string{
 	str=strings.Replace(str,"\\u003e",">",-1)
 	return str
 }
+//U00Byte\u00转义
+func U00Byte(str []byte)[]byte{
+	str=bytes.Replace(str,[]byte("\\u0026"),[]byte("&"),-1)
+	str=bytes.Replace(str,[]byte("\\u003c"),[]byte("<"),-1)
+	str=bytes.Replace(str,[]byte("\\u003e"),[]byte(">"),-1)
+	return str
+}

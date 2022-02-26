@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"bytes"
+	"github.com/wjpxxx/letgo/lib"
 )
 
 //jsonBinding
@@ -32,7 +33,7 @@ func(jsonBinding)Render(code int,w http.ResponseWriter,value interface{})error{
 	if err!=nil{
 		return err
 	}
-	_,err=w.Write(jsonData)
+	_,err=w.Write(lib.U00Byte(jsonData))
 	return err
 }
 
@@ -47,6 +48,6 @@ func(jsonpBinding)Render(code int,w http.ResponseWriter,value interface{})error{
 	if err!=nil{
 		return err
 	}
-	_,err=w.Write(jsonData)
+	_,err=w.Write(lib.U00Byte(jsonData))
 	return err
 }
