@@ -184,7 +184,9 @@ func(h *HttpClient)Post(url string,values lib.InRow) *HttpResponse{
 	if h.checkIncludeFile(values) {
 		return h.PostMultipart(url,values)
 	}
-	h.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+	if _,ok:=h.headers["Content-Type"];!ok{
+		h.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+	}
 	body:=strings.NewReader(HttpBuildQuery(values))
 	client:=h.getClient()
 	req:=h.getRequest(url,"POST",body)
@@ -192,7 +194,9 @@ func(h *HttpClient)Post(url string,values lib.InRow) *HttpResponse{
 }
 //PostJson 请求json
 func(h *HttpClient)PostJson(url string,value interface{}) *HttpResponse{
-	h.WithHeader("Content-Type", "application/json")
+	if _,ok:=h.headers["Content-Type"];!ok{
+		h.WithHeader("Content-Type", "application/json")
+	}
 	var body []byte
 	switch t := value.(type) {
 	case []byte:
@@ -213,7 +217,9 @@ func(h *HttpClient)PostJson(url string,value interface{}) *HttpResponse{
 }
 //PostXml 请求xml
 func(h *HttpClient)PostXml(url string,value interface{})*HttpResponse {
-	h.WithHeader("Content-Type", "text/xml")
+	if _,ok:=h.headers["Content-Type"];!ok{
+		h.WithHeader("Content-Type", "text/xml")
+	}
 	var body []byte
 	switch t := value.(type) {
 	case []byte:
@@ -318,7 +324,9 @@ func(h *HttpClient)Put(url string,values lib.InRow) *HttpResponse{
 	if h.checkIncludeFile(values) {
 		return h.PostMultipart(url,values)
 	}
-	h.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+	if _,ok:=h.headers["Content-Type"];!ok{
+		h.WithHeader("Content-Type", "application/x-www-form-urlencoded")
+	}
 	body:=strings.NewReader(HttpBuildQuery(values))
 	client:=h.getClient()
 	req:=h.getRequest(url,"PUT",body)
