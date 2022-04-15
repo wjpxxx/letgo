@@ -270,6 +270,14 @@ func InterfaceArrayToArrayData(list []interface{}) []*Data {
 	}
 	return rp
 }
+//map[string]interface {}转Row
+func MapInterfaceArrayToRow(list map[string]interface {}) Row {
+	var rp Row=make(Row)
+	for k,v:=range list{
+		rp[k]=&Data{Value: v}
+	}
+	return rp
+}
 
 //interface转ArrayString
 func Int64ArrayToArrayString(list []int64) []string {

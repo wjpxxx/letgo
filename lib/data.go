@@ -291,18 +291,18 @@ func (d *Data) ArrayData() ([]*Data) {
 	return r
 }
 
-//WhetherData 输出*Data数据对象
-func (d *Data) WhetherData() (*Data, bool) {
-	if v, ok := d.Value.(*Data); ok {
+//WhetherRow 输出Row数据对象
+func (d *Data) WhetherRow() (Row, bool) {
+	if v, ok := d.Value.(Row); ok {
 		return v, true
-	} else if v, ok := d.Value.(interface{}); ok {
-		return &Data{Value: v}, true
+	} else if v, ok := d.Value.(map[string]interface {}); ok {
+		return MapInterfaceArrayToRow(v), true
 	}
 	return nil, false
 }
-//Data 输出*Data 数据对象
-func (d *Data) Data() (*Data) {
-	r, _ := d.WhetherData()
+//Row 输出Row 数据对象
+func (d *Data) Row() (Row) {
+	r, _ := d.WhetherRow()
 	return r
 }
 //ArrayString 输出[]string字符串数组
