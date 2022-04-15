@@ -275,7 +275,7 @@ func (d *Data) ArrayInt64() ([]int64) {
 	return r
 }
 
-//WhetherArrayInt64 输出[]int64字符串数组
+//WhetherArrayInt64 输出[]*Data数据数组
 func (d *Data) WhetherArrayData() ([]*Data, bool) {
 	if v, ok := d.Value.([]*Data); ok {
 		return v, true
@@ -288,6 +288,21 @@ func (d *Data) WhetherArrayData() ([]*Data, bool) {
 //ArrayData 输出[]*Data 数据数组
 func (d *Data) ArrayData() ([]*Data) {
 	r, _ := d.WhetherArrayData()
+	return r
+}
+
+//WhetherData 输出*Data数据对象
+func (d *Data) WhetherData() (*Data, bool) {
+	if v, ok := d.Value.(*Data); ok {
+		return v, true
+	} else if v, ok := d.Value.(interface{}); ok {
+		return &Data{Value: v}, true
+	}
+	return nil, false
+}
+//Data 输出*Data 数据对象
+func (d *Data) Data() (*Data) {
+	r, _ := d.WhetherData()
 	return r
 }
 //ArrayString 输出[]string字符串数组
