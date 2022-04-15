@@ -261,12 +261,12 @@ func InterfaceArrayToArrayInt64(list []interface{}) []int64 {
 	return rp
 }
 
-//interface转ArrayData
-func InterfaceArrayToArrayData(list []interface{}) []*Data {
-	var rp []*Data
+//interface转ArrayRow
+func InterfaceArrayToArrayRow(list []interface{}) []Row {
+	var rp []Row
 	for _, v := range list {
 		data := &Data{Value: v}
-		rp = append(rp, data)
+		rp = append(rp, data.Row())
 	}
 	return rp
 }

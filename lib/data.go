@@ -275,19 +275,19 @@ func (d *Data) ArrayInt64() ([]int64) {
 	return r
 }
 
-//WhetherArrayInt64 输出[]*Data数据数组
-func (d *Data) WhetherArrayData() ([]*Data, bool) {
-	if v, ok := d.Value.([]*Data); ok {
+//WhetherArrayRow 输出[]Row数据数组
+func (d *Data) WhetherArrayRow() ([]Row, bool) {
+	if v, ok := d.Value.([]Row); ok {
 		return v, true
 	} else if v, ok := d.Value.([]interface{}); ok {
-		return InterfaceArrayToArrayData(v), true
+		return InterfaceArrayToArrayRow(v), true
 	}
 	return nil, false
 }
 
-//ArrayData 输出[]*Data 数据数组
-func (d *Data) ArrayData() ([]*Data) {
-	r, _ := d.WhetherArrayData()
+//ArrayRow 输出[]Row 数据数组
+func (d *Data) ArrayRow() ([]Row) {
+	r, _ := d.WhetherArrayRow()
 	return r
 }
 
