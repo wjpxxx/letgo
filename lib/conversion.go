@@ -1,14 +1,14 @@
 package lib
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"strconv"
-	"bytes"
 	"math"
-	"encoding/xml"
+	"strconv"
 
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -23,9 +23,10 @@ func StrToFloat32(str string) float32 {
 	}
 	return 0
 }
+
 //Round
-func Round(x float32)int{
-	return int(math.Floor(float64(x)+0.5))
+func Round(x float32) int {
+	return int(math.Floor(float64(x) + 0.5))
 }
 
 //字符串转float64
@@ -45,6 +46,7 @@ func StrToInt(str string) int {
 	}
 	return 0
 }
+
 //字符串转uint
 func StrToUInt(str string) uint {
 	vv, err := strconv.Atoi(str)
@@ -53,6 +55,7 @@ func StrToUInt(str string) uint {
 	}
 	return 0
 }
+
 //字符串转int64
 func StrToInt64(str string) int64 {
 	vv, err := strconv.ParseInt(str, 10, 64)
@@ -89,10 +92,11 @@ func InterfaceToInt64(data interface{}) int64 {
 func Float64ToInt64(data float64) int64 {
 	return int64(data)
 }
+
 //InRowToSqlRow 将InRow 转SqlRow
-func InRowToSqlRow(row InRow) SqlRow{
+func InRowToSqlRow(row InRow) SqlRow {
 	record := make(SqlRow)
-	for k,v:=range row{
+	for k, v := range row {
 		row := &Data{}
 		row.Set(v)
 		record[k] = row
@@ -101,29 +105,29 @@ func InRowToSqlRow(row InRow) SqlRow{
 }
 
 //RowsToSqlRows sql.Rows转 SqlRows
-func RowsToSqlRows(rows *sql.Rows) SqlRows{
+func RowsToSqlRows(rows *sql.Rows) SqlRows {
 	cols, err := rows.Columns()
 	if err != nil {
 		return nil
 	}
 	scanArgs := make([]interface{}, len(cols))
-	cs,_:=rows.ColumnTypes()
-	for i,v:=range cs{
+	cs, _ := rows.ColumnTypes()
+	for i, v := range cs {
 		switch v.DatabaseTypeName() {
-		case "VARCHAR","TEXT","UUID","TIMESTAMP":
-			scanArgs[i]=new(sql.NullString)
+		case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
+			scanArgs[i] = new(sql.NullString)
 			break
-		case "INT","BIGINT","BIT","TINYINT","INTEGER","MEDIUMINT","NUMERIC","SMALLINT":
-			scanArgs[i]=new(sql.NullInt64)
+		case "INT", "BIGINT", "BIT", "TINYINT", "INTEGER", "MEDIUMINT", "NUMERIC", "SMALLINT":
+			scanArgs[i] = new(sql.NullInt64)
 			break
-		case "DECIMAL","DOUBLE","FLOAT":
-			scanArgs[i]=new(sql.NullFloat64)
+		case "DECIMAL", "DOUBLE", "FLOAT":
+			scanArgs[i] = new(sql.NullFloat64)
 			break
 		case "BOOL":
-			scanArgs[i]=new(sql.NullBool)
+			scanArgs[i] = new(sql.NullBool)
 			break
 		default:
-			scanArgs[i]=new(sql.NullString)
+			scanArgs[i] = new(sql.NullString)
 		}
 	}
 	var list SqlRows
@@ -136,13 +140,13 @@ func RowsToSqlRows(rows *sql.Rows) SqlRows{
 		for i, col := range scanArgs {
 			row := &Data{}
 			switch cs[i].DatabaseTypeName() {
-			case "VARCHAR","TEXT","UUID","TIMESTAMP":
+			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP":
 				row.Set(col.(*sql.NullString).String)
 				break
-			case "INT","BIGINT","BIT","TINYINT","INTEGER","MEDIUMINT","NUMERIC","SMALLINT":
+			case "INT", "BIGINT", "BIT", "TINYINT", "INTEGER", "MEDIUMINT", "NUMERIC", "SMALLINT":
 				row.Set(col.(*sql.NullInt64).Int64)
 				break
-			case "DECIMAL","DOUBLE","FLOAT":
+			case "DECIMAL", "DOUBLE", "FLOAT":
 				row.Set(col.(*sql.NullFloat64).Float64)
 				break
 			case "BOOL":
@@ -172,6 +176,7 @@ func XmlObjectToString(data interface{}) string {
 func JsonObjectToString(data interface{}) string {
 	return ObjectToString(data)
 }
+
 //ObjectToString 将对象转成json字符串
 func ObjectToString(data interface{}) string {
 	js, err := json.Marshal(data)
@@ -180,6 +185,7 @@ func ObjectToString(data interface{}) string {
 	}
 	return string(js)
 }
+
 //StringToJsonObject json字符串转json对象
 func StringToJsonObject(str string, data interface{}) bool {
 	return StringToObject(str, data)
@@ -187,7 +193,7 @@ func StringToJsonObject(str string, data interface{}) bool {
 
 //StringToObject json字符串转对象
 func StringToObject(str string, data interface{}) bool {
-	js:=json.NewDecoder(bytes.NewReader([]byte(str)))
+	js := json.NewDecoder(bytes.NewReader([]byte(str)))
 	js.UseNumber()
 	err := js.Decode(data)
 	if err == nil {
@@ -204,6 +210,7 @@ func StringToXmlObject(str string, data interface{}) bool {
 	}
 	return false
 }
+
 //JSONToMap
 func JSONToMap(str string) InRow {
 	var tempMap InRow
@@ -213,33 +220,39 @@ func JSONToMap(str string) InRow {
 	}
 	return tempMap
 }
+
+//MapToJSON
+func MapToJSON(list Rows) string {
+	s := list.ToOutput()
+	return ObjectToString(s)
+}
+
 //Int64ArrayToInterfaceArray int64转[]interface{}
-func Int64ArrayToInterfaceArray(data []int64)[]interface{}{
+func Int64ArrayToInterfaceArray(data []int64) []interface{} {
 	var it []interface{}
-	for _,v:=range data{
-		it=append(it, v)
+	for _, v := range data {
+		it = append(it, v)
 	}
 	return it
 }
 
 //StringArrayToInterfaceArray string转[]interface{}
-func StringArrayToInterfaceArray(data []string)[]interface{}{
+func StringArrayToInterfaceArray(data []string) []interface{} {
 	var it []interface{}
-	for _,v:=range data{
-		it=append(it, v)
+	for _, v := range data {
+		it = append(it, v)
 	}
 	return it
 }
 
 //StringArrayToInt64Array string转[]int64
-func StringArrayToInt64Array(data []string)[]int64{
+func StringArrayToInt64Array(data []string) []int64 {
 	var it []int64
-	for _,v:=range data{
-		it=append(it, StrToInt64(v))
+	for _, v := range data {
+		it = append(it, StrToInt64(v))
 	}
 	return it
 }
-
 
 //interface转ArrayString
 func InterfaceArrayToArrayString(list []interface{}) []string {
@@ -270,11 +283,22 @@ func InterfaceArrayToArrayRow(list []interface{}) []Row {
 	}
 	return rp
 }
+
+//interface转Rows
+func InterfaceArrayToArrayRows(list []interface{}) Rows {
+	var rp Rows
+	for _, v := range list {
+		data := &Data{Value: v}
+		rp = append(rp, data.Row())
+	}
+	return rp
+}
+
 //map[string]interface {}转Row
-func MapInterfaceArrayToRow(list map[string]interface {}) Row {
-	var rp Row=make(Row)
-	for k,v:=range list{
-		rp[k]=&Data{Value: v}
+func MapInterfaceArrayToRow(list map[string]interface{}) Row {
+	var rp Row = make(Row)
+	for k, v := range list {
+		rp[k] = &Data{Value: v}
 	}
 	return rp
 }
@@ -283,7 +307,7 @@ func MapInterfaceArrayToRow(list map[string]interface {}) Row {
 func Int64ArrayToArrayString(list []int64) []string {
 	var rp []string
 	for _, v := range list {
-		rp = append(rp, fmt.Sprintf("%d",v))
+		rp = append(rp, fmt.Sprintf("%d", v))
 	}
 	return rp
 }
@@ -300,8 +324,9 @@ func Gb2312ToUtf8(src string) string {
 	rts := string(data)
 	return rts
 }
+
 //JsonArrayStringToStringArray json数组字符串转字符串数组
-func JsonArrayStringToStringArray(in string)[]string{
+func JsonArrayStringToStringArray(in string) []string {
 	var js []string
 	err := json.Unmarshal([]byte(in), &js)
 	if err == nil {
@@ -309,22 +334,25 @@ func JsonArrayStringToStringArray(in string)[]string{
 	}
 	return nil
 }
+
 //CopyJSON 拷贝对象
-func CopyJSON(input interface{},out interface{}){
+func CopyJSON(input interface{}, out interface{}) {
 	aj, _ := json.Marshal(input)
 	_ = json.Unmarshal(aj, out)
 }
+
 //\u00转义
-func U00(str string)string{
-	str=strings.Replace(str,"\\u0026","&",-1)
-	str=strings.Replace(str,"\\u003c","<",-1)
-	str=strings.Replace(str,"\\u003e",">",-1)
+func U00(str string) string {
+	str = strings.Replace(str, "\\u0026", "&", -1)
+	str = strings.Replace(str, "\\u003c", "<", -1)
+	str = strings.Replace(str, "\\u003e", ">", -1)
 	return str
 }
+
 //U00Byte\u00转义
-func U00Byte(str []byte)[]byte{
-	str=bytes.Replace(str,[]byte("\\u0026"),[]byte("&"),-1)
-	str=bytes.Replace(str,[]byte("\\u003c"),[]byte("<"),-1)
-	str=bytes.Replace(str,[]byte("\\u003e"),[]byte(">"),-1)
+func U00Byte(str []byte) []byte {
+	str = bytes.Replace(str, []byte("\\u0026"), []byte("&"), -1)
+	str = bytes.Replace(str, []byte("\\u003c"), []byte("<"), -1)
+	str = bytes.Replace(str, []byte("\\u003e"), []byte(">"), -1)
 	return str
 }

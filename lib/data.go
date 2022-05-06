@@ -291,6 +291,21 @@ func (d *Data) ArrayRow() ([]Row) {
 	return r
 }
 
+
+//WhetherArrayRow 输出[]Row数据数组
+func (d *Data) WhetherArrayRows() (Rows, bool) {
+	if v, ok := d.Value.(Rows); ok {
+		return v, true
+	} else if v, ok := d.Value.([]interface{}); ok {
+		return InterfaceArrayToArrayRows(v), true
+	}
+	return nil, false
+}
+//Rows 输出[]Row 数据数组
+func (d *Data) Rows() (Rows) {
+	r, _ := d.WhetherArrayRows()
+	return r
+}
 //WhetherRow 输出Row数据对象
 func (d *Data) WhetherRow() (Row, bool) {
 	if v, ok := d.Value.(Row); ok {
