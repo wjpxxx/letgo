@@ -100,6 +100,19 @@ func Reg(reg string, content string, index int) string {
 	return ""
 }
 
+//正则替换
+//参数reg：正则表达式
+//参数new_str：替换成字符串
+//参数content：待匹配字符串
+//返回值：替换后的字符串
+func RegReplace(reg, newStr, content string) string {
+	r, _ := regexp.Compile(reg)
+	if r != nil {
+		return r.ReplaceAllString(content, newStr)
+	}
+	return ""
+}
+
 //GetRootDomain 获得根域名
 func GetRootDomain(ul string) (root string) {
 	pattern := "([a-z0-9--]{1,200})\\.(ac\\.cn|bj\\.cn|sh\\.cn|tj\\.cn|cq\\.cn|he\\.cn|sn\\.cn|sx\\.cn|nm\\.cn|ln\\.cn|jl\\.cn|hl\\.cn|js\\.cn|zj\\.cn|ah\\.cn|fj\\.cn|jx\\.cn|sd\\.cn|ha\\.cn|hb\\.cn|hn\\.cn|gd\\.cn|gx\\.cn|hi\\.cn|sc\\.cn|gz\\.cn|yn\\.cn|gs\\.cn|qh\\.cn|nx\\.cn|xj\\.cn|tw\\.cn|hk\\.cn|mo\\.cn|xz\\.cn" +
