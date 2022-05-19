@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"compress/gzip"
 )
 var fix []byte=[]byte{0,1,1,1,1,1}  //序列化前缀
 //Data 数据
@@ -353,6 +354,27 @@ func UnSerialize(data []byte, rdata interface{}) bool{
 		return false
 	}
 	return true
+}
+
+
+//GzipData压缩
+func GzipData(data []byte) []byte {
+	buf := new(bytes.Buffer)
+	wr := gzip.NewWriter(buf)
+	len, err := wr.Write(data)
+	if err != nil || len == 0 {
+		return data
+	}
+	err = wr.Flush()
+	if err != nil {
+		return data
+	}
+	err = wr.Close()
+	if err != nil {
+		return data
+	}
+	b := buf.Bytes()
+	return b
 }
 
 

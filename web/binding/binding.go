@@ -23,9 +23,11 @@ const (
 )
 var (
 	JSON =jsonBinding{}
+	GZIPJSON=gzipJsonBinding{}
 	XML=xmlBinding{}
 	YAML=yamlBinding{}
 	JSONP=jsonpBinding{}
+	GZIPJSONP=gzipJsonpBinding{}
 	TEXT=textBinding{}
 )
 func NewBind(contentType string)Binding{

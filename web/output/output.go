@@ -5,9 +5,6 @@ import (
 	"github.com/wjpxxx/letgo/web/binding"
 	"github.com/wjpxxx/letgo/web/input"
 	//"github.com/wjpxxx/letgo/log"
-	"bytes"
-	"compress/gzip"
-	"encoding/json"
 	"html/template"
 	"net/http"
 )
@@ -39,6 +36,11 @@ func (o *Output) Header(key, value string) {
 //JSON
 func (o *Output) JSON(code int, value interface{}) error {
 	return o.Render(code, value, binding.JSON)
+}
+
+//GZIPJSON
+func (o *Output) GZIPJSON(code int, value interface{}) error {
+	return o.Render(code, value, binding.GZIPJSON)
 }
 
 //JSONOK
@@ -111,32 +113,13 @@ func (o *Output) SuccessJSON(data lib.InRow) error {
 
 //SuccessGZipJSON 成功输出json
 func (o *Output) SuccessGZipJSON(data lib.InRow) error {
-	o.Header("Content-Encoding", "gzip")
-	o.Header("Content-Type", "application/json; charset=utf-8")
-	o.writer.WriteHeader(200)
-	js, _ := json.Marshal(data)
-	_, er := o.writer.Write(o.gzipData(js))
-	return er
-}
-
-//压缩
-func (o *Output) gzipData(data []byte) []byte {
-	buf := new(bytes.Buffer)
-	wr := gzip.NewWriter(buf)
-	len, err := wr.Write(data)
-	if err != nil || len == 0 {
-		return data
-	}
-	err = wr.Flush()
-	if err != nil {
-		return data
-	}
-	err = wr.Close()
-	if err != nil {
-		return data
-	}
-	b := buf.Bytes()
-	return b
+	return o.GZIPJSON(200, lib.MergeInRow(lib.InRow{
+		"code":     1,
+		"success":  true,
+		"msg":      "获取成功",
+		"err":      "",
+		"sub_code": "list.success",
+	}, data))
 }
 
 //JSONPager
