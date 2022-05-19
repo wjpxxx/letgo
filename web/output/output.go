@@ -53,8 +53,17 @@ func (o *Output) JSONOK(code int, message string) error {
 		"sub_code": "success",
 	})
 }
-
-//JSONOK
+//GZIPJSONOK
+func (o *Output) GZIPJSONOK(code int, message string) error {
+	return o.GZIPJSON(code, lib.InRow{
+		"code":     1,
+		"success":  true,
+		"msg":      message,
+		"err":      "",
+		"sub_code": "success",
+	})
+}
+//JSONERROR
 func (o *Output) JSONERROR(code int, message, subCode string) error {
 	return o.JSON(code, lib.InRow{
 		"code":     0,
@@ -64,10 +73,30 @@ func (o *Output) JSONERROR(code int, message, subCode string) error {
 		"sub_code": subCode,
 	})
 }
-
-//JSONOK
+//GZIPJSONERROR
+func (o *Output) GZIPJSONERROR(code int, message, subCode string) error {
+	return o.GZIPJSON(code, lib.InRow{
+		"code":     0,
+		"success":  false,
+		"msg":      "",
+		"err":      message,
+		"sub_code": subCode,
+	})
+}
+//JSONFail
 func (o *Output) JSONFail(code int, message string) error {
 	return o.JSON(code, lib.InRow{
+		"code":     0,
+		"success":  false,
+		"msg":      "",
+		"err":      message,
+		"sub_code": "fail",
+	})
+}
+
+//GZIPJSONFail
+func (o *Output) GZIPJSONFail(code int, message string) error {
+	return o.GZIPJSON(code, lib.InRow{
 		"code":     0,
 		"success":  false,
 		"msg":      "",
@@ -88,6 +117,20 @@ func (o *Output) JSONObject(code int, info interface{}) error {
 	})
 }
 
+
+//GZIPJSONObject
+func (o *Output) GZIPJSONObject(code int, info interface{}) error {
+	return o.GZIPJSON(code, lib.InRow{
+		"code":     1,
+		"success":  true,
+		"msg":      "获取成功",
+		"err":      "",
+		"info":     info,
+		"sub_code": "info.success",
+	})
+}
+
+
 //JSONList
 func (o *Output) JSONList(code int, list interface{}) error {
 	return o.JSON(code, lib.InRow{
@@ -99,6 +142,20 @@ func (o *Output) JSONList(code int, list interface{}) error {
 		"sub_code": "list.success",
 	})
 }
+
+
+//GZIPJSONList
+func (o *Output) GZIPJSONList(code int, list interface{}) error {
+	return o.GZIPJSON(code, lib.InRow{
+		"code":     1,
+		"success":  true,
+		"msg":      "获取成功",
+		"err":      "",
+		"list":     list,
+		"sub_code": "list.success",
+	})
+}
+
 
 //Success 成功输出json
 func (o *Output) SuccessJSON(data lib.InRow) error {
@@ -125,6 +182,20 @@ func (o *Output) SuccessGZipJSON(data lib.InRow) error {
 //JSONPager
 func (o *Output) JSONPager(code int, list interface{}, pager interface{}) error {
 	return o.JSON(code, lib.InRow{
+		"code":     1,
+		"success":  true,
+		"msg":      "获取成功",
+		"err":      "",
+		"list":     list,
+		"pager":    pager,
+		"sub_code": "pager.success",
+	})
+}
+
+
+//GZIPJSONPager
+func (o *Output) GZIPJSONPager(code int, list interface{}, pager interface{}) error {
+	return o.GZIPJSON(code, lib.InRow{
 		"code":     1,
 		"success":  true,
 		"msg":      "获取成功",
