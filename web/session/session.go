@@ -47,7 +47,10 @@ func (s *Session) CreateSessionID() string {
 	defer sessionMutex.Unlock()
 	return encry.Base64Encode(encry.Hmac(fmt.Sprintf("%d", time.Now().UnixNano()), lib.RandChar(20)))
 }
-
+//SessionKey
+func (s *Session) SessionKey() string {
+	return config.Name
+}
 //SessionID
 func (s *Session) SessionID() string {
 	cookie := s.cookie.Cookie(config.Name)
@@ -82,6 +85,8 @@ type Sessioner interface {
 	Del(key string) bool
 	FlushDB() bool
 	Start() bool
+	SessionID() string
+	SessionKey() string
 }
 
 //Cookier
