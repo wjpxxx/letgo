@@ -400,7 +400,11 @@ func (t *Table) SelectByHasWhere(fields string, where string,hasWhere bool, wher
 		if hasWhere&&len(whereParams)>0{
 			sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
 		}else{
-			sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
+			if len(whereParams)==0{
+				sql=fmt.Sprintf("select %s from %s %s", fields,t.tableName, where)
+			}else{
+				sql=fmt.Sprintf("select %s from %s where %s", fields,t.tableName, where)
+			}
 		}
 	}else{
 		sql=fmt.Sprintf("select %s from %s", fields,t.tableName)
