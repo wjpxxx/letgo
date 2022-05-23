@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 //SubString 字符串截取
@@ -125,4 +126,27 @@ func GetRootDomain(ul string) (root string) {
 		root = arr[0]
 	}
 	return root
+}
+
+//UnderLineName 驼峰转下划线命名
+func UnderLineName(name string) string{
+	var buf []byte
+	for i, r := range name {
+		if unicode.IsUpper(r) {
+			if i != 0 {
+				buf=append(buf, '_')
+			}
+			buf=append(buf, byte(unicode.ToLower(r)))
+		} else {
+			buf=append(buf, byte(r))
+		}
+	}
+	return string(buf)
+}
+
+//HumpName 下划线命名转驼峰
+func HumpName(name string) string{
+	name = strings.Replace(name, "_", " ", -1)
+	name = strings.Title(name)
+	return strings.Replace(name, " ", "", -1)
 }
