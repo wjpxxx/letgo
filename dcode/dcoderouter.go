@@ -134,36 +134,35 @@ func (c *DCodeRouter) initRouter(fn *ast.FuncDecl) {
 	if !filterFun {
 		c.createFilterFun(fn)
 	}
-	for _, v := range c.controller {
-		//注册路由
-		c.regiterRouter(fn, v)
-	}
+	c.regiterRouter(fn)
 	//ast.Print(c.fset,fn.Body)
 }
 
 //regiterRouter 注册路由
-func (c *DCodeRouter) regiterRouter(fn *ast.FuncDecl, cs ControllerInfo) {
-	var x *ast.CallExpr
+func (c *DCodeRouter) regiterRouter(fn *ast.FuncDecl) {
+	//ast.Print(c.fset,fn.Body)
+	//var x *ast.CallExpr
+	var fns []ast.Stmt
 	for _, v := range fn.Body.List {
 		if cll, ok := v.(*ast.ExprStmt); ok {
 			if cll2, ok2 := cll.X.(*ast.CallExpr); ok2 {
 				if fun, ok3 := cll2.Fun.(*ast.SelectorExpr); ok3 {
-					args := []ast.Expr(cll2.Args)
-					for _, ar := range args {
-						if unar, ok4 := ar.(*ast.UnaryExpr); ok4 {
-							if unx, ok5 := unar.X.(*ast.CompositeLit); ok5 {
-								if unt, ok6 := unx.Type.(*ast.SelectorExpr); ok6 {
-									if unt.Sel.Name == cs.ControllerName && fun.Sel.Name == "RegisterController" {
-										x = cll2
-									}
-								}
-							}
-						}
+					if fun.Sel.Name != "RegisterController" {
+						fns=append(fns, v)
 					}
 				}
 			}
+		}else{
+			fns=append(fns, v)
 		}
 	}
+	fn.Body.List=fns
+	//ast.Print(c.fset,fn.Body)
+	for _,nc:=range c.controller{
+		c.createController(fn, nc)
+	}
+	//ast.Print(c.fset,fn.Body)
+	/*
 	if x == nil {
 		//创建
 		c.createController(fn, cs)
@@ -171,6 +170,7 @@ func (c *DCodeRouter) regiterRouter(fn *ast.FuncDecl, cs ControllerInfo) {
 		//更新
 		c.updateController(x, cs)
 	}
+	*/
 }
 
 //createController 创建控制器
