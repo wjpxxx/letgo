@@ -84,8 +84,8 @@ func (c *DCodeController) astFile(file *ast.File) {
 	c.needContext(file)
 	if file.Scope != nil {
 		for k, _ := range file.Scope.Objects {
-			if strings.Index(k,"Get")!=0&&strings.Index(k,"Controller")!=-1{
-				c.ControllerName=k
+			if strings.Index(k, "Get") != 0 && strings.Index(k, "Controller") != -1 {
+				c.ControllerName = k
 			}
 		}
 	}
@@ -246,7 +246,7 @@ func (c *DCodeController) genTitle(fn *ast.FuncDecl) {
 type params struct {
 	name     string
 	typeStr  string
-	method   string  //请求方式 post,get
+	method   string //请求方式 post,get
 	defaultV string
 }
 
@@ -348,12 +348,14 @@ func (c *DCodeController) genParamByBlockStmt(nd *ast.BlockStmt) []params {
 				if n, nk := v2.(*ast.CallExpr); nk {
 					if n2, nk2 := n.Fun.(*ast.SelectorExpr); nk2 {
 						if n3, nk3 := n2.X.(*ast.CallExpr); nk3 {
-							if n4, nk4 := n3.Args[0].(*ast.BasicLit); nk4 {
-								name = strings.ReplaceAll(n4.Value, "\"", "")
-							}
-							if len(n3.Args) > 1 {
-								if n5, nk5 := n3.Args[1].(*ast.BasicLit); nk5 {
-									defaultV = strings.ReplaceAll(n5.Value, "\"", "")
+							if len(n3.Args) > 0 {
+								if n4, nk4 := n3.Args[0].(*ast.BasicLit); nk4 {
+									name = strings.ReplaceAll(n4.Value, "\"", "")
+								}
+								if len(n3.Args) > 1 {
+									if n5, nk5 := n3.Args[1].(*ast.BasicLit); nk5 {
+										defaultV = strings.ReplaceAll(n5.Value, "\"", "")
+									}
 								}
 							}
 							//ast.Print(c.fset, n3.Args[0])
