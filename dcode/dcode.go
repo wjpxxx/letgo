@@ -18,6 +18,7 @@ type ControllerInfo struct {
 	PackageName string
 	Path        string
 	Funcs       []FuncList
+	ControllerName string
 }
 
 //自动检测代码控制器
@@ -41,8 +42,9 @@ func DcodeController(controllerDir string) []ControllerInfo {
 					//fmt.Println(bf.String())
 					cs = append(cs, ControllerInfo{
 						PackageName: dc.PackageName,
-						Path:        file.DirName(path),
+						Path:        strings.ReplaceAll(file.DirName(path),"\\","/"),
 						Funcs:       dc.GetFuncList(),
+						ControllerName: dc.ControllerName,
 					})
 				}
 			}
@@ -60,8 +62,9 @@ func DcodeRouter(router, controllerDir string) bool {
 		fset := token.NewFileSet()
 		fl, err := parser.ParseFile(fset, router, nil, parser.ParseComments)
 		if err == nil {
-			dc := &DCodeRouter{fset: fset, mfile: fl, modName: md, cs: rs}
+			dc := &DCodeRouter{fset: fset, mfile: fl, modName: md, controller: rs}
 			ast.Walk(dc, fl)
+			dc.Finish()
 			var buf []byte
 			bf := bytes.NewBuffer(buf)
 			format.Node(bf, fset, fl)

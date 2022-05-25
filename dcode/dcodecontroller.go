@@ -11,11 +11,12 @@ import (
 
 //控制器检测
 type DCodeController struct {
-	fset        *token.FileSet
-	mfile       *ast.File
-	comments    []*ast.CommentGroup
-	funcList    []FuncList
-	PackageName string
+	fset           *token.FileSet
+	mfile          *ast.File
+	comments       []*ast.CommentGroup
+	funcList       []FuncList
+	PackageName    string
+	ControllerName string
 }
 
 //FuncList
@@ -67,6 +68,7 @@ func (c *DCodeController) Visit(node ast.Node) ast.Visitor {
 func (c *DCodeController) Finish() {
 	//fmt.Println(c.funcList)
 	c.mfile.Comments = c.comments
+	//fmt.Println(c.ControllerName)
 }
 
 //获得控制器的方法列表
@@ -77,9 +79,16 @@ func (c *DCodeController) GetFuncList() []FuncList {
 //astFile 根
 func (c *DCodeController) astFile(file *ast.File) {
 	//ast.Print(c.fset, file.Unresolved)
-	//ast.Print(c.fset, file)
+	//ast.Print(c.fset, file.Scope.Objects)
 	c.PackageName = file.Name.Name
 	c.needContext(file)
+	if file.Scope != nil {
+		for k, _ := range file.Scope.Objects {
+			if strings.Index(k,"Get")!=0&&strings.Index(k,"Controller")!=-1{
+				c.ControllerName=k
+			}
+		}
+	}
 }
 
 //genDecl 字节点
@@ -121,7 +130,7 @@ func (c *DCodeController) needContext(file *ast.File) {
 			}
 		}
 		if len(importStrs) > 0 {
-			c.createImport(file, importStrs...)
+			CreateImport(file, importStrs...)
 		}
 	} else {
 		for k2, v2 := range needImport {
@@ -136,7 +145,7 @@ func (c *DCodeController) needContext(file *ast.File) {
 }
 
 //createImport创建导入包
-func (c *DCodeController) createImport(file *ast.File, packageName ...string) {
+func CreateImport(file *ast.File, packageName ...string) {
 	var specs []ast.Spec
 	i := 0
 	for _, v := range packageName {
@@ -158,12 +167,33 @@ func (c *DCodeController) createImport(file *ast.File, packageName ...string) {
 		})
 		i++
 	}
-	ip := &ast.GenDecl{
-		Tok:   token.IMPORT,
-		Specs: specs,
+	if len(file.Decls) == 0 {
+		ip := &ast.GenDecl{
+			Tok:   token.IMPORT,
+			Specs: specs,
+		}
+		ips := []ast.Decl{ip}
+		file.Decls = append(ips, file.Decls...)
+	} else {
+		var find bool
+		for _, v := range file.Decls {
+			if n1, ok1 := v.(*ast.GenDecl); ok1 {
+				if n1.Tok == token.IMPORT {
+					n1.Specs = append(n1.Specs, specs...)
+					find = true
+				}
+			}
+		}
+		if !find {
+			ip := &ast.GenDecl{
+				Tok:   token.IMPORT,
+				Specs: specs,
+			}
+			ips := []ast.Decl{ip}
+			file.Decls = append(ips, file.Decls...)
+		}
 	}
-	ips := []ast.Decl{ip}
-	file.Decls = append(ips, file.Decls...)
+
 }
 
 //addImport 添加导入包
@@ -216,7 +246,7 @@ func (c *DCodeController) genTitle(fn *ast.FuncDecl) {
 type params struct {
 	name     string
 	typeStr  string
-	method   string
+	method   string  //请求方式 post,get
 	defaultV string
 }
 
@@ -228,6 +258,7 @@ func (c *DCodeController) genRouter(fn *ast.FuncDecl) {
 		if len(fn.Recv.List) > 0 {
 			if n, ok := fn.Recv.List[0].Type.(*ast.StarExpr); ok {
 				if n2, ok2 := n.X.(*ast.Ident); ok2 {
+					c.ControllerName = n2.Name
 					ctl = strings.Replace(strings.ToLower(n2.Name), "controller", "", -1)
 				}
 			}
@@ -235,7 +266,7 @@ func (c *DCodeController) genRouter(fn *ast.FuncDecl) {
 		if ctl != "" {
 			f := FuncList{
 				MethodName: strings.ToLower(fn.Name.Name),
-				Method:     "post",
+				Method:     "any",
 				Controller: ctl,
 			}
 			c.addComment(fn, "@router", fmt.Sprintf("// @router /%s/%s   [%s]", f.Controller, f.MethodName, f.Method))

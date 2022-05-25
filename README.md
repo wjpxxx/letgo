@@ -571,3 +571,54 @@ func main() {
 
 After execution, the model source code will be generated in the current directory model / and the entity source 
 code will be generated in the directory model / entity
+
+
+
+## Automatic generation router and notes
+
+```go
+
+package main
+import (
+	"github.com/wjpxxx/letgo/dcode"
+)
+func main() {
+	dcode.DcodeRouter("router/router.go","./controller")
+}
+```
+
+Before execution
+
+
+```go
+
+func (c *AccountController) Signin(ctx *context.Context) {
+	userName := ctx.Input.Param("userName", "").String()
+	password := ctx.Input.Param("password", 0).Int64()
+	if userName != "" && password != 0 {
+	} else {
+	}
+}
+
+```
+
+After execution
+
+```go
+
+// @Title Signin 接口说明
+// @Description: 描述信息
+// @router /account/signin   [get]
+// @Param   userName   body   String      "参数说明"
+// @Param   password   body   Int64   0   "参数说明"
+// @Success  200 {object}
+// @Failure 400 Invalid
+func (c *AccountController) Signin(ctx *context.Context) {
+	userName := ctx.Input.Param("userName", "").String()
+	password := ctx.Input.Param("password", 0).Int64()
+	if userName != "" && password != 0 {
+	} else {
+	}
+}
+
+```
