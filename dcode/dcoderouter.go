@@ -150,7 +150,11 @@ func (c *DCodeRouter) regiterRouter(fn *ast.FuncDecl) {
 					if fun.Sel.Name != "RegisterController" {
 						fns=append(fns, v)
 					}
+				}else{
+					fns=append(fns, v)
 				}
+			}else{
+				fns=append(fns, v)
 			}
 		}else{
 			fns=append(fns, v)
