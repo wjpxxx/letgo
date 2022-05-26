@@ -148,32 +148,32 @@ func (c *DCodeRouter) regiterRouter(fn *ast.FuncDecl) {
 			if cll2, ok2 := cll.X.(*ast.CallExpr); ok2 {
 				if fun, ok3 := cll2.Fun.(*ast.SelectorExpr); ok3 {
 					if fun.Sel.Name != "RegisterController" {
-						fns=append(fns, v)
+						fns = append(fns, v)
 					}
-				}else{
-					fns=append(fns, v)
+				} else {
+					fns = append(fns, v)
 				}
-			}else{
-				fns=append(fns, v)
+			} else {
+				fns = append(fns, v)
 			}
-		}else{
-			fns=append(fns, v)
+		} else {
+			fns = append(fns, v)
 		}
 	}
-	fn.Body.List=fns
+	fn.Body.List = fns
 	//ast.Print(c.fset,fn.Body)
-	for _,nc:=range c.controller{
+	for _, nc := range c.controller {
 		c.createController(fn, nc)
 	}
 	//ast.Print(c.fset,fn.Body)
 	/*
-	if x == nil {
-		//创建
-		c.createController(fn, cs)
-	} else {
-		//更新
-		c.updateController(x, cs)
-	}
+		if x == nil {
+			//创建
+			c.createController(fn, cs)
+		} else {
+			//更新
+			c.updateController(x, cs)
+		}
 	*/
 }
 
@@ -219,7 +219,7 @@ func (c *DCodeRouter) createController(fn *ast.FuncDecl, cs ControllerInfo) {
 //updateController 更新控制器
 func (c *DCodeRouter) updateController(x *ast.CallExpr, cs ControllerInfo) {
 	var ags []ast.Expr
-	ags=append(ags,x.Args[0])
+	ags = append(ags, x.Args[0])
 	for _, fs := range cs.Funcs {
 		var find bool
 		fnn := fmt.Sprintf("%s:%s", fs.Method, fs.MethodName)

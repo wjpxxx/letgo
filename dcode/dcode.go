@@ -15,9 +15,9 @@ import (
 
 //ControllerInfo 控制器信息
 type ControllerInfo struct {
-	PackageName string
-	Path        string
-	Funcs       []FuncList
+	PackageName    string
+	Path           string
+	Funcs          []FuncList
 	ControllerName string
 }
 
@@ -41,9 +41,9 @@ func DcodeController(controllerDir string) []ControllerInfo {
 					ioutil.WriteFile(path, bf.Bytes(), 0644)
 					//fmt.Println(bf.String())
 					cs = append(cs, ControllerInfo{
-						PackageName: dc.PackageName,
-						Path:        strings.ReplaceAll(file.DirName(path),"\\","/"),
-						Funcs:       dc.GetFuncList(),
+						PackageName:    dc.PackageName,
+						Path:           strings.ReplaceAll(file.DirName(path), "\\", "/"),
+						Funcs:          dc.GetFuncList(),
 						ControllerName: dc.ControllerName,
 					})
 				}
@@ -74,6 +74,30 @@ func DcodeRouter(router, controllerDir string) bool {
 		return true
 	}
 	return false
+}
+
+func DcodeJson(dir string) {
+	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			if file.GetExt(path) == ".go" {
+				fset := token.NewFileSet()
+				fl, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
+				if err == nil {
+					//ast.Print(fset,file)
+					dc := &DCodeJson{fset: fset, mfile: fl}
+					ast.Walk(dc, fl)
+					dc.Finish()
+					var buf []byte
+					bf := bytes.NewBuffer(buf)
+					format.Node(bf, fset, fl)
+					//wbf,_:=format.Source(bf.Bytes())
+					ioutil.WriteFile(path, bf.Bytes(), 0644)
+					//fmt.Println(bf.String())
+				}
+			}
+		}
+		return nil
+	})
 }
 
 func GetGoModName() string {
