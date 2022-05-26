@@ -622,3 +622,71 @@ func (c *AccountController) Signin(ctx *context.Context) {
 }
 
 ```
+
+
+## Automatic generation json tag
+
+By using //@json or //@Json
+
+```go
+
+package main
+import (
+	"github.com/wjpxxx/letgo/dcode"
+)
+func main() {
+	dcode.DcodeJson("json/")
+}
+```
+
+
+
+Before execution
+
+
+```go
+//@json
+type N struct {
+	SName  string
+	JxName int
+	X      int64
+}
+
+//@json
+type X struct {
+	SName  string
+	JxName int
+	X      int64
+}
+
+
+```
+
+After execution
+
+```go
+
+
+//@json
+type N struct {
+	SName  string `json:"s_name"`
+	JxName int    `json:"jx_name"`
+	X      int64  `json:"x"`
+}
+
+//@json
+type X struct {
+	SName  string `json:"s_name"`
+	JxName int    `json:"jx_name"`
+	X      int64  `json:"x"`
+}
+
+func (n *N) String() string {
+	return lib.ObjectToString(n)
+}
+func (x *X) String() string {
+	return lib.ObjectToString(x)
+}
+
+
+```
