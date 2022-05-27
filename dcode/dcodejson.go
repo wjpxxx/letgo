@@ -160,7 +160,7 @@ func (c *DCodeJson) genDecl(decl *ast.GenDecl) {
 							if isjson == 1 {
 								js = fmt.Sprintf("`json:\"%s\"`", lib.UnderLineName(name))
 							} else if isjson == 2 {
-								js = fmt.Sprintf("`json:\"%s\"`", name)
+								js = fmt.Sprintf("`json:\"%s\"`",lib.FirstToLower(name))
 							}
 							if f.Tag == nil {
 								f.Tag = &ast.BasicLit{

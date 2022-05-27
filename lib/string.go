@@ -36,6 +36,20 @@ func FirstToUpper(str string) string {
 	return string(strArry)
 }
 
+//FirstToLower 首字母小写
+//参数str：输入字符串
+//返回值：首字母小写字符串
+func FirstToLower(str string) string {
+	if len(str) < 1 {
+		return ""
+	}
+	strArry := []rune(str)
+	if strArry[0] >= 65 && strArry[0] <= 90 {
+		strArry[0] += 32
+	}
+	return string(strArry)
+}
+
 //InStringArray 是否包含字符
 func InStringArray(need string, needArr []string) bool {
 	for _, v := range needArr {
@@ -129,23 +143,23 @@ func GetRootDomain(ul string) (root string) {
 }
 
 //UnderLineName 驼峰转下划线命名
-func UnderLineName(name string) string{
+func UnderLineName(name string) string {
 	var buf []byte
 	for i, r := range name {
 		if unicode.IsUpper(r) {
 			if i != 0 {
-				buf=append(buf, '_')
+				buf = append(buf, '_')
 			}
-			buf=append(buf, byte(unicode.ToLower(r)))
+			buf = append(buf, byte(unicode.ToLower(r)))
 		} else {
-			buf=append(buf, byte(r))
+			buf = append(buf, byte(r))
 		}
 	}
 	return string(buf)
 }
 
 //HumpName 下划线命名转驼峰
-func HumpName(name string) string{
+func HumpName(name string) string {
 	name = strings.Replace(name, "_", " ", -1)
 	name = strings.Title(name)
 	return strings.Replace(name, " ", "", -1)
