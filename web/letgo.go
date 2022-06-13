@@ -25,6 +25,14 @@ import (
 var initserver *server.Server
 
 var onceDo sync.Once
+var logo = `
+ __         ______     ______   ______     ______    
+/\ \       /\  ___\   /\__  _\ /\  ___\   /\  __ \   
+\ \ \____  \ \  __\   \/_/\ \/ \ \ \__ \  \ \ \/\ \  
+ \ \_____\  \ \_____\    \ \_\  \ \_____\  \ \_____\ 
+  \/_____/   \/_____/     \/_/   \/_____/   \/_____/ 
+                                                     
+`
 
 func httpServer() *server.Server{
 	onceDo.Do(func(){
@@ -37,6 +45,7 @@ func httpServer() *server.Server{
 func Run(addr ...string) {
 	go func(){
 		pid:=os.Getpid()
+		log.DebugPrint("%s",logo)
 		log.DebugPrint("Start web server Pid:%d",pid)
 		if err:=httpServer().Run(addr...);err!=nil{
 			//log.DebugPrint("letgo stop :%v", err)
