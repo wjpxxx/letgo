@@ -76,6 +76,7 @@ type Modeler interface{
 	Truncate() int64
 	Optimize() int64
 	Delete() int64
+	SoftDel() int64
 	DB()DBer
 }
 //Fielder 字段暴露出去的接口
@@ -178,6 +179,7 @@ type Wherer interface{
 	Pager(page, pageSize int)(lib.SqlRows,lib.SqlRow)
 	Update(data lib.SqlIn)int64
 	Delete() int64
+	SoftDel() int64
 }
 //GroupByer 分组接口
 type GroupByer interface{
@@ -1205,6 +1207,19 @@ func (m *Model)Delete() int64{
 	m.preSql,m.preParams=table.GetSqlInfo()
 	m.clear()
 	return effects
+}
+//SoftDel 删除
+func (m *Model)SoftDel() int64{
+	tableName,values:=m.getTables()
+	where,whereValues:=m.getWhere()
+	table:=NewTable(m.db,tableName)
+	i:=table.Update(lib.SqlIn{
+		m.getAddDeleteName():lib.Time(),
+	},values,where,whereValues...)
+	m.lastSql=table.GetLastSql()
+	m.preSql,m.preParams=table.GetSqlInfo()
+	m.clear()
+	return i
 }
 //init 初始化连接池
 func init(){
