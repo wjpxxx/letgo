@@ -76,7 +76,7 @@ func Hmac(str string, key string) string {
 }
 
 //HmacSHA1 签名采用HmacSHA1算法 + Base64，编码采用UTF-8
-func HmacSHA1(str string, key string) string{
+func HmacSHA1(str string, key string) string {
 	h := hmac.New(sha1.New, []byte(key))
 	io.WriteString(h, str)
 	r := base64.StdEncoding.EncodeToString(h.Sum(nil))
@@ -84,7 +84,7 @@ func HmacSHA1(str string, key string) string{
 }
 
 //HMACSHA256
-func HMACSHA256(data []byte,key []byte) []byte {
+func HMACSHA256(data []byte, key []byte) []byte {
 	hash := hmac.New(sha256.New, key)
 	hash.Write(data)
 	return hash.Sum(nil)
@@ -261,6 +261,27 @@ func DesEncryptCBC(src, key string) string {
 	return fmt.Sprintf("%X", out)
 }
 
+//CBC加密
+//参数src:要加密的数据
+//参数key:密钥,长度必须是8位数不能超过
+//返回值:加密后的数据
+func DesEncryptCBCByte(src []byte, key string) []byte {
+	data := src
+	keyByte := []byte(key)
+	block, err := des.NewCipher(keyByte)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	data = PKCS5Padding(data, block.BlockSize())
+	//获取CBC加密模式
+	iv := keyByte //用密钥作为向量(不建议这样使用)
+	mode := cipher.NewCBCEncrypter(block, iv)
+	out := make([]byte, len(data))
+	mode.CryptBlocks(out, data)
+	return out
+}
+
 //CBC解密
 //参数src:要解密的数据
 //参数key:密钥,长度必须是8位数不能超过
@@ -283,6 +304,32 @@ func DesDecryptCBC(src, key string) string {
 	mode.CryptBlocks(plaintext, data)
 	plaintext = PKCS5UnPadding(plaintext)
 	return string(plaintext)
+}
+
+//CBC解密
+//参数src:要解密的数据
+//参数key:密钥,长度必须是8位数不能超过
+//返回值:解密后的数据
+func DesDecryptCBCByte(src []byte, key string) []byte {
+	keyByte := []byte(key)
+	data:=src
+	n, err := hex.Decode(data,src)
+	if err != nil {
+		//fmt.Println("加密报错DesDecryptCBC:", err.Error())
+		return nil
+	}
+	data=data[:n]
+	block, err := des.NewCipher(keyByte)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	iv := keyByte //用密钥作为向量(不建议这样使用)
+	mode := cipher.NewCBCDecrypter(block, iv)
+	plaintext := make([]byte, len(data))
+	mode.CryptBlocks(plaintext, data)
+	plaintext = PKCS5UnPadding(plaintext)
+	return plaintext
 }
 
 //ECB加密
@@ -316,6 +363,38 @@ func DesEncryptECB(src, key string) string {
 	return fmt.Sprintf("%X", out)
 }
 
+
+//ECB加密
+//参数src:要加密的数据
+//参数key:密钥,长度必须是8位数不能超过
+//返回值:加密后的数据
+func DesEncryptECBByte(src []byte, key string) []byte {
+	data := src
+	keyByte := []byte(key)
+	block, err := des.NewCipher(keyByte)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	bs := block.BlockSize()
+	//对明文数据进行补码
+	data = PKCS5Padding(data, bs)
+	if len(data)%bs != 0 {
+		fmt.Println("Need a multiple of the blocksize")
+		return nil
+	}
+	out := make([]byte, len(data))
+	dst := out
+	for len(data) > 0 {
+		//对明文按照blocksize进行分块加密
+		//必要时可以使用go关键字进行并行加密
+		block.Encrypt(dst, data[:bs])
+		data = data[bs:]
+		dst = dst[bs:]
+	}
+	return out
+}
+
 //ECB解密
 //参数src:要解密的数据
 //参数key:密钥,长度必须是8位数不能超过
@@ -347,6 +426,38 @@ func DesDecryptECB(src, key string) string {
 	out = PKCS5UnPadding(out)
 	return string(out)
 }
+//ECB解密
+//参数src:要解密的数据
+//参数key:密钥,长度必须是8位数不能超过
+//返回值:解密后的数据
+func DesDecryptECBByte(src []byte, key string) []byte {
+	data, err := hex.DecodeString(string(src))
+	if err != nil {
+		fmt.Println("加密报错DesDecryptECB:", err.Error())
+		return nil
+	}
+	keyByte := []byte(key)
+	block, err := des.NewCipher(keyByte)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	bs := block.BlockSize()
+	if len(data)%bs != 0 {
+		fmt.Println("crypto/cipher: input not full blocks")
+		return nil
+	}
+	out := make([]byte, len(data))
+	dst := out
+	for len(data) > 0 {
+		block.Decrypt(dst, data[:bs])
+		data = data[bs:]
+		dst = dst[bs:]
+	}
+	out = PKCS5UnPadding(out)
+	return out
+}
+
 
 //明文补码算法
 func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
