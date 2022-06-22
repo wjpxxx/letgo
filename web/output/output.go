@@ -3,6 +3,7 @@ package output
 import (
 	"github.com/wjpxxx/letgo/lib"
 	"github.com/wjpxxx/letgo/web/binding"
+	"github.com/wjpxxx/letgo/web/headerlock"
 	"github.com/wjpxxx/letgo/web/input"
 	//"github.com/wjpxxx/letgo/log"
 	"html/template"
@@ -28,7 +29,9 @@ func (o *Output) Init(writer http.ResponseWriter, in *input.Input, templ *templa
 //Header 设置头
 func (o *Output) Header(key, value string) {
 	if o != nil && o.writer != nil && o.writer.Header() != nil {
+		headerlock.HeaderMapMutex.Lock()
 		o.writer.Header().Set(key, value)
+		headerlock.HeaderMapMutex.Unlock()
 	}
 
 }
