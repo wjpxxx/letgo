@@ -6,6 +6,7 @@ import (
 	"github.com/wjpxxx/letgo/web/output"
 	"github.com/wjpxxx/letgo/web/session"
 	"github.com/wjpxxx/letgo/web/tmpl"
+	"github.com/wjpxxx/letgo/web/headerlock"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -98,7 +99,10 @@ func (c *Context) Host() string {
 
 //HttpOrigin
 func (c *Context) HttpOrigin() string {
-	return c.Request.Header.Get("Origin")
+	headerlock.HeaderMapMutex.RLock()
+	r:=c.Request.Header.Get("Origin")
+	headerlock.HeaderMapMutex.RUnlock()
+	return r
 }
 //Domain
 func (c *Context)Domain()string{
@@ -139,7 +143,10 @@ func (c *Context) DumpRequest() string {
 
 //GetHeader
 func (c *Context) GetHeader(key string) string {
-	return c.Request.Header.Get(key)
+	headerlock.HeaderMapMutex.RLock()
+	r:= c.Request.Header.Get(key)
+	headerlock.HeaderMapMutex.RUnlock()
+	return r
 }
 
 //NewContext 新建一个上下文
