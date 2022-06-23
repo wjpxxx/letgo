@@ -2,19 +2,21 @@ package context
 
 import (
 	"github.com/wjpxxx/letgo/lib"
+	"github.com/wjpxxx/letgo/web/headerlock"
 	"github.com/wjpxxx/letgo/web/input"
 	"github.com/wjpxxx/letgo/web/output"
 	"github.com/wjpxxx/letgo/web/session"
 	"github.com/wjpxxx/letgo/web/tmpl"
-	"github.com/wjpxxx/letgo/web/headerlock"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"strings"
 	"sync"
 )
+
 //读写操作锁
 var someMapMutex = sync.RWMutex{}
+
 //HandlerFunc 请求处理函数
 type HandlerFunc func(*Context)
 
@@ -100,14 +102,15 @@ func (c *Context) Host() string {
 //HttpOrigin
 func (c *Context) HttpOrigin() string {
 	headerlock.HeaderMapMutex.RLock()
-	r:=c.Request.Header.Get("Origin")
+	r := c.Request.Header.Get("Origin")
 	headerlock.HeaderMapMutex.RUnlock()
 	return r
 }
+
 //Domain
-func (c *Context)Domain()string{
-	domain1:=lib.GetRootDomain(c.HttpOrigin())
-	if domain1!="" && domain1!=c.Host(){
+func (c *Context) Domain() string {
+	domain1 := lib.GetRootDomain(c.HttpOrigin())
+	if domain1 != "" && domain1 != c.Host() {
 		return domain1
 	}
 	return c.Host()
@@ -121,7 +124,9 @@ func (c *Context) Cookie(name string) *lib.Data {
 	if err != nil {
 		return nil
 	}
+	someMapMutex.RLock()
 	val, _ := url.QueryUnescape(cookie.Value)
+	someMapMutex.RUnlock()
 	return &(lib.Data{Value: val})
 }
 
@@ -144,7 +149,7 @@ func (c *Context) DumpRequest() string {
 //GetHeader
 func (c *Context) GetHeader(key string) string {
 	headerlock.HeaderMapMutex.RLock()
-	r:= c.Request.Header.Get(key)
+	r := c.Request.Header.Get(key)
 	headerlock.HeaderMapMutex.RUnlock()
 	return r
 }
