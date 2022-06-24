@@ -14,9 +14,6 @@ import (
 	"sync"
 )
 
-//读写操作锁
-var someMapMutex = sync.RWMutex{}
-
 //HandlerFunc 请求处理函数
 type HandlerFunc func(*Context)
 
@@ -77,9 +74,9 @@ func (c *Context) SetCookies(name, value string, maxAge int, path, domain string
 		HttpOnly: httpOnly,
 	}
 	//log.DebugPrint("设置cookie:%p",&c.Writer)
-	someMapMutex.Lock()
+	headerlock.HeaderMapMutex.Lock()
 	http.SetCookie(c.Writer, &cookie)
-	someMapMutex.Unlock()
+	headerlock.HeaderMapMutex.Unlock()
 }
 
 //SetCookie 设置cookie
@@ -118,15 +115,13 @@ func (c *Context) Domain() string {
 
 //Cookie 获得cookie
 func (c *Context) Cookie(name string) *lib.Data {
-	someMapMutex.RLock()
+	headerlock.HeaderMapMutex.RLock()
 	cookie, err := c.Request.Cookie(name)
-	someMapMutex.RUnlock()
+	headerlock.HeaderMapMutex.RUnlock()
 	if err != nil {
 		return nil
 	}
-	someMapMutex.RLock()
 	val, _ := url.QueryUnescape(cookie.Value)
-	someMapMutex.RUnlock()
 	return &(lib.Data{Value: val})
 }
 
