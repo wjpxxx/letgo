@@ -11,7 +11,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"strings"
-	"sync"
 )
 
 //HandlerFunc 请求处理函数
