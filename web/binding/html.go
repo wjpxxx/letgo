@@ -3,6 +3,7 @@ package binding
 import (
 	"html/template"
 	"net/http"
+	"github.com/wjpxxx/letgo/web/headerlock"
 )
 
 //HTML
@@ -21,7 +22,9 @@ func NewHTML(name string,template *template.Template) Rendering{
 //Render
 func(h HTML)Render(code int,w http.ResponseWriter,value interface{})error{
 	writeContentType(w,[]string{"text/html; charset=utf-8"})
+	headerlock.HeaderMapMutex.RLock()
 	w.WriteHeader(code)
+	headerlock.HeaderMapMutex.RUnlock()
 	if h.Name==""{
 		return h.Template.Execute(w,value)
 	}

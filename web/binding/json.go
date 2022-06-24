@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"bytes"
+	"github.com/wjpxxx/letgo/web/headerlock"
 )
 
 //jsonBinding
@@ -27,7 +28,9 @@ func(jsonBinding)Bind(req *http.Request,body []byte,value interface{}) error{
 //Render
 func(jsonBinding)Render(code int,w http.ResponseWriter,value interface{})error{
 	writeContentType(w,[]string{"application/json; charset=utf-8"})
+	headerlock.HeaderMapMutex.RLock()
 	w.WriteHeader(code)
+	headerlock.HeaderMapMutex.RUnlock()
 	jsonData,err:=json.Marshal(value)
 	if err!=nil{
 		return err
@@ -42,7 +45,9 @@ type jsonpBinding struct{}
 //Render
 func(jsonpBinding)Render(code int,w http.ResponseWriter,value interface{})error{
 	writeContentType(w,[]string{"application/javascript; charset=utf-8"})
+	headerlock.HeaderMapMutex.RLock()
 	w.WriteHeader(code)
+	headerlock.HeaderMapMutex.RUnlock()
 	jsonData,err:=json.Marshal(value)
 	if err!=nil{
 		return err

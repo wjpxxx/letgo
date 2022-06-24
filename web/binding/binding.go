@@ -64,8 +64,8 @@ func NewRender(contentType string)Rendering{
 }
 //writeContentType
 func writeContentType(w http.ResponseWriter, value []string) {
-	header:=w.Header()
 	headerlock.HeaderMapMutex.RLock()
+	header:=w.Header()
 	if v:=header["Content-Type"];len(v)==0{
 		header["Content-Type"] = value
 	}
