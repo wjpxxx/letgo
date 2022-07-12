@@ -28,12 +28,11 @@ func (o *Output) Init(writer http.ResponseWriter, in *input.Input, templ *templa
 
 //Header 设置头
 func (o *Output) Header(key, value string) {
+	headerlock.HeaderMapMutex.Lock()
 	if o != nil && o.writer != nil && o.writer.Header() != nil {
-		headerlock.HeaderMapMutex.Lock()
 		o.writer.Header().Set(key, value)
-		headerlock.HeaderMapMutex.Unlock()
 	}
-
+	headerlock.HeaderMapMutex.Unlock()
 }
 
 //JSON
